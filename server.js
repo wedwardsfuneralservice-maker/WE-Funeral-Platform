@@ -20,7 +20,7 @@ function safeReadJSON(filePath, fallback) {
   try {
     if (!fs.existsSync(filePath)) return fallback;
     const raw = fs.readFileSync(filePath, "utf8");
-    if (!raw.trim()) return fallback;        // <-- FIX: no crash on empty file
+    if (!raw.trim()) return fallback; // prevents crashes on empty file
     return JSON.parse(raw);
   } catch (e) {
     console.error("JSON read error:", filePath, e);
@@ -46,9 +46,19 @@ function saveMemorials(data) {
   fs.writeFileSync(memorialsFile, JSON.stringify(data, null, 2));
 }
 
+// --------------------------------------------------
+// ROUTES
+// --------------------------------------------------
+
 // ---------- HOME PAGE ----------
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// ---------- GET ALL TENANTS (THIS WAS MISSING!) ----------
+app.get("/api/tenants", (req, res) => {
+  const tenants = loadTenants();
+  res.json(tenants);
 });
 
 // ---------- TENANT HOME PAGE ----------
@@ -56,7 +66,7 @@ app.get("/t/:slug", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "tenant-home.html"));
 });
 
-// ---------- RETURN TENANT DATA ----------
+// ---------- RETURN SINGLE TENANT DATA ----------
 app.get("/api/tenant/:slug", (req, res) => {
   const tenants = loadTenants();
   const tenant = tenants.find(t => t.slug === req.params.slug);
@@ -122,18 +132,20 @@ app.post("/api/memorials/add", (req, res) => {
   res.json({ success: true, memorial: newMemorial });
 });
 
-// ---------- CATCH-ALL (IMPORTANT: LAST ROUTE) ----------
+// ---------- CATCH-ALL ----------
 app.get("*", (req, res) => {
-  // Prevent blocking admin and api routes
-  if (req.originalUrl.startsWith("/api")) return res.status(404).json({ error: "Not found" });
-  if (req.originalUrl.startsWith("/admin")) return res.sendFile(path.join(__dirname, "admin", "admin-login.html"));
+  // Do not block API and admin routes
+  if (req.originalUrl.startsWith("/api"))
+    return res.status(404).json({ error: "Not found" });
+
+  if (req.originalUrl.startsWith("/admin"))
+    return res.sendFile(path.join(__dirname, "admin", "admin-login.html"));
 
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // ---------- START SERVER ----------
 const PORT = process.env.PORT || 10000;
-
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
