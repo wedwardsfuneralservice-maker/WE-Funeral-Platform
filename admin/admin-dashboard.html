@@ -8,6 +8,7 @@
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100">
   <div class="min-h-screen flex">
+    <!-- SIDEBAR -->
     <aside class="w-60 bg-slate-950 border-r border-slate-900 flex flex-col">
       <div class="px-4 py-4 border-b border-slate-900">
         <div class="flex items-center space-x-2">
@@ -43,9 +44,11 @@
       </div>
     </aside>
 
+    <!-- MAIN -->
     <main class="flex-1">
+      <!-- TOP BAR -->
       <header class="border-b border-slate-900 bg-slate-950/80 backdrop-blur">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
             <h1 id="pageTitle" class="text-sm font-semibold text-slate-50">Overview</h1>
             <p class="text-[0.7rem] text-slate-400">Multi-tenant funeral admin console</p>
@@ -56,17 +59,18 @@
         </div>
       </header>
 
-      <section id="page-overview" class="max-w-5xl mx-auto px-4 py-6 text-xs">
+      <!-- OVERVIEW PAGE -->
+      <section id="page-overview" class="max-w-6xl mx-auto px-4 py-6 text-xs">
         <div class="grid gap-3 sm:grid-cols-3 mb-4">
-          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3">
+          <div class="card">
             <div class="text-[0.65rem] text-slate-400 uppercase tracking-wide mb-1">Memorials</div>
             <div id="statMemorials" class="text-xl font-semibold">0</div>
           </div>
-          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3">
+          <div class="card">
             <div class="text-[0.65rem] text-slate-400 uppercase tracking-wide mb-1">Appointments</div>
             <div id="statAppointments" class="text-xl font-semibold">0</div>
           </div>
-          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3">
+          <div class="card">
             <div class="text-[0.65rem] text-slate-400 uppercase tracking-wide mb-1">Invoices</div>
             <div id="statInvoices" class="text-xl font-semibold">0</div>
           </div>
@@ -76,25 +80,136 @@
         </p>
       </section>
 
-      <section id="page-memorials" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
-        <h2 class="text-sm font-semibold text-slate-50 mb-3">Memorials</h2>
-        <form id="memorialForm" class="grid gap-3 sm:grid-cols-2 mb-4">
-          <input name="fullName" placeholder="Full name" class="input" required />
-          <input name="summary" placeholder="Short summary" class="input sm:col-span-2" />
-          <input name="dob" placeholder="Date of birth" class="input" />
-          <input name="dod" placeholder="Date of death" class="input" />
-          <input name="serviceDate" placeholder="Service date" class="input" />
-          <input name="serviceTime" placeholder="Service time" class="input" />
-          <input name="serviceLocation" placeholder="Service location" class="input sm:col-span-2" />
-          <input type="file" name="photo" class="text-[0.7rem] text-slate-300 sm:col-span-2" />
-          <button class="sm:col-span-2 px-3 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-medium hover:bg-amber-300">
-            Add memorial
-          </button>
-        </form>
-        <div id="memorialList" class="space-y-2"></div>
+      <!-- MEMORIALS PAGE (NEW CARD LAYOUT) -->
+      <section id="page-memorials" class="max-w-6xl mx-auto px-4 py-6 text-xs hidden">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-slate-50">Memorials</h2>
+          <p class="text-[0.7rem] text-slate-400">Create and manage online memorials for this funeral home.</p>
+        </div>
+
+        <!-- Add Memorial card -->
+        <div class="card mb-6">
+          <h3 class="text-[0.75rem] font-semibold text-slate-100 mb-3">Add new memorial</h3>
+          <form id="memorialForm" class="space-y-4">
+            <!-- Personal section -->
+            <div class="grid gap-3 md:grid-cols-2">
+              <div class="md:col-span-2">
+                <label class="label">Full name</label>
+                <input name="fullName" class="input" required />
+              </div>
+              <div>
+                <label class="label">Date of birth</label>
+                <input name="dob" class="input" placeholder="YYYY-MM-DD" />
+              </div>
+              <div>
+                <label class="label">Date of death</label>
+                <input name="dod" class="input" placeholder="YYYY-MM-DD" />
+              </div>
+            </div>
+
+            <!-- Obituary / Summary -->
+            <div class="grid gap-3 md:grid-cols-[2fr,1fr]">
+              <div>
+                <label class="label">Obituary / life story</label>
+                <textarea name="obituary" rows="4" class="input resize-y" placeholder="Write the obituary or life story here..."></textarea>
+              </div>
+              <div>
+                <label class="label">Short summary (optional)</label>
+                <textarea name="summary" rows="4" class="input resize-y" placeholder="For preview cards on the website."></textarea>
+              </div>
+            </div>
+
+            <!-- Viewing + Service -->
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="space-y-3">
+                <p class="section-heading">Viewing</p>
+                <div class="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <label class="label">Viewing date</label>
+                    <input name="viewingDate" class="input" placeholder="YYYY-MM-DD" />
+                  </div>
+                  <div>
+                    <label class="label">Viewing time</label>
+                    <input name="viewingTime" class="input" placeholder="e.g. 4:00 PM" />
+                  </div>
+                </div>
+                <div>
+                  <label class="label">Viewing location</label>
+                  <input name="viewingLocation" class="input" placeholder="Funeral home / chapel" />
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <p class="section-heading">Funeral service</p>
+                <div class="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <label class="label">Service date</label>
+                    <input name="serviceDate" class="input" placeholder="YYYY-MM-DD" />
+                  </div>
+                  <div>
+                    <label class="label">Service time</label>
+                    <input name="serviceTime" class="input" placeholder="e.g. 10:00 AM" />
+                  </div>
+                </div>
+                <div>
+                  <label class="label">Service location</label>
+                  <input name="serviceLocation" class="input" placeholder="Church / chapel" />
+                </div>
+                <div>
+                  <label class="label">Livestream link (optional)</label>
+                  <input name="livestreamLink" class="input" placeholder="YouTube / Facebook / Zoom URL" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Burial + Photo -->
+            <div class="grid gap-4 md:grid-cols-[2fr,1fr]">
+              <div class="space-y-3">
+                <p class="section-heading">Burial / interment</p>
+                <div class="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <label class="label">Burial date</label>
+                    <input name="burialDate" class="input" placeholder="YYYY-MM-DD (optional)" />
+                  </div>
+                  <div>
+                    <label class="label">Burial time</label>
+                    <input name="burialTime" class="input" placeholder="e.g. 2:00 PM (optional)" />
+                  </div>
+                </div>
+                <div>
+                  <label class="label">Place of burial</label>
+                  <input name="burialPlace" class="input" placeholder="Cemetery / burial ground" />
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <p class="section-heading">Main photo</p>
+                <p class="text-[0.7rem] text-slate-400">
+                  Upload the primary portrait for this memorial (JPG or PNG). This will appear on the public memorial card.
+                </p>
+                <input type="file" name="photo" class="text-[0.7rem] text-slate-300" />
+              </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+              <button
+                class="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-semibold hover:bg-amber-300 transition">
+                Save memorial
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Existing memorials -->
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[0.8rem] font-semibold text-slate-100">Existing memorials</h3>
+          <span id="memorialCountLabel" class="text-[0.7rem] text-slate-400"></span>
+        </div>
+        <div id="memorialList" class="grid gap-3 md:grid-cols-2"></div>
       </section>
 
-      <section id="page-pdf" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+      <!-- PDF PAGE -->
+      <section id="page-pdf" class="max-w-6xl mx-auto px-4 py-6 text-xs hidden">
         <h2 class="text-sm font-semibold text-slate-50 mb-3">PDF Auto-fill (Funeral Form)</h2>
         <p class="text-[0.7rem] text-slate-400 mb-3">
           This starter takes basic funeral form data and generates a simple PDF summary
@@ -113,7 +228,8 @@
         <div id="pdfResult" class="text-[0.7rem] text-slate-300"></div>
       </section>
 
-      <section id="page-scheduler" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+      <!-- SCHEDULER PAGE -->
+      <section id="page-scheduler" class="max-w-6xl mx-auto px-4 py-6 text-xs hidden">
         <h2 class="text-sm font-semibold text-slate-50 mb-3">Appointment Scheduler (Starter)</h2>
         <form id="apptForm" class="grid gap-3 sm:grid-cols-2 mb-4">
           <input name="title" placeholder="Meeting type (Arrangement, Follow-up…)" class="input sm:col-span-2" />
@@ -129,7 +245,8 @@
         <div id="apptList" class="space-y-2"></div>
       </section>
 
-      <section id="page-accounting" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+      <!-- ACCOUNTING PAGE -->
+      <section id="page-accounting" class="max-w-6xl mx-auto px-4 py-6 text-xs hidden">
         <h2 class="text-sm font-semibold text-slate-50 mb-3">Accounting (Starter)</h2>
         <form id="invoiceForm" class="grid gap-3 sm:grid-cols-2 mb-4">
           <input name="invoiceNumber" placeholder="Invoice number" class="input" />
@@ -145,14 +262,15 @@
         <div id="invoiceList" class="space-y-2"></div>
       </section>
 
-      <section id="page-designer" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+      <!-- DESIGNER PAGE -->
+      <section id="page-designer" class="max-w-6xl mx-auto px-4 py-6 text-xs hidden">
         <h2 class="text-sm font-semibold text-slate-50 mb-3">Drag &amp; Drop Designer (Starter)</h2>
         <p class="text-[0.7rem] text-slate-400 mb-3">
           This starter gives you a basic drag-and-drop canvas where you can arrange blocks.
           In a future step we can save this layout to JSON and connect it to the live public page.
         </p>
         <div class="grid gap-4 md:grid-cols-[220px,1fr]">
-          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3 space-y-2 text-[0.7rem]">
+          <div class="card space-y-2 text-[0.7rem]">
             <div class="font-semibold text-slate-200 mb-1">Blocks</div>
             <div class="block-pill" draggable="true" data-type="hero">Hero banner</div>
             <div class="block-pill" draggable="true" data-type="memorials">Memorial grid</div>
@@ -168,10 +286,47 @@
 
   <style>
     .input {
-      @apply w-full rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-[0.75rem] text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:border-amber-400/70;
+      width: 100%;
+      border-radius: 0.75rem;
+      background-color: #020617; /* slate-950 */
+      border: 1px solid #1f2937; /* slate-700 */
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      color: #e5e7eb;
+    }
+    .input:focus {
+      outline: none;
+      border-color: #fbbf24;
+      box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.6);
+    }
+    .label {
+      display: block;
+      font-size: 0.7rem;
+      color: #cbd5f5;
+      margin-bottom: 0.15rem;
+    }
+    .section-heading {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+    .card {
+      border-radius: 1.25rem;
+      background-color: #020617;
+      border: 1px solid #1e293b;
+      padding: 1rem;
     }
     .block-pill {
-      @apply px-3 py-2 rounded-xl bg-slate-800 text-slate-100 border border-slate-700 cursor-move hover:bg-slate-700;
+      border-radius: 0.75rem;
+      background-color: #0f172a;
+      border: 1px solid #1f2937;
+      padding: 0.5rem 0.75rem;
+      color: #e5e7eb;
+      font-size: 0.75rem;
+      cursor: move;
+    }
+    .block-pill:hover {
+      background-color: #111827;
     }
   </style>
 
@@ -193,7 +348,6 @@
       window.location.href = "/";
     });
 
-    // Nav
     const navLinks = document.querySelectorAll(".nav-link");
     const pages = {
       overview: document.getElementById("page-overview"),
@@ -211,6 +365,7 @@
       navLinks.forEach(link => {
         if (link.dataset.page === key) {
           link.classList.add("bg-slate-900", "text-amber-200");
+          link.classList.remove("text-slate-300");
         } else {
           link.classList.remove("bg-slate-900", "text-amber-200");
           link.classList.add("text-slate-300");
@@ -227,7 +382,6 @@
 
     document.getElementById("publicLink").href = `/t/${tenantSlug}`;
 
-    // Load overview stats
     async function loadOverview() {
       try {
         const res = await fetch(`/api/${tenantSlug}/admin/overview`);
@@ -240,7 +394,6 @@
       }
     }
 
-    // Tenant name in sidebar
     async function hydrateTenantName() {
       try {
         const res = await fetch("/api/tenants");
@@ -254,31 +407,42 @@
       }
     }
 
-    // Memorials
+    // MEMORIALS
+    const memorialForm = document.getElementById("memorialForm");
+    const memorialListEl = document.getElementById("memorialList");
+    const memorialCountLabel = document.getElementById("memorialCountLabel");
+
     async function loadMemorials() {
       try {
         const res = await fetch(`/api/${tenantSlug}/admin/memorials`);
         const list = await res.json();
-        const container = document.getElementById("memorialList");
         if (!Array.isArray(list) || list.length === 0) {
-          container.innerHTML = '<p class="text-[0.7rem] text-slate-500">No memorials yet.</p>';
+          memorialListEl.innerHTML = '<p class="text-[0.7rem] text-slate-500 col-span-2">No memorials yet.</p>';
+          if (memorialCountLabel) memorialCountLabel.textContent = "0 memorials";
           return;
         }
-        container.innerHTML = list.map(m => `
-          <div class="rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 flex items-center justify-between">
+        if (memorialCountLabel) memorialCountLabel.textContent = `${list.length} memorial${list.length === 1 ? "" : "s"}`;
+
+        memorialListEl.innerHTML = list.map(m => `
+          <article class="card flex flex-col justify-between">
             <div>
-              <div class="text-[0.75rem] text-slate-100">${m.fullName || "Unnamed"}</div>
-              <div class="text-[0.65rem] text-slate-400">${m.serviceDate || ""} · ${m.serviceTime || ""}</div>
+              <div class="flex items-center justify-between mb-1">
+                <h4 class="text-[0.8rem] font-semibold text-slate-100">${m.fullName || "Unnamed"}</h4>
+                <span class="text-[0.65rem] text-slate-500">${m.id}</span>
+              </div>
+              <p class="text-[0.7rem] text-slate-400 mb-1">
+                ${m.serviceDate || ""} ${m.serviceTime ? "· " + m.serviceTime : ""} ${m.serviceLocation ? "· " + m.serviceLocation : ""}
+              </p>
+              ${m.burialPlace ? `<p class="text-[0.7rem] text-slate-400 mb-1">Burial: ${m.burialPlace}</p>` : ""}
+              ${m.livestreamLink ? `<p class="text-[0.7rem] text-amber-300 truncate">Livestream: ${m.livestreamLink}</p>` : ""}
             </div>
-            <div class="text-[0.65rem] text-slate-500">${m.id}</div>
-          </div>
+          </article>
         `).join("");
       } catch (err) {
         console.error(err);
       }
     }
 
-    const memorialForm = document.getElementById("memorialForm");
     memorialForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(memorialForm);
@@ -301,7 +465,7 @@
       }
     });
 
-    // PDF form
+    // PDF
     const pdfForm = document.getElementById("pdfForm");
     const pdfResult = document.getElementById("pdfResult");
     pdfForm.addEventListener("submit", async (e) => {
@@ -337,7 +501,7 @@
           return;
         }
         apptList.innerHTML = list.map(a => `
-          <div class="rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 flex items-center justify-between">
+          <div class="card flex items-center justify-between">
             <div>
               <div class="text-[0.75rem] text-slate-100">${a.title || "Appointment"}</div>
               <div class="text-[0.65rem] text-slate-400">${a.date || ""} · ${a.time || ""}</div>
@@ -385,7 +549,7 @@
           return;
         }
         invoiceList.innerHTML = list.map(inv => `
-          <div class="rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 flex items-center justify-between">
+          <div class="card flex items-center justify-between">
             <div>
               <div class="text-[0.75rem] text-slate-100">${inv.invoiceNumber || "Invoice"}</div>
               <div class="text-[0.65rem] text-slate-400">${inv.clientName || ""}</div>
