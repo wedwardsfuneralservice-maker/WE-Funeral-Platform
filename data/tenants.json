@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "tenant-w-edwards",
+    "slug": "w-edwards",
+    "name": "W. Edwards Funeral Services",
+    "brandColor": "#f5c242",
+    "logo": "/public/assets/we-logo.png",
+    "createdAt": 1764709000000
+  }
+]
