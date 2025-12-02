@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – Funeral Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+  <div class="min-h-screen flex">
+    <aside class="w-60 bg-slate-950 border-r border-slate-900 flex flex-col">
+      <div class="px-4 py-4 border-b border-slate-900">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-rose-500 shadow-md"></div>
+          <div>
+            <div class="text-xs uppercase tracking-[0.25em] text-amber-200/80">W.E Console</div>
+            <div id="tenantName" class="text-xs text-slate-300 truncate">Tenant</div>
+          </div>
+        </div>
+      </div>
+      <nav class="flex-1 px-2 py-3 text-xs space-y-1">
+        <a href="#" data-page="overview" class="nav-link flex items-center px-3 py-2 rounded-xl bg-slate-900 text-amber-200">
+          Overview
+        </a>
+        <a href="#" data-page="memorials" class="nav-link flex items-center px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-900">
+          Memorials
+        </a>
+        <a href="#" data-page="pdf" class="nav-link flex items-center px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-900">
+          PDF Auto-fill
+        </a>
+        <a href="#" data-page="scheduler" class="nav-link flex items-center px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-900">
+          Appointment Scheduler
+        </a>
+        <a href="#" data-page="accounting" class="nav-link flex items-center px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-900">
+          Accounting
+        </a>
+        <a href="#" data-page="designer" class="nav-link flex items-center px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-900">
+          Drag &amp; Drop Designer
+        </a>
+      </nav>
+      <div class="px-4 py-3 border-t border-slate-900 text-[0.7rem] text-slate-500">
+        <button id="logoutBtn" class="underline underline-offset-2">Log out</button>
+      </div>
+    </aside>
+
+    <main class="flex-1">
+      <header class="border-b border-slate-900 bg-slate-950/80 backdrop-blur">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div>
+            <h1 id="pageTitle" class="text-sm font-semibold text-slate-50">Overview</h1>
+            <p class="text-[0.7rem] text-slate-400">Multi-tenant funeral admin console</p>
+          </div>
+          <a id="publicLink" href="#" class="text-[0.7rem] px-3 py-1.5 rounded-full border border-slate-700 text-slate-200 hover:bg-slate-800">
+            View public site
+          </a>
+        </div>
+      </header>
+
+      <section id="page-overview" class="max-w-5xl mx-auto px-4 py-6 text-xs">
+        <div class="grid gap-3 sm:grid-cols-3 mb-4">
+          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3">
+            <div class="text-[0.65rem] text-slate-400 uppercase tracking-wide mb-1">Memorials</div>
+            <div id="statMemorials" class="text-xl font-semibold">0</div>
+          </div>
+          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3">
+            <div class="text-[0.65rem] text-slate-400 uppercase tracking-wide mb-1">Appointments</div>
+            <div id="statAppointments" class="text-xl font-semibold">0</div>
+          </div>
+          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3">
+            <div class="text-[0.65rem] text-slate-400 uppercase tracking-wide mb-1">Invoices</div>
+            <div id="statInvoices" class="text-xl font-semibold">0</div>
+          </div>
+        </div>
+        <p class="text-[0.7rem] text-slate-400">
+          This starter dashboard gives you a high-level view. The other tabs let you manage data for this funeral home.
+        </p>
+      </section>
+
+      <section id="page-memorials" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+        <h2 class="text-sm font-semibold text-slate-50 mb-3">Memorials</h2>
+        <form id="memorialForm" class="grid gap-3 sm:grid-cols-2 mb-4">
+          <input name="fullName" placeholder="Full name" class="input" required />
+          <input name="summary" placeholder="Short summary" class="input sm:col-span-2" />
+          <input name="dob" placeholder="Date of birth" class="input" />
+          <input name="dod" placeholder="Date of death" class="input" />
+          <input name="serviceDate" placeholder="Service date" class="input" />
+          <input name="serviceTime" placeholder="Service time" class="input" />
+          <input name="serviceLocation" placeholder="Service location" class="input sm:col-span-2" />
+          <input type="file" name="photo" class="text-[0.7rem] text-slate-300 sm:col-span-2" />
+          <button class="sm:col-span-2 px-3 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-medium hover:bg-amber-300">
+            Add memorial
+          </button>
+        </form>
+        <div id="memorialList" class="space-y-2"></div>
+      </section>
+
+      <section id="page-pdf" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+        <h2 class="text-sm font-semibold text-slate-50 mb-3">PDF Auto-fill (Funeral Form)</h2>
+        <p class="text-[0.7rem] text-slate-400 mb-3">
+          This starter takes basic funeral form data and generates a simple PDF summary
+          stored in the <code>/uploads/pdf</code> folder.
+        </p>
+        <form id="pdfForm" class="grid gap-3 sm:grid-cols-2 mb-3">
+          <input name="deceasedName" placeholder="Deceased name" class="input" />
+          <input name="refNumber" placeholder="Form reference number" class="input" />
+          <input name="serviceDate" placeholder="Service date" class="input" />
+          <input name="serviceTime" placeholder="Service time" class="input" />
+          <input name="serviceLocation" placeholder="Service location" class="input sm:col-span-2" />
+          <button class="sm:col-span-2 px-3 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-medium hover:bg-amber-300">
+            Generate PDF
+          </button>
+        </form>
+        <div id="pdfResult" class="text-[0.7rem] text-slate-300"></div>
+      </section>
+
+      <section id="page-scheduler" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+        <h2 class="text-sm font-semibold text-slate-50 mb-3">Appointment Scheduler (Starter)</h2>
+        <form id="apptForm" class="grid gap-3 sm:grid-cols-2 mb-4">
+          <input name="title" placeholder="Meeting type (Arrangement, Follow-up…)" class="input sm:col-span-2" />
+          <input name="clientName" placeholder="Client name" class="input" />
+          <input name="date" placeholder="Date" class="input" />
+          <input name="time" placeholder="Time" class="input" />
+          <input name="location" placeholder="Location" class="input sm:col-span-2" />
+          <input name="notes" placeholder="Notes" class="input sm:col-span-2" />
+          <button class="sm:col-span-2 px-3 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-medium hover:bg-amber-300">
+            Add appointment
+          </button>
+        </form>
+        <div id="apptList" class="space-y-2"></div>
+      </section>
+
+      <section id="page-accounting" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+        <h2 class="text-sm font-semibold text-slate-50 mb-3">Accounting (Starter)</h2>
+        <form id="invoiceForm" class="grid gap-3 sm:grid-cols-2 mb-4">
+          <input name="invoiceNumber" placeholder="Invoice number" class="input" />
+          <input name="clientName" placeholder="Client name" class="input" />
+          <input name="amount" type="number" step="0.01" placeholder="Amount" class="input" />
+          <input name="status" placeholder="Status (Unpaid/Paid…)" class="input" />
+          <input name="dueDate" placeholder="Due date" class="input sm:col-span-2" />
+          <input name="notes" placeholder="Notes" class="input sm:col-span-2" />
+          <button class="sm:col-span-2 px-3 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-medium hover:bg-amber-300">
+            Add invoice
+          </button>
+        </form>
+        <div id="invoiceList" class="space-y-2"></div>
+      </section>
+
+      <section id="page-designer" class="max-w-5xl mx-auto px-4 py-6 text-xs hidden">
+        <h2 class="text-sm font-semibold text-slate-50 mb-3">Drag &amp; Drop Designer (Starter)</h2>
+        <p class="text-[0.7rem] text-slate-400 mb-3">
+          This starter gives you a basic drag-and-drop canvas where you can arrange blocks.
+          In a future step we can save this layout to JSON and connect it to the live public page.
+        </p>
+        <div class="grid gap-4 md:grid-cols-[220px,1fr]">
+          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3 space-y-2 text-[0.7rem]">
+            <div class="font-semibold text-slate-200 mb-1">Blocks</div>
+            <div class="block-pill" draggable="true" data-type="hero">Hero banner</div>
+            <div class="block-pill" draggable="true" data-type="memorials">Memorial grid</div>
+            <div class="block-pill" draggable="true" data-type="cta">Call to action</div>
+          </div>
+          <div id="designerCanvas" class="rounded-2xl bg-slate-900 border border-dashed border-slate-700 p-4 text-[0.75rem] min-h-[220px]">
+            <p class="text-slate-500 mb-2">Drag blocks here to design your home page layout.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <style>
+    .input {
+      @apply w-full rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-[0.75rem] text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:border-amber-400/70;
+    }
+    .block-pill {
+      @apply px-3 py-2 rounded-xl bg-slate-800 text-slate-100 border border-slate-700 cursor-move hover:bg-slate-700;
+    }
+  </style>
+
+  <script>
+    function getTenantFromQuery() {
+      const url = new URL(window.location.href);
+      return url.searchParams.get("tenant") || localStorage.getItem("we_admin_tenant") || "w-edwards";
+    }
+
+    const tenantSlug = getTenantFromQuery();
+
+    if (localStorage.getItem("we_admin_logged_in") !== "true") {
+      window.location.href = `/admin/admin-login.html?tenant=${encodeURIComponent(tenantSlug)}`;
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("we_admin_logged_in");
+      localStorage.removeItem("we_admin_tenant");
+      window.location.href = "/";
+    });
+
+    // Nav
+    const navLinks = document.querySelectorAll(".nav-link");
+    const pages = {
+      overview: document.getElementById("page-overview"),
+      memorials: document.getElementById("page-memorials"),
+      pdf: document.getElementById("page-pdf"),
+      scheduler: document.getElementById("page-scheduler"),
+      accounting: document.getElementById("page-accounting"),
+      designer: document.getElementById("page-designer"),
+    };
+
+    function showPage(key) {
+      Object.values(pages).forEach(sec => sec.classList.add("hidden"));
+      pages[key].classList.remove("hidden");
+      document.getElementById("pageTitle").textContent = key.charAt(0).toUpperCase() + key.slice(1);
+      navLinks.forEach(link => {
+        if (link.dataset.page === key) {
+          link.classList.add("bg-slate-900", "text-amber-200");
+        } else {
+          link.classList.remove("bg-slate-900", "text-amber-200");
+          link.classList.add("text-slate-300");
+        }
+      });
+    }
+
+    navLinks.forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        showPage(link.dataset.page);
+      });
+    });
+
+    document.getElementById("publicLink").href = `/t/${tenantSlug}`;
+
+    // Load overview stats
+    async function loadOverview() {
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/overview`);
+        const data = await res.json();
+        document.getElementById("statMemorials").textContent = data.memorialCount ?? 0;
+        document.getElementById("statAppointments").textContent = data.appointmentCount ?? 0;
+        document.getElementById("statInvoices").textContent = data.invoiceCount ?? 0;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Tenant name in sidebar
+    async function hydrateTenantName() {
+      try {
+        const res = await fetch("/api/tenants");
+        const tenants = await res.json();
+        const t = tenants.find(x => x.slug === tenantSlug);
+        if (!t) return;
+        const el = document.getElementById("tenantName");
+        if (el) el.textContent = t.name;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Memorials
+    async function loadMemorials() {
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/memorials`);
+        const list = await res.json();
+        const container = document.getElementById("memorialList");
+        if (!Array.isArray(list) || list.length === 0) {
+          container.innerHTML = '<p class="text-[0.7rem] text-slate-500">No memorials yet.</p>';
+          return;
+        }
+        container.innerHTML = list.map(m => `
+          <div class="rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 flex items-center justify-between">
+            <div>
+              <div class="text-[0.75rem] text-slate-100">${m.fullName || "Unnamed"}</div>
+              <div class="text-[0.65rem] text-slate-400">${m.serviceDate || ""} · ${m.serviceTime || ""}</div>
+            </div>
+            <div class="text-[0.65rem] text-slate-500">${m.id}</div>
+          </div>
+        `).join("");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    const memorialForm = document.getElementById("memorialForm");
+    memorialForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(memorialForm);
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/memorials`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to save memorial");
+          return;
+        }
+        memorialForm.reset();
+        await loadMemorials();
+        await loadOverview();
+      } catch (err) {
+        console.error(err);
+        alert("Network error");
+      }
+    });
+
+    // PDF form
+    const pdfForm = document.getElementById("pdfForm");
+    const pdfResult = document.getElementById("pdfResult");
+    pdfForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = Object.fromEntries(new FormData(pdfForm).entries());
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/pdf/from-form`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pdfResult.textContent = data.error || "Failed to generate PDF.";
+          return;
+        }
+        pdfResult.innerHTML = `PDF generated: <a class="text-amber-300 underline" href="${data.url}" target="_blank">Download</a>`;
+      } catch (err) {
+        console.error(err);
+        pdfResult.textContent = "Network error.";
+      }
+    });
+
+    // Scheduler
+    const apptForm = document.getElementById("apptForm");
+    const apptList = document.getElementById("apptList");
+    async function loadAppointments() {
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/appointments`);
+        const list = await res.json();
+        if (!Array.isArray(list) || list.length === 0) {
+          apptList.innerHTML = '<p class="text-[0.7rem] text-slate-500">No appointments yet.</p>';
+          return;
+        }
+        apptList.innerHTML = list.map(a => `
+          <div class="rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 flex items-center justify-between">
+            <div>
+              <div class="text-[0.75rem] text-slate-100">${a.title || "Appointment"}</div>
+              <div class="text-[0.65rem] text-slate-400">${a.date || ""} · ${a.time || ""}</div>
+              <div class="text-[0.65rem] text-slate-500">${a.clientName || ""}</div>
+            </div>
+          </div>
+        `).join("");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    apptForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = Object.fromEntries(new FormData(apptForm).entries());
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/appointments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to save appointment");
+          return;
+        }
+        apptForm.reset();
+        await loadAppointments();
+        await loadOverview();
+      } catch (err) {
+        console.error(err);
+        alert("Network error");
+      }
+    });
+
+    // Accounting
+    const invoiceForm = document.getElementById("invoiceForm");
+    const invoiceList = document.getElementById("invoiceList");
+    async function loadInvoices() {
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/accounting/invoices`);
+        const list = await res.json();
+        if (!Array.isArray(list) || list.length === 0) {
+          invoiceList.innerHTML = '<p class="text-[0.7rem] text-slate-500">No invoices yet.</p>';
+          return;
+        }
+        invoiceList.innerHTML = list.map(inv => `
+          <div class="rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 flex items-center justify-between">
+            <div>
+              <div class="text-[0.75rem] text-slate-100">${inv.invoiceNumber || "Invoice"}</div>
+              <div class="text-[0.65rem] text-slate-400">${inv.clientName || ""}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-[0.75rem] text-slate-100">$${inv.amount?.toFixed ? inv.amount.toFixed(2) : inv.amount}</div>
+              <div class="text-[0.65rem] text-slate-400">${inv.status || ""}</div>
+            </div>
+          </div>
+        `).join("");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    invoiceForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = Object.fromEntries(new FormData(invoiceForm).entries());
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/accounting/invoices`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to save invoice");
+          return;
+        }
+        invoiceForm.reset();
+        await loadInvoices();
+        await loadOverview();
+      } catch (err) {
+        console.error(err);
+        alert("Network error");
+      }
+    });
+
+    // Designer drag-and-drop
+    const blocks = document.querySelectorAll(".block-pill");
+    const canvas = document.getElementById("designerCanvas");
+    blocks.forEach(block => {
+      block.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", block.dataset.type);
+      });
+    });
+    canvas.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      canvas.classList.add("border-amber-400");
+    });
+    canvas.addEventListener("dragleave", () => {
+      canvas.classList.remove("border-amber-400");
+    });
+    canvas.addEventListener("drop", (e) => {
+      e.preventDefault();
+      canvas.classList.remove("border-amber-400");
+      const type = e.dataTransfer.getData("text/plain");
+      const div = document.createElement("div");
+      div.className = "rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 mb-2";
+      div.textContent = "Block: " + type;
+      canvas.appendChild(div);
+    });
+
+    // Init
+    showPage("overview");
+    loadOverview();
+    hydrateTenantName();
+    loadMemorials();
+    loadAppointments();
+    loadInvoices();
+  </script>
+</body>
+</html>

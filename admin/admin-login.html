@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login – Funeral Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+  <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl shadow-black/50">
+    <h1 class="text-lg font-semibold text-slate-50 mb-1">Admin console login</h1>
+    <p class="text-xs text-slate-400 mb-4">
+      This is a starter login. Enter any admin key to continue for the selected funeral home.
+    </p>
+    <div class="text-[0.7rem] text-slate-400 mb-3">
+      Tenant: <span id="tenantLabel" class="font-mono">w-edwards</span>
+    </div>
+    <form id="loginForm" class="space-y-3">
+      <div>
+        <label class="block text-xs mb-1 text-slate-300">Admin key</label>
+        <input
+          type="password"
+          name="adminKey"
+          class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:border-amber-400/70"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full rounded-xl bg-amber-400 text-slate-950 text-sm font-medium py-2 hover:bg-amber-300 transition"
+      >
+        Enter admin console
+      </button>
+    </form>
+  </div>
+
+  <script>
+    function getTenantFromQuery() {
+      const url = new URL(window.location.href);
+      return url.searchParams.get("tenant") || "w-edwards";
+    }
+    const tenantSlug = getTenantFromQuery();
+    document.getElementById("tenantLabel").textContent = tenantSlug;
+
+    const form = document.getElementById("loginForm");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const adminKey = formData.get("adminKey");
+      try {
+        const res = await fetch(`/api/${tenantSlug}/admin/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminKey })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Login failed");
+          return;
+        }
+        // Store basic session in localStorage
+        localStorage.setItem("we_admin_logged_in", "true");
+        localStorage.setItem("we_admin_tenant", tenantSlug);
+        window.location.href = `/admin/admin-dashboard.html?tenant=${encodeURIComponent(tenantSlug)}`;
+      } catch (err) {
+        console.error(err);
+        alert("Network error");
+      }
+    });
+  </script>
+</body>
+</html>
