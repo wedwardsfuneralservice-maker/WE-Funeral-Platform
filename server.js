@@ -20,6 +20,7 @@ function safeReadJSON(filePath, fallback) {
   try {
     if (!fs.existsSync(filePath)) return fallback;
     const raw = fs.readFileSync(filePath, "utf8");
+    if (!raw.trim()) return fallback;        // <-- FIX: no crash on empty file
     return JSON.parse(raw);
   } catch (e) {
     console.error("JSON read error:", filePath, e);
@@ -89,7 +90,16 @@ app.get("/api/memorials/:slug", (req, res) => {
 
 // ---------- ADD MEMORIAL ----------
 app.post("/api/memorials/add", (req, res) => {
-  const { tenant, fullName, summary, dateOfBirth, dateOfDeath, serviceDate, serviceTime, serviceLocation } = req.body;
+  const {
+    tenant,
+    fullName,
+    summary,
+    dateOfBirth,
+    dateOfDeath,
+    serviceDate,
+    serviceTime,
+    serviceLocation
+  } = req.body;
 
   const data = loadMemorials();
 
@@ -112,8 +122,12 @@ app.post("/api/memorials/add", (req, res) => {
   res.json({ success: true, memorial: newMemorial });
 });
 
-// ---------- CATCH-ALL ----------
+// ---------- CATCH-ALL (IMPORTANT: LAST ROUTE) ----------
 app.get("*", (req, res) => {
+  // Prevent blocking admin and api routes
+  if (req.originalUrl.startsWith("/api")) return res.status(404).json({ error: "Not found" });
+  if (req.originalUrl.startsWith("/admin")) return res.sendFile(path.join(__dirname, "admin", "admin-login.html"));
+
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
