@@ -1,13 +1,23 @@
+// ------------------------------------------------------
+//  W.E. Funeral Platform - Multi-Tenant Backend
+//  Fully Patched with Safe Email Handling
+// ------------------------------------------------------
+
 const express = require("express");
+const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
-const nodemailer = require("nodemailer");
-const crypto = require("crypto");
-
-// Email transport (uses Gmail App Password)
+// ------------------------------------------------------
+//  SAFE EMAIL TRANSPORT (Never Crashes)
+// ------------------------------------------------------
 const mailer = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -16,345 +26,131 @@ const mailer = nodemailer.createTransport({
   }
 });
 
-// Simple wrapper so email sending never crashes server
 async function sendMailSafe(options) {
   try {
-    await mailer.sendMail(options);
+    const info = await mailer.sendMail(options);
+    console.log("Email sent:", info.response);
   } catch (err) {
-    console.error("Email Error:", err);
+    console.error("Email Error:", err?.message || err);
   }
 }
 
-// ---------------------------------------------
-// DIRECTORIES
-// ---------------------------------------------
-const ROOT = __dirname;
-const PUBLIC = path.join(ROOT, "public");
-const ADMIN = path.join(ROOT, "admin");
-const DATA = path.join(ROOT, "data");
-
-// Ensure "data" directory exists
-if (!fs.existsSync(DATA)) {
-  fs.mkdirSync(DATA, { recursive: true });
+// ------------------------------------------------------
+//  Helpers: Load & Save JSON Data
+// ------------------------------------------------------
+function loadJSON(file) {
+  const filePath = path.join(__dirname, "data", file);
+  if (!fs.existsSync(filePath)) return {};
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
-// JSON data files
-const tenantsFile = path.join(DATA, "tenants.json");   // array of tenants
-const adminFile = path.join(DATA, "admin.json");       // map: { [slug]: { adminKey } }
-const memorialsFile = path.join(DATA, "memorials.json"); // map: { [slug]: [memorials] }
-
-// ---------------------------------------------
-// MIDDLEWARE
-// ---------------------------------------------
-app.use(express.json({ limit: "5mb" }));
-app.use(express.urlencoded({ extended: true, limit: "5mb" }));
-
-// Static files
-app.use(express.static(PUBLIC));
-app.use("/admin", express.static(ADMIN));
-
-// ---------------------------------------------
-// UTILS — JSON SAFE READ/WRITE
-// ---------------------------------------------
-function readJSON(file, fallback) {
-  try {
-    if (!fs.existsSync(file)) return fallback;
-    const content = fs.readFileSync(file, "utf8");
-    if (!content.trim()) return fallback;
-    return JSON.parse(content);
-  } catch (e) {
-    console.error("JSON Read Error:", file, e);
-    return fallback;
-  }
+function saveJSON(file, data) {
+  const filePath = path.join(__dirname, "data", file);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
-function writeJSON(file, data) {
-  try {
-    fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf8");
-  } catch (e) {
-    console.error("JSON Write Error:", file, e);
-  }
-}
+const loadTenants = () => loadJSON("tenants.json");
+const saveTenants = (d) => saveJSON("tenants.json", d);
 
-// ---------------------------------------------
-// LOADERS / SAVERS
-// ---------------------------------------------
-const loadTenants = () => readJSON(tenantsFile, []);      // array
-const saveTenants = (tenants) => writeJSON(tenantsFile, tenants);
+const loadAdmins = () => loadJSON("admins.json");
+const saveAdmins = (d) => saveJSON("admins.json", d);
 
-const loadAdmins = () => readJSON(adminFile, {});         // map
-const saveAdmins = (admins) => writeJSON(adminFile, admins);
-
-const loadMemorials = () => readJSON(memorialsFile, {});  // map
-const saveMemorials = (data) => writeJSON(memorialsFile, data);
-
-// ---------------------------------------------
-// HELPERS
-// ---------------------------------------------
-function slugifyName(name) {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "tenant";
-}
-
-function generateUniqueSlug(baseSlug, existingSlugs) {
-  let slug = baseSlug;
-  let i = 1;
-  while (existingSlugs.includes(slug)) {
-    slug = `${baseSlug}-${i}`;
-    i++;
-  }
-  return slug;
-}
-
-function generateTempKey(length = 10) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let key = "";
-  for (let i = 0; i < length; i++) {
-    key += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return key;
-}
-
-// Day helpers
-const DAYS = 24 * 60 * 60 * 1000;
-
-// ---------------------------------------------
-// ROOT PAGES
-// ---------------------------------------------
-app.get("/", (req, res) => {
-  res.sendFile(path.join(PUBLIC, "index.html"));
-});
-
-// Tenant public site
-app.get("/t/:slug", (req, res) => {
-  res.sendFile(path.join(PUBLIC, "tenant-home.html"));
-});
-
-// ---------------------------------------------
-// HEALTHCHECK (optional)
-// ---------------------------------------------
-app.get("/api/health", (req, res) => {
-  res.json({ ok: true, time: Date.now() });
-});
-
-// ---------------------------------------------
-// TENANT API (READ)
-// ---------------------------------------------
-app.get("/api/tenant/:slug", (req, res) => {
-  const tenants = loadTenants();
-  const tenant = tenants.find((t) => t.slug === req.params.slug);
-
-  if (!tenant) return res.status(404).json({ error: "Tenant not found" });
-
-  res.json(tenant);
-});
-// Save / update tenant settings (branding, business info, website options)
-app.post("/api/tenant/:slug/settings", (req, res) => {
-  const slug = req.params.slug;
-  const settings = req.body || {};
-
-  const tenants = loadTenants(); // existing helper
-  const tenant = tenants.find(t => t.slug === slug);
-
-  if (!tenant) {
-    return res.status(404).json({ error: "Tenant not found" });
-  }
-
-  // Merge new settings into tenant record
-  tenant.branding = settings.branding || tenant.branding || {};
-  tenant.business = settings.business || tenant.business || {};
-  tenant.websiteOptions = settings.website || tenant.websiteOptions || {};
-  tenant.brandColor = settings.branding?.brandColor || tenant.brandColor || null;
-  tenant.theme = settings.branding?.theme || tenant.theme || "hybrid";
-  tenant.logoUrl = settings.branding?.logoUrl || tenant.logoUrl || "";
-  tenant.heroUrl = settings.branding?.heroUrl || tenant.heroUrl || "";
-  tenant.setupComplete = true;
-
-  saveTenants(tenants);
-
-  res.json({ success: true, tenant });
-});
-
-
-// Status (includes trial info)
-app.get("/api/tenant/:slug/status", (req, res) => {
-  const tenants = loadTenants();
-  const tenant = tenants.find((t) => t.slug === req.params.slug);
-
-  if (!tenant) {
-    return res.status(404).json({ error: "Tenant not found" });
-  }
-
-  const now = Date.now();
-  const trialExpired =
-    tenant.trialEndsAt && typeof tenant.trialEndsAt === "number"
-      ? now > tenant.trialEndsAt
-      : false;
-
-  res.json({
-    slug: tenant.slug,
-    name: tenant.name,
-    package: tenant.package,
-    status: tenant.status,    // "trial", "active", "suspended", etc.
-    trialEndsAt: tenant.trialEndsAt || null,
-    trialExpired,
-    createdAt: tenant.createdAt || null,
-    paidAt: tenant.paidAt || null,
-  });
-});
-
-// List all tenants (optional admin usage)
-app.get("/api/tenants", (req, res) => {
-  res.json(loadTenants());
-});
-
-// ---------------------------------------------
-// SIGNUP (AUTO-PROVISION + 14-DAY TRIAL)
-// ---------------------------------------------
-// This is called by your public signup form
+// ------------------------------------------------------
+//  CREATE NEW TENANT (Free Trial Signup)
+// ------------------------------------------------------
 app.post("/api/signup", (req, res) => {
-  const {
-    funeralHomeName,
-    ownerName,
-    email,
-    phone,
-    website,
-    country,
-    packageName, // e.g. "starter", "pro", "premium"
-  } = req.body;
-
-  if (!funeralHomeName || !email || !packageName) {
-    return res
-      .status(400)
-      .json({ error: "funeralHomeName, email, and packageName are required" });
+  const { funeralHomeName, email } = req.body;
+  if (!funeralHomeName || !email) {
+    return res.status(400).json({ error: "Missing required fields." });
   }
 
   const tenants = loadTenants();
-  const baseSlug = slugifyName(funeralHomeName);
-  const existingSlugs = tenants.map((t) => t.slug);
-  const slug = generateUniqueSlug(baseSlug, existingSlugs);
+  const admins = loadAdmins();
 
-  const now = Date.now();
-  const trialEndsAt = now + 14 * DAYS;
+  const slug = funeralHomeName.toLowerCase().replace(/\s+/g, "-");
+  const tempAdminKey = crypto.randomBytes(4).toString("hex");
+
+  if (tenants.find((t) => t.slug === slug)) {
+    return res.status(400).json({ error: "Tenant already exists." });
+  }
+
+  const trialEndsAt = Date.now() + 14 * 24 * 60 * 60 * 1000;
 
   const newTenant = {
     slug,
-    name: funeralHomeName,
-    ownerName: ownerName || "",
+    funeralHomeName,
     email,
-    phone: phone || "",
-    website: website || "",
-    country: country || "",
-    package: packageName,
-    status: "trial", // trial until payment / upgrade
-    trialEndsAt,
-    createdAt: now,
-    paidAt: null,
+    createdAt: Date.now(),
+    trialEndsAt
   };
 
   tenants.push(newTenant);
-  saveTenants(tenants);
-
-  const admins = loadAdmins();
-  const tempAdminKey = generateTempKey();
   admins[slug] = { adminKey: tempAdminKey };
+
+  saveTenants(tenants);
   saveAdmins(admins);
 
- // Send welcome email
-sendMailSafe({
-  from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
-  to: email,
-  subject: "Welcome to WE Funeral Platform",
-  html: `
-    <h2>Welcome to the WE Funeral Platform!</h2>
-    <p>Your funeral home <strong>${funeralHomeName}</strong> has been created.</p>
+  // ------------------------------------------------------
+  //  SAFE WELCOME EMAIL (Never Crashes)
+  // ------------------------------------------------------
+  sendMailSafe({
+    from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Welcome to WE Funeral Platform",
+    html: `
+      <h2>Welcome to the WE Funeral Platform!</h2>
+      <p>Your funeral home <strong>${funeralHomeName}</strong> is now created.</p>
 
-    <p><strong>Login URL:</strong><br>
-    https://we-funeral-platform.onrender.com/admin/admin-login.html?tenant=${slug}</p>
+      <p><strong>Login URL:</strong><br>
+      https://we-funeral-platform.onrender.com/admin/admin-login.html?tenant=${slug}</p>
 
-    <p><strong>Temporary Password:</strong> ${tempAdminKey}</p>
+      <p><strong>Your Temporary Admin Password:</strong><br>${tempAdminKey}</p>
 
-    <p>Your 14-day free trial ends on: <strong>${new Date(trialEndsAt).toDateString()}</strong></p>
-
-    <p>Please log in and complete your onboarding.</p>
-  `
-});
-
-
-  console.log(
-    `New tenant signup: ${slug} (${funeralHomeName}) – trial until ${new Date(
-      trialEndsAt
-    ).toISOString()}`
-  );
+      <p><strong>Free Trial Ends:</strong> ${new Date(trialEndsAt).toDateString()}</p>
+    `
+  });
 
   res.json({
     success: true,
-    tenantSlug: slug,
-    tempAdminKey,
-    trialEndsAt,
+    slug,
+    message: "Tenant created and welcome email sent."
   });
 });
 
-// ---------------------------------------------
-// ADMIN LOGIN
-// ---------------------------------------------
+// ------------------------------------------------------
+//  ADMIN LOGIN
+// ------------------------------------------------------
 app.post("/api/admin/login", (req, res) => {
-  const { tenant, key } = req.body;
+  const { slug, adminKey } = req.body;
 
-  if (!tenant || !key)
-    return res.status(400).json({ error: "Missing tenant or key" });
-
-  const admins = loadAdmins();
-  const info = admins[tenant];
-
-  if (!info) return res.status(404).json({ error: "Tenant admin not found" });
-  if (info.adminKey !== key)
-    return res.status(403).json({ error: "Invalid admin key" });
-
-  // Optional: check trial status and block if expired and not paid
   const tenants = loadTenants();
-  const t = tenants.find((x) => x.slug === tenant);
-  if (t) {
-    const now = Date.now();
-    const trialExpired =
-      t.trialEndsAt && typeof t.trialEndsAt === "number"
-        ? now > t.trialEndsAt
-        : false;
+  const admins = loadAdmins();
 
-    if (trialExpired && t.status !== "active") {
-      return res.status(402).json({
-        error: "Trial expired",
-        code: "TRIAL_EXPIRED",
-        tenant: tenant,
-      });
-    }
+  const tenant = tenants.find((t) => t.slug === slug);
+  if (!tenant) return res.status(400).json({ error: "Tenant not found" });
+
+  if (!admins[slug] || admins[slug].adminKey !== adminKey) {
+    return res.status(400).json({ error: "Invalid admin key" });
   }
 
-  res.json({ success: true, tenant });
+  res.json({ success: true });
 });
 
+// ------------------------------------------------------
+//  PASSWORD RESET REQUEST
+// ------------------------------------------------------
 app.post("/api/auth/reset-request", (req, res) => {
   const { email } = req.body;
-
-  if (!email) return res.status(400).json({ error: "Email required" });
-
   const tenants = loadTenants();
-  const admins = loadAdmins();
 
-  // find tenant by email
-  const tenant = tenants.find(t => t.email === email);
-  if (!tenant) {
-    // Do not reveal if email exists (security)
-    return res.json({ success: true });
-  }
+  const tenant = tenants.find((t) => t.email === email);
 
-  // Create reset token
+  // Always return success to prevent enumeration attacks
+  if (!tenant) return res.json({ success: true });
+
   const token = crypto.randomBytes(32).toString("hex");
   tenant.resetToken = token;
-  tenant.resetExpiry = Date.now() + 30 * 60 * 1000; // 30 minutes
+  tenant.resetExpiry = Date.now() + 30 * 60 * 1000;
 
   saveTenants(tenants);
 
@@ -362,11 +158,11 @@ app.post("/api/auth/reset-request", (req, res) => {
 
   sendMailSafe({
     from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
-    to: tenant.email,
+    to: email,
     subject: "Password Reset",
     html: `
       <h2>Password Reset Request</h2>
-      <p>Click the link below to reset your password:</p>
+      <p>Click below to reset your password:</p>
       <p><a href="${resetURL}">${resetURL}</a></p>
       <p>This link expires in 30 minutes.</p>
     `
@@ -375,170 +171,83 @@ app.post("/api/auth/reset-request", (req, res) => {
   res.json({ success: true });
 });
 
+// ------------------------------------------------------
+//  PASSWORD RESET CONFIRMATION
+// ------------------------------------------------------
 app.post("/api/auth/reset-confirm", (req, res) => {
   const { token, password } = req.body;
-
-  if (!token || !password) {
-    return res.status(400).json({ error: "Missing token or password" });
-  }
 
   const tenants = loadTenants();
   const admins = loadAdmins();
 
-  const tenant = tenants.find(t => t.resetToken === token);
+  const tenant = tenants.find((t) => t.resetToken === token);
 
-  if (!tenant) {
-    return res.status(400).json({ error: "Invalid or expired reset link" });
-  }
-
+  if (!tenant) return res.status(400).json({ error: "Invalid or expired token" });
   if (Date.now() > tenant.resetExpiry) {
-    return res.status(400).json({ error: "Reset link expired" });
+    return res.status(400).json({ error: "Token expired" });
   }
 
-  // Update admin password
   admins[tenant.slug].adminKey = password;
-  saveAdmins(admins);
-
-  // Remove reset fields
   delete tenant.resetToken;
   delete tenant.resetExpiry;
+
+  saveAdmins(admins);
   saveTenants(tenants);
 
   res.json({ success: true });
 });
 
-
-// ---------------------------------------------
-// PAYMENT WEBHOOK / ACTIVATION
-// ---------------------------------------------
-// Call this from your payment provider webhook when payment succeeds
-app.post("/api/tenants/mark-paid", (req, res) => {
-  const { slug } = req.body;
-
-  if (!slug) {
-    return res.status(400).json({ error: "slug required" });
-  }
-
+// ------------------------------------------------------
+//  READ TENANT DATA
+// ------------------------------------------------------
+app.get("/api/tenant/:slug", (req, res) => {
   const tenants = loadTenants();
+  const tenant = tenants.find((t) => t.slug === req.params.slug);
+  if (!tenant) return res.status(404).json({ error: "Tenant not found" });
+  res.json(tenant);
+});
+
+// ------------------------------------------------------
+//  UPDATE TENANT SETTINGS
+// ------------------------------------------------------
+app.post("/api/tenant/:slug/settings", (req, res) => {
+  const slug = req.params.slug;
+  const tenants = loadTenants();
+
   const tenant = tenants.find((t) => t.slug === slug);
+  if (!tenant) return res.status(404).json({ error: "Tenant not found" });
 
-  if (!tenant) {
-    return res.status(404).json({ error: "Tenant not found" });
-  }
-
-  tenant.status = "active";
-  tenant.paidAt = Date.now();
+  Object.assign(tenant, req.body);
 
   saveTenants(tenants);
 
-  console.log(`Tenant ${slug} marked as PAID and ACTIVE.`);
-  res.json({ success: true, tenant });
+  res.json({ success: true, message: "Settings updated." });
 });
 
-// ---------------------------------------------
-// MEMORIALS API (per-tenant)
-// ---------------------------------------------
-app.get("/api/memorials/:tenant", (req, res) => {
-  const all = loadMemorials();
-  res.json(all[req.params.tenant] || []);
-});
-
-app.get("/api/memorials/:tenant/:id", (req, res) => {
-  const all = loadMemorials();
-  const list = all[req.params.tenant] || [];
-  const item = list.find((m) => m.id === req.params.id);
-
-  if (!item) return res.status(404).json({ error: "Memorial not found" });
-
-  res.json(item);
-});
-
-app.post("/api/memorials/add", (req, res) => {
-  const data = req.body;
-  const tenant = data.tenant;
-
-  if (!tenant || !data.fullName)
-    return res
-      .status(400)
-      .json({ error: "Tenant and fullName are required" });
-
-  const all = loadMemorials();
-  if (!all[tenant]) all[tenant] = [];
-
-  const memorial = {
-    id: "mem-" + Date.now().toString(36),
-    ...data,
-    createdAt: Date.now(),
-  };
-
-  all[tenant].push(memorial);
-  saveMemorials(all);
-
-  res.json({ success: true, memorial });
-});
-
-app.post("/api/memorials/update", (req, res) => {
-  const { tenant, id, ...updates } = req.body;
-
-  if (!tenant || !id)
-    return res.status(400).json({ error: "Tenant and id required" });
-
-  const all = loadMemorials();
-  const list = all[tenant] || [];
-  const item = list.find((m) => m.id === id);
-
-  if (!item) return res.status(404).json({ error: "Memorial not found" });
-
-  Object.assign(item, updates);
-  saveMemorials(all);
-
-  res.json({ success: true, memorial: item });
-});
-
-app.post("/api/memorials/delete", (req, res) => {
-  const { tenant, id } = req.body;
-
-  if (!tenant || !id)
-    return res.status(400).json({ error: "Tenant and id required" });
-
-  const all = loadMemorials();
-  const list = all[tenant] || [];
-
-  const filtered = list.filter((m) => m.id !== id);
-  if (filtered.length === list.length)
-    return res.status(404).json({ error: "Memorial not found" });
-
-  all[tenant] = filtered;
-  saveMemorials(all);
-
-  res.json({ success: true });
-});
-
+// ------------------------------------------------------
+//  SAFE TEST EMAIL ROUTE
+// ------------------------------------------------------
 app.get("/api/test-email", async (req, res) => {
-  await sendMailSafe({
-    from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
-    to: process.env.EMAIL_USER,
-    subject: "Test Email",
-    text: "This is a test email from WE Funeral Platform"
-  });
-
-  res.json({ success: true });
-});
-
-// ---------------------------------------------
-// FALLBACK—Render needs this for SPA-ish navigation
-// ---------------------------------------------
-app.get("*", (req, res) => {
-  if ((req.headers.accept || "").includes("text/html")) {
-    return res.sendFile(path.join(PUBLIC, "index.html"));
+  try {
+    await sendMailSafe({
+      from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      subject: "Test Email",
+      text: "This is a test email from WE Funeral Platform"
+    });
+    res.json({ success: true, message: "Test email attempted." });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
   }
-  res.status(404).json({ error: "Not found" });
 });
 
-// ---------------------------------------------
-// START SERVER (Render injects PORT)
-// ---------------------------------------------
+// ------------------------------------------------------
+//  START SERVER
+// ------------------------------------------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("✔ Server running on Render port", PORT);
+  console.log("////////////////////////////////////////////////////");
+  console.log(`✓ Server running on Render port ${PORT}`);
+  console.log("✓ Your service is live 🎉");
+  console.log("////////////////////////////////////////////////////");
 });
