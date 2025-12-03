@@ -107,7 +107,18 @@
     }
 
     if (data.success) {
-      window.location.href = `/admin/dashboard.html?tenant=${tenantSlug}`;
+       // After login, fetch tenant record to see if onboarding is done
+  const tenantRes = await fetch(`/api/tenant/${tenantSlug}`);
+  const tenantData = await tenantRes.json();
+
+  // If onboarding isn't complete, redirect to onboarding wizard
+  if (!tenantData.setupComplete) {
+    window.location.href = `/admin/onboarding.html?tenant=${tenantSlug}`;
+    return;
+  }
+
+  // Otherwise, go directly to dashboard
+  window.location.href = `/admin/admin-dashboard.html?tenant=${tenantSlug}`;
     }
   });
 </script>
