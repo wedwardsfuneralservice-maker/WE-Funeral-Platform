@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login – Funeral Home Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
+<body class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+
+  <div class="bg-slate-900 w-full max-w-md p-8 rounded-2xl shadow-xl border border-slate-800">
+
+    <h1 class="text-3xl font-semibold text-center mb-2">Admin Console</h1>
+    <p class="text-center text-slate-400 mb-6">Sign in to manage your funeral home</p>
+
+    <p id="trialWarning" class="hidden text-center text-red-400 text-sm mb-4"></p>
+
+    <div id="trialExpiredBox" class="hidden bg-red-900/40 border border-red-600 p-4 rounded-xl text-center mb-4">
+      <p class="text-red-200 font-semibold">Your free trial has expired.</p>
+      <p class="text-red-300 text-sm mt-1">Please upgrade your plan to continue.</p>
+      <a id="billingLink"
+         class="inline-block mt-3 px-4 py-2 bg-amber-400 text-slate-900 font-semibold rounded-lg hover:bg-amber-300 transition">
+         Go to Billing
+      </a>
+    </div>
+
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label class="block text-sm mb-1">Tenant</label>
+        <input id="tenant" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg" readonly />
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">Admin Key</label>
+        <input id="adminKey" type="password"
+               class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg"
+               placeholder="Enter your admin key" required />
+      </div>
+      
+<div class="text-center mt-3">
+  <a
+    href="reset-password.html"
+    class="text-xs text-blue-400 hover:underline"
+  >
+    Forgot your password?
+  </a>
+</div>
+
+      
+      <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition">
+        Log In
+      </button>
+    </form>
+
+    <p id="errorMsg" class="hidden text-center text-red-400 mt-4"></p>
+
+  </div>
+
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const tenantSlug = params.get("tenant");
+  const TENANT_INPUT = document.getElementById("tenant");
+  const errorMsg = document.getElementById("errorMsg");
+  const trialWarning = document.getElementById("trialWarning");
+  const expiredBox = document.getElementById("trialExpiredBox");
+  const billingLink = document.getElementById("billingLink");
+
+  // Put tenant into input field
+  TENANT_INPUT.value = tenantSlug || "";
+
+  // Fetch tenant status (trial, expired, etc.)
+  async function loadStatus() {
+    if (!tenantSlug) return;
+    const res = await fetch(`/api/tenant/${tenantSlug}/status`);
+    if (!res.ok) return;
+    const data = await res.json();
+
+    if (data.trialExpired && data.status !== "active") {
+      expiredBox.classList.remove("hidden");
+      billingLink.href = `/billing.html?tenant=${tenantSlug}`;
+    } else {
+      const daysLeft = Math.ceil((data.trialEndsAt - Date.now()) / (1000 * 60 * 60 * 24));
+      trialWarning.textContent = `Free trial: ${daysLeft} days remaining`;
+      trialWarning.classList.remove("hidden");
+    }
+  }
+
+  loadStatus();
+
+  // LOGIN HANDLER
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorMsg.classList.add("hidden");
+
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tenant: tenantSlug,
+        key: document.getElementById("adminKey").value.trim()
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.error === "Invalid admin key") {
+      errorMsg.textContent = "Invalid Admin Key";
+      errorMsg.classList.remove("hidden");
+      return;
+    }
+
+    if (data.code === "TRIAL_EXPIRED") {
+      expiredBox.classList.remove("hidden");
+      return;
+    }
+
+    if (data.success) {
+       // After login, fetch tenant record to see if onboarding is done
+  const tenantRes = await fetch(`/api/tenant/${tenantSlug}`);
+  const tenantData = await tenantRes.json();
+
+  // If onboarding isn't complete, redirect to onboarding wizard
+  if (!tenantData.setupComplete) {
+    window.location.href = `/admin/onboarding.html?tenant=${tenantSlug}`;
+    return;
+  }
+
+  // Otherwise, go directly to dashboard
+  window.location.href = `/admin/admin-dashboard.html?tenant=${tenantSlug}`;
+    }
+  });
+</script>
+
+</body>
+</html>
