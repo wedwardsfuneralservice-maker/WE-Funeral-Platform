@@ -4,6 +4,27 @@ const path = require("path");
 
 const app = express();
 
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+
+// Email transport (uses Gmail App Password)
+const mailer = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Simple wrapper so email sending never crashes server
+async function sendMailSafe(options) {
+  try {
+    await mailer.sendMail(options);
+  } catch (err) {
+    console.error("Email Error:", err);
+  }
+}
+
 // ---------------------------------------------
 // DIRECTORIES
 // ---------------------------------------------
@@ -242,8 +263,26 @@ app.post("/api/signup", (req, res) => {
   admins[slug] = { adminKey: tempAdminKey };
   saveAdmins(admins);
 
-  // TODO: plug in SMTP email here later:
-  // sendWelcomeEmail({ to: email, slug, tempAdminKey, trialEndsAt });
+ // Send welcome email
+sendMailSafe({
+  from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
+  to: email,
+  subject: "Welcome to WE Funeral Platform",
+  html: `
+    <h2>Welcome to the WE Funeral Platform!</h2>
+    <p>Your funeral home <strong>${funeralHomeName}</strong> has been created.</p>
+
+    <p><strong>Login URL:</strong><br>
+    https://we-funeral-platform.onrender.com/admin/admin-login.html?tenant=${slug}</p>
+
+    <p><strong>Temporary Password:</strong> ${tempAdminKey}</p>
+
+    <p>Your 14-day free trial ends on: <strong>${new Date(trialEndsAt).toDateString()}</strong></p>
+
+    <p>Please log in and complete your onboarding.</p>
+  `
+});
+
 
   console.log(
     `New tenant signup: ${slug} (${funeralHomeName}) – trial until ${new Date(
@@ -296,6 +335,78 @@ app.post("/api/admin/login", (req, res) => {
 
   res.json({ success: true, tenant });
 });
+
+app.post("/api/auth/reset-request", (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ error: "Email required" });
+
+  const tenants = loadTenants();
+  const admins = loadAdmins();
+
+  // find tenant by email
+  const tenant = tenants.find(t => t.email === email);
+  if (!tenant) {
+    // Do not reveal if email exists (security)
+    return res.json({ success: true });
+  }
+
+  // Create reset token
+  const token = crypto.randomBytes(32).toString("hex");
+  tenant.resetToken = token;
+  tenant.resetExpiry = Date.now() + 30 * 60 * 1000; // 30 minutes
+
+  saveTenants(tenants);
+
+  const resetURL = `https://we-funeral-platform.onrender.com/admin/reset-confirm.html?token=${token}`;
+
+  sendMailSafe({
+    from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
+    to: tenant.email,
+    subject: "Password Reset",
+    html: `
+      <h2>Password Reset Request</h2>
+      <p>Click the link below to reset your password:</p>
+      <p><a href="${resetURL}">${resetURL}</a></p>
+      <p>This link expires in 30 minutes.</p>
+    `
+  });
+
+  res.json({ success: true });
+});
+
+app.post("/api/auth/reset-confirm", (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    return res.status(400).json({ error: "Missing token or password" });
+  }
+
+  const tenants = loadTenants();
+  const admins = loadAdmins();
+
+  const tenant = tenants.find(t => t.resetToken === token);
+
+  if (!tenant) {
+    return res.status(400).json({ error: "Invalid or expired reset link" });
+  }
+
+  if (Date.now() > tenant.resetExpiry) {
+    return res.status(400).json({ error: "Reset link expired" });
+  }
+
+  // Update admin password
+  admins[tenant.slug].adminKey = password;
+  saveAdmins(admins);
+
+  // Remove reset fields
+  delete tenant.resetToken;
+  delete tenant.resetExpiry;
+  saveTenants(tenants);
+
+  res.json({ success: true });
+});
+
 
 // ---------------------------------------------
 // PAYMENT WEBHOOK / ACTIVATION
@@ -399,6 +510,17 @@ app.post("/api/memorials/delete", (req, res) => {
 
   all[tenant] = filtered;
   saveMemorials(all);
+
+  res.json({ success: true });
+});
+
+app.get("/api/test-email", async (req, res) => {
+  await sendMailSafe({
+    from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
+    to: process.env.EMAIL_USER,
+    subject: "Test Email",
+    text: "This is a test email from WE Funeral Platform"
+  });
 
   res.json({ success: true });
 });
