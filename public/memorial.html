@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memorial</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <a href="javascript:history.back()" class="text-xs text-slate-400 hover:text-amber-300">
+      ← Back
+    </a>
+
+    <section id="memorialSection" class="mt-6 hidden">
+      <p id="tenantBadge"
+         class="inline-flex items-center px-3 py-1 rounded-full bg-slate-800 text-xs uppercase tracking-[0.2em] text-amber-300/80">
+      </p>
+
+      <h1 id="memorialName" class="text-3xl font-semibold mt-4"></h1>
+      <p id="lifeDates" class="text-sm text-slate-400 mt-1"></p>
+
+      <div class="mt-4 text-sm text-slate-300" id="summary"></div>
+
+      <div class="mt-6 grid md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-slate-900/70 rounded-xl p-4 border border-slate-800">
+          <h2 class="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+            Service details
+          </h2>
+          <p id="serviceInfo" class="mt-2 text-slate-200"></p>
+        </div>
+
+        <div class="bg-slate-900/70 rounded-xl p-4 border border-slate-800">
+          <h2 class="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+            Burial details
+          </h2>
+          <p id="burialInfo" class="mt-2 text-slate-200"></p>
+        </div>
+      </div>
+
+      <div id="livestreamBlock" class="mt-6 hidden">
+        <h2 class="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+          Livestream
+        </h2>
+        <a id="livestreamLink"
+           href="#"
+           target="_blank"
+           class="mt-2 inline-flex items-center text-sm text-amber-300 hover:text-amber-200 underline">
+          Open livestream
+        </a>
+      </div>
+
+      <div class="mt-8 bg-slate-900/70 rounded-xl p-6 border border-slate-800">
+        <h2 class="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+          Obituary
+        </h2>
+        <p id="obituaryText" class="mt-3 text-sm leading-relaxed text-slate-200 whitespace-pre-line"></p>
+      </div>
+    </section>
+
+    <p id="loadingState" class="mt-10 text-sm text-slate-400">
+      Loading memorial…
+    </p>
+    <p id="errorState" class="mt-10 text-sm text-red-400 hidden">
+      Memorial not found.
+    </p>
+  </main>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const tenant = params.get("tenant");
+  const id = params.get("id");
+
+  function formatDate(d) {
+    if (!d) return "";
+    const parsed = new Date(d);
+    if (isNaN(parsed)) return d;
+    return parsed.toLocaleDateString();
+  }
+
+  async function loadMemorial() {
+    const section = document.getElementById("memorialSection");
+    const loading = document.getElementById("loadingState");
+    const error = document.getElementById("errorState");
+
+    if (!tenant || !id) {
+      loading.classList.add("hidden");
+      error.classList.remove("hidden");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/memorials/${tenant}/${id}`);
+      if (!res.ok) {
+        loading.classList.add("hidden");
+        error.classList.remove("hidden");
+        return;
+      }
+
+      const m = await res.json();
+      loading.classList.add("hidden");
+      section.classList.remove("hidden");
+
+      document.getElementById("tenantBadge").textContent =
+        `TENANT: ${tenant}`;
+      document.getElementById("memorialName").textContent =
+        m.fullName || "Memorial";
+
+      if (m.dateOfBirth || m.dateOfDeath) {
+        document.getElementById("lifeDates").textContent =
+          `${m.dateOfBirth || "?"} – ${m.dateOfDeath || "?"}`;
+      }
+
+      document.getElementById("summary").textContent = m.summary || "";
+
+      const serviceLines = [];
+      if (m.serviceDate || m.serviceTime) {
+        serviceLines.push(
+          `Date & time: ${formatDate(m.serviceDate)} ${m.serviceTime || ""}`
+        );
+      }
+      if (m.serviceLocation) {
+        serviceLines.push(`Location: ${m.serviceLocation}`);
+      }
+      document.getElementById("serviceInfo").textContent =
+        serviceLines.join("\n") || "Not available.";
+
+      const burialLines = [];
+      if (m.burialDate || m.burialTime) {
+        burialLines.push(
+          `Date & time: ${formatDate(m.burialDate)} ${m.burialTime || ""}`
+        );
+      }
+      if (m.burialLocation) {
+        burialLines.push(`Location: ${m.burialLocation}`);
+      }
+      document.getElementById("burialInfo").textContent =
+        burialLines.join("\n") || "Not available.";
+
+      if (m.livestreamUrl) {
+        const block = document.getElementById("livestreamBlock");
+        const link = document.getElementById("livestreamLink");
+        link.href = m.livestreamUrl;
+        block.classList.remove("hidden");
+      }
+
+      document.getElementById("obituaryText").textContent =
+        m.obituary || "No obituary has been added yet.";
+    } catch (err) {
+      console.error("Memorial load error", err);
+      loading.classList.add("hidden");
+      error.classList.remove("hidden");
+    }
+  }
+
+  loadMemorial();
+</script>
+</body>
+</html>
