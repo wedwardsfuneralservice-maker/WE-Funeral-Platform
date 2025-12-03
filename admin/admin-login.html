@@ -1,16 +1,58 @@
-<script>
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();  // Stop reload
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login — Funeral Console</title>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const tenant = urlParams.get("tenant");
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" />
+</head>
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center h-screen">
+
+    <!-- LOGIN CARD -->
+    <div class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <h2 class="text-xl font-bold mb-6">Admin console login</h2>
+
+        <p id="tenantLabel" class="text-sm text-gray-400 mb-4"></p>
+
+        <!-- ✅ REAL FORM -->
+        <form id="loginForm">
+            <label class="block mb-2">Admin key</label>
+            <input 
+                id="adminKey"
+                type="password"
+                class="w-full p-3 rounded bg-gray-700 mb-4 border border-gray-600"
+                required
+            />
+
+            <button 
+                type="submit"
+                class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-lg">
+                Enter admin console
+            </button>
+        </form>
+    </div>
+
+<script>
+// Display tenant slug on page
+const urlParams = new URLSearchParams(window.location.search);
+const tenantName = urlParams.get("tenant");
+document.getElementById("tenantLabel").innerText = "Tenant: " + tenantName;
+
+// LOGIN HANDLER
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
     const key = document.getElementById("adminKey").value;
 
     try {
         const response = await fetch("/api/admin/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tenant, key })
+            body: JSON.stringify({
+                tenant: tenantName,
+                key: key
+            })
         });
 
         const data = await response.json();
@@ -20,12 +62,14 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
             return;
         }
 
-        // Login success → redirect
-        window.location.href = `/admin/admin-dashboard.html?tenant=${tenant}`;
+        // Success → go to dashboard
+        window.location.href = `/admin/admin-dashboard.html?tenant=${tenantName}`;
     }
     catch (err) {
-        console.error(err);
         alert("Network error — unable to reach server");
     }
 });
 </script>
+
+</body>
+</html>
