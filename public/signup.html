@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Funeral Home Account – 14-Day Free Trial</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: #f7f8fa;
+    }
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6">
+
+  <div class="max-w-lg w-full card p-8">
+
+    <h1 class="text-3xl font-bold text-gray-800 mb-2 text-center">
+      Create Your Account
+    </h1>
+
+    <p class="text-center text-gray-600 mb-6">
+      Start your <span class="font-semibold">14-day free trial</span>.  
+      No credit card required today.
+    </p>
+
+    <!-- FORM -->
+    <form id="signupForm" class="space-y-5">
+
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Funeral Home Name</label>
+        <input id="funeralHomeName" required
+               class="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-200"
+               placeholder="Winston Edwards Funeral Services"/>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Owner / Director Name</label>
+        <input id="ownerName"
+               class="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-200"
+               placeholder="Carl Brathwaite"/>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Email</label>
+        <input id="email" type="email" required
+               class="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-200"
+               placeholder="name@funeralhome.com"/>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Phone</label>
+        <input id="phone"
+               class="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-200"
+               placeholder="+1 (246) 555-0000"/>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Country</label>
+        <input id="country"
+               class="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-200"
+               placeholder="Barbados"/>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Select Package</label>
+        <select id="packageName" required
+                class="w-full px-4 py-3 border rounded-lg bg-white focus:ring focus:ring-blue-200">
+          <option value="">Choose a package...</option>
+          <option value="starter">Starter – Basic Features</option>
+          <option value="professional">Professional – Most Popular</option>
+          <option value="premium">Premium – All Features Included</option>
+        </select>
+      </div>
+
+      <!-- SUBMIT BUTTON -->
+      <button type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-lg transition">
+        Create Account
+      </button>
+    </form>
+
+    <p id="errorMsg" class="text-center text-red-600 mt-4 hidden"></p>
+
+    <p class="text-center text-gray-500 text-sm mt-5">
+      By creating an account, you agree to our Terms & Privacy Policy.
+    </p>
+
+  </div>
+
+
+  <!-- JS LOGIC -->
+  <script>
+    const form = document.getElementById("signupForm");
+    const errorMsg = document.getElementById("errorMsg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      errorMsg.classList.add("hidden");
+
+      const payload = {
+        funeralHomeName: document.getElementById("funeralHomeName").value.trim(),
+        ownerName: document.getElementById("ownerName").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        country: document.getElementById("country").value.trim(),
+        packageName: document.getElementById("packageName").value,
+      };
+
+      try {
+        const res = await fetch("/api/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+          errorMsg.textContent = data.error || "Signup failed.";
+          errorMsg.classList.remove("hidden");
+          return;
+        }
+
+        // Redirect to thank-you page with slug + key
+        window.location.href = `/thank-you.html?tenant=${data.tenantSlug}&key=${data.tempAdminKey}&trialEnds=${data.trialEndsAt}`;
+
+      } catch (err) {
+        console.error("Signup error:", err);
+        errorMsg.textContent = "Network error. Please try again.";
+        errorMsg.classList.remove("hidden");
+      }
+    });
+  </script>
+
+</body>
+</html>
