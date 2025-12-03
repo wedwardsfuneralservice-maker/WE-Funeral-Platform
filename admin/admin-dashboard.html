@@ -6,6 +6,32 @@
   <title>Admin Dashboard – Funeral Console</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+  <!-- TRIAL BANNER -->
+<div id="trialBanner" class="hidden w-full bg-amber-500/20 border-b border-amber-400/40 text-amber-200 text-sm text-center py-2">
+  <span id="trialBannerText">Loading trial status...</span>
+  <a id="trialUpgradeBtn"
+     href="#"
+     class="ml-2 underline font-semibold hover:text-amber-300">
+     Upgrade Now
+  </a>
+</div>
+
+<!-- EXPIRED TRIAL OVERLAY -->
+<div id="trialExpiredOverlay"
+     class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center text-center p-6 z-[9999]">
+
+  <h2 class="text-2xl font-bold text-red-300 mb-2">Your Free Trial Has Ended</h2>
+
+  <p class="text-red-200 text-sm mb-6 max-w-sm">
+    Your 14-day free trial has expired. To continue using the Admin Console and keep your funeral home site active, please upgrade your plan.
+  </p>
+
+  <a id="trialExpiredUpgrade"
+     class="px-6 py-3 bg-amber-400 text-black font-semibold rounded-lg shadow hover:bg-amber-300 transition">
+     Upgrade Plan
+  </a>
+</div>
+
 <body class="min-h-screen bg-slate-950 text-slate-100">
   <div class="min-h-screen flex">
     <!-- SIDEBAR -->
@@ -357,6 +383,77 @@
       accounting: document.getElementById("page-accounting"),
       designer: document.getElementById("page-designer"),
     };
+// ================================
+// TRIAL STATUS LOADER
+// ================================
+async function loadTrialStatus() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tenantSlug = params.get("tenant");
+
+    const res = await fetch(`/api/tenant/${tenantSlug}/status`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const banner = document.getElementById("trialBanner");
+    const bannerText = document.getElementById("trialBannerText");
+    const bannerUpgrade = document.getElementById("trialUpgradeBtn");
+
+    const expiredOverlay = document.getElementById("trialExpiredOverlay");
+    const expiredUpgrade = document.getElementById("trialExpiredUpgrade");
+
+    // Setup upgrade link
+    bannerUpgrade.href = `/billing.html?tenant=${tenantSlug}`;
+    expiredUpgrade.href = `/billing.html?tenant=${tenantSlug}`;
+
+    // Handle expired trial
+    if (data.trialExpired && data.status !== "active") {
+      expiredOverlay.classList.remove("hidden");
+      return; // Stop further dashboard usage
+    }
+
+    // Show banner with days left
+    const daysLeft = Math.ceil(
+      (data.trialEndsAt - Date.now()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (daysLeft <= 3) {
+      // WARNING MODE (Red)
+      banner.classList.remove("hidden");
+      banner.classList.remove("bg-amber-500/20");
+      banner.classList.add("bg-red-500/20", "border-red-400/40", "text-red-200");
+      bannerText.textContent = `Your free trial expires in ${daysLeft} day(s)`;
+    } else {
+      // NORMAL MODE (Amber)
+      banner.classList.remove("hidden");
+      bannerText.textContent = `Free trial: ${daysLeft} days remaining`;
+    }
+
+  } catch (err) {
+    console.error("Trial status error:", err);
+  }
+}
+
+// Run trial checker when dashboard loads
+loadTrialStatus();
+
+    // ================================
+// BLOCK DASHBOARD IF TRIAL EXPIRED
+// ================================
+function disableDashboardForExpiredTrial() {
+  const overlay = document.getElementById("trialExpiredOverlay");
+  if (!overlay.classList.contains("hidden")) {
+    document.querySelectorAll("button, a").forEach(el => {
+      if (!el.closest("#trialExpiredOverlay")) {
+        el.style.pointerEvents = "none";
+        el.style.opacity = "0.4";
+      }
+    });
+  }
+}
+
+// Re-check every second (slight delay for UI)
+setInterval(disableDashboardForExpiredTrial, 1000);
 
     function showPage(key) {
       Object.values(pages).forEach(sec => sec.classList.add("hidden"));
