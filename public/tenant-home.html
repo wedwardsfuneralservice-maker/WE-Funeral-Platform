@@ -4,124 +4,139 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Funeral Home – Tenant View</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100">
-  <div class="min-h-screen flex flex-col">
-    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-      <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-        <a href="/" class="flex items-center space-x-2">
-          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-rose-500 shadow-md"></div>
-          <div>
-            <div id="brandName" class="text-sm font-semibold text-slate-50">Funeral Home</div>
-            <div class="text-[0.65rem] text-slate-400">Memorials & service details</div>
-          </div>
-        </a>
-        <a id="adminLink" href="#" class="text-xs px-3 py-1.5 rounded-full border border-slate-700 text-slate-200 hover:bg-slate-800 transition">
-          Admin console
-        </a>
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div>
+        <div class="text-xs uppercase tracking-[0.25em] text-amber-300/70">
+          In loving memory
+        </div>
+        <h1 id="tenantName" class="text-2xl font-semibold mt-1">
+          Recent memorials
+        </h1>
+        <p class="text-sm text-slate-400">
+          View online memorials, service information, and livestream details.
+        </p>
       </div>
-    </header>
 
-    <main class="flex-1">
-      <section class="relative overflow-hidden border-b border-slate-900">
-        <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(248,250,252,0.05),_transparent_55%)]"></div>
-        <div class="relative max-w-5xl mx-auto px-4 py-12 sm:py-16">
-          <p class="text-xs font-semibold tracking-[0.3em] text-amber-200/80 mb-3 uppercase">In loving memory</p>
-          <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-50">
-            Recent memorials for <span id="tenantNameInline" class="text-amber-300">this funeral home</span>
-          </h1>
-          <p class="mt-3 text-sm text-slate-300 max-w-2xl">
-            View online memorials, service information, and leave condolences for families we are serving.
-          </p>
-        </div>
-      </section>
+      <a href="/" class="text-xs px-4 py-2 rounded-full border border-slate-700 hover:border-amber-300 transition">
+        Back to W.E. Platform
+      </a>
+    </div>
+  </header>
 
-      <section class="bg-slate-950">
-        <div class="max-w-5xl mx-auto px-4 py-10">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-semibold text-slate-50">Recent Memorials</h2>
-            <p class="text-xs text-slate-400" id="memorialCountLabel"></p>
-          </div>
-          <div id="memorialGrid" class="grid gap-4 sm:grid-cols-2"></div>
-        </div>
-      </section>
-    </main>
-  </div>
+  <!-- Memorial list -->
+  <main class="max-w-5xl mx-auto px-4 py-8">
+    <section>
+      <h2 class="text-lg font-semibold mb-4">Recent Memorials</h2>
 
-  <script>
-    function getTenantSlugFromURL() {
-      const parts = window.location.pathname.split("/").filter(Boolean);
-      // /t/{slug}
-      return parts[1] || "w-edwards";
+      <div id="memorialList" class="grid gap-4 md:grid-cols-2">
+        <!-- Cards injected here -->
+      </div>
+
+      <p id="emptyState" class="text-sm text-slate-400 mt-4 hidden">
+        No memorials have been published yet.
+      </p>
+    </section>
+  </main>
+
+<script>
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  const tenantSlug = pathParts[pathParts.length - 1]; // /t/w-edwards -> "w-edwards"
+
+  async function loadTenant() {
+    try {
+      const res = await fetch(`/api/tenant/${tenantSlug}`);
+      if (!res.ok) return;
+      const tenant = await res.json();
+      document.getElementById("tenantName").textContent =
+        `Recent memorials for ${tenant.name}`;
+    } catch (err) {
+      console.error("Tenant load error", err);
     }
+  }
 
-    async function hydrateTenantHeader(slug) {
-      try {
-        const res = await fetch("/api/tenants");
-        const tenants = await res.json();
-        const t = tenants.find(x => x.slug === slug);
-        if (!t) return;
+  function formatDate(d) {
+    if (!d) return "";
+    return new Date(d).toLocaleDateString();
+  }
 
-        const brandNameEl = document.getElementById("brandName");
-        const inlineEl = document.getElementById("tenantNameInline");
-        const adminLink = document.getElementById("adminLink");
+  async function loadMemorials() {
+    const listEl = document.getElementById("memorialList");
+    const emptyEl = document.getElementById("emptyState");
+    listEl.innerHTML = "";
 
-        if (brandNameEl) brandNameEl.textContent = t.name || "Funeral Home";
-        if (inlineEl) inlineEl.textContent = t.name || "this funeral home";
-        if (adminLink) adminLink.href = `/admin/admin-login.html?tenant=${encodeURIComponent(slug)}`;
-      } catch (err) {
-        console.error(err);
+    try {
+      const res = await fetch(`/api/memorials/${tenantSlug}`);
+      const memorials = await res.json();
+
+      if (!Array.isArray(memorials) || memorials.length === 0) {
+        emptyEl.classList.remove("hidden");
+        return;
       }
-    }
 
-    async function loadMemorials(slug) {
-      try {
-        const res = await fetch(`/api/${slug}/memorials`);
-        const memorials = await res.json();
-        const grid = document.getElementById("memorialGrid");
-        const label = document.getElementById("memorialCountLabel");
+      emptyEl.classList.add("hidden");
 
-        if (!Array.isArray(memorials) || memorials.length === 0) {
-          grid.innerHTML = '<p class="text-xs text-slate-400">No memorials have been published yet.</p>';
-          if (label) label.textContent = "0 memorials";
-          return;
-        }
+      memorials
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+        .forEach((m) => {
+          const card = document.createElement("article");
+          card.className =
+            "rounded-2xl border border-slate-800 bg-slate-900/70 p-4 flex flex-col justify-between shadow-lg";
 
-        if (label) label.textContent = `${memorials.length} memorial${memorials.length === 1 ? "" : "s"}`;
+          const serviceLabel = m.serviceDate
+            ? `${formatDate(m.serviceDate)} • ${m.serviceTime || ""}`
+            : "";
 
-        grid.innerHTML = memorials.map(m => `
-          <article class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden flex flex-col">
-            <div class="relative h-40 bg-slate-800">
-              ${m.photoPath ? `<img src="${m.photoPath}" class="w-full h-full object-cover" alt="${m.fullName || ""}" />` : ""}
-              <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pt-6 pb-2">
-                <h3 class="text-sm font-semibold text-slate-50">${m.fullName || "Unnamed memorial"}</h3>
-                <p class="text-[0.7rem] text-slate-300">${m.dob || ""} – ${m.dod || ""}</p>
-              </div>
+          card.innerHTML = `
+            <div>
+              <h3 class="text-lg font-semibold text-amber-200">${m.fullName || "Unnamed memorial"}</h3>
+              <p class="text-xs text-slate-400 mt-1">${m.summary || ""}</p>
+
+              ${
+                m.dateOfBirth || m.dateOfDeath
+                  ? `<p class="text-xs text-slate-400 mt-2">
+                       ${m.dateOfBirth || "?"} – ${m.dateOfDeath || "?"}
+                     </p>`
+                  : ""
+              }
+
+              ${
+                serviceLabel
+                  ? `<p class="text-xs text-slate-300 mt-2">
+                       Service: ${serviceLabel}<br/>
+                       ${m.serviceLocation || ""}
+                     </p>`
+                  : ""
+              }
             </div>
-            <div class="p-3 flex-1 flex flex-col justify-between">
-              <p class="text-xs text-slate-300 line-clamp-3">${m.summary || ""}</p>
-              <div class="mt-3 flex items-center justify-between text-[0.7rem] text-slate-400">
-                <div>
-                  <div>${m.serviceDate || ""} · ${m.serviceTime || ""}</div>
-                  <div class="truncate">${m.serviceLocation || ""}</div>
-                </div>
-                <a href="#" class="text-amber-300 hover:text-amber-200 font-medium whitespace-nowrap text-[0.7rem]">
-                  View memorial →
-                </a>
-              </div>
-            </div>
-          </article>
-        `).join("");
-      } catch (err) {
-        console.error(err);
-      }
-    }
 
-    const slug = getTenantSlugFromURL();
-    hydrateTenantHeader(slug);
-    loadMemorials(slug);
-  </script>
+            <div class="mt-4 flex items-center justify-between gap-2">
+              <a
+                href="/public/memorial.html?tenant=${encodeURIComponent(
+                  tenantSlug
+                )}&id=${encodeURIComponent(m.id)}"
+                class="text-xs px-3 py-2 rounded-full bg-amber-400 text-black font-semibold hover:bg-amber-300 transition">
+                View memorial
+              </a>
+            </div>
+          `;
+
+          listEl.appendChild(card);
+        });
+    } catch (err) {
+      console.error("Memorial load error", err);
+      emptyEl.classList.remove("hidden");
+    }
+  }
+
+  loadTenant();
+  loadMemorials();
+</script>
 </body>
 </html>
