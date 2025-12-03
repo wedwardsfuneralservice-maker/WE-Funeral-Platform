@@ -1,6 +1,6 @@
 <script>
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();   // 🔥 Stop form from reloading the page
+    e.preventDefault();  // Stop reload
 
     const urlParams = new URLSearchParams(window.location.search);
     const tenant = urlParams.get("tenant");
@@ -20,11 +20,11 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
             return;
         }
 
-        // Login success → go to dashboard
+        // Login success → redirect
         window.location.href = `/admin/admin-dashboard.html?tenant=${tenant}`;
     }
     catch (err) {
-        console.error("Login failed:", err);
+        console.error(err);
         alert("Network error — unable to reach server");
     }
 });
