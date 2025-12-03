@@ -15,6 +15,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+// Serve admin files (pretty URLs)
+app.get("/admin/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/admin-login.html"));
+});
+
+app.get("/admin/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/admin-dashboard.html"));
+});
+
+app.get("/admin/onboarding", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/onboarding.html"));
+});
+
+
 // ------------------------------------------------------
 //  SAFE EMAIL TRANSPORT (Never Crashes)
 // ------------------------------------------------------
