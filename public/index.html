@@ -8,8 +8,12 @@
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100">
   <div class="min-h-screen flex flex-col">
+
+    <!-- NAVBAR -->
     <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
       <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+
+        <!-- Branding -->
         <div class="flex items-center space-x-2">
           <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-rose-500 shadow-lg"></div>
           <div>
@@ -17,52 +21,96 @@
             <div class="text-xs text-slate-400">Multi-tenant funeral home console</div>
           </div>
         </div>
-        <a href="#tenants" class="text-xs sm:text-sm px-4 py-2 rounded-full border border-amber-400/60 text-amber-100 hover:bg-amber-400/10 transition">
-          View Funeral Homes
-        </a>
+
+        <!-- NAV BUTTONS -->
+        <div class="flex items-center space-x-3">
+
+          <a href="#tenants"
+             class="text-xs sm:text-sm px-4 py-2 rounded-full border border-amber-400/60 text-amber-100 hover:bg-amber-400/10 transition">
+            View Funeral Homes
+          </a>
+
+          <!-- ⭐ NEW: NAVBAR FREE TRIAL BUTTON -->
+          <a href="/signup.html"
+             class="text-xs sm:text-sm px-4 py-2 rounded-full bg-yellow-400 text-slate-900 font-semibold shadow hover:bg-yellow-300 transition">
+            Start Free Trial
+          </a>
+
+        </div>
       </div>
     </header>
 
     <main class="flex-1">
+
+      <!-- HERO SECTION -->
       <section class="relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black"></div>
         <div class="absolute -top-40 -right-40 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-rose-500/10 rounded-full blur-3xl"></div>
 
         <div class="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 grid gap-10 lg:grid-cols-[1.3fr,1fr] items-center">
+
+          <!-- HERO TEXT -->
           <div>
-            <p class="text-xs font-semibold tracking-[0.3em] text-amber-200/80 mb-3 uppercase">Multi-tenant funeral platform</p>
+            <p class="text-xs font-semibold tracking-[0.3em] text-amber-200/80 mb-3 uppercase">
+              Multi-tenant funeral platform
+            </p>
+
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-slate-50">
               One platform. <span class="text-amber-300">Many funeral homes.</span>
             </h1>
+
             <p class="mt-4 text-sm sm:text-base text-slate-300 max-w-xl">
               Each funeral home has its own branded website, memorial pages, and admin console—
               all managed through a single, scalable backend.
             </p>
 
+            <!-- BUTTONS GROUP -->
             <div class="mt-6 flex flex-wrap gap-3">
-              <a href="#tenants" class="px-5 py-2.5 rounded-full text-sm font-medium bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/30 hover:bg-amber-300 transition">
+
+              <a href="#tenants"
+                 class="px-5 py-2.5 rounded-full text-sm font-medium bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/30 hover:bg-amber-300 transition">
                 Open W. Edwards Site
               </a>
+
               <span class="px-4 py-2 rounded-full text-xs border border-slate-700 text-slate-300">
                 Plug-and-play · Multi-tenant ready
               </span>
             </div>
+
+            <!-- ⭐ NEW: HERO SECTION FREE TRIAL BUTTON -->
+            <div class="mt-6">
+              <a href="/signup.html"
+                 class="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg transition">
+                Start Free Trial
+              </a>
+
+              <p class="mt-3 text-gray-400 text-xs sm:text-sm">
+                No credit card required • 14-day free trial
+              </p>
+            </div>
           </div>
 
+          <!-- SNAPSHOT CARD -->
           <div class="bg-slate-900/70 border border-slate-800 rounded-3xl p-5 shadow-xl shadow-black/50">
             <p class="text-xs font-semibold text-slate-400 tracking-[0.25em] uppercase mb-3">Snapshot</p>
+
             <div class="grid grid-cols-2 gap-3 text-xs">
+
               <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3">
                 <div class="text-[0.65rem] text-slate-400 uppercase tracking-wide">Tenants</div>
                 <div class="mt-1 text-xl font-semibold" id="tenantCount">1</div>
                 <div class="mt-1 text-[0.65rem] text-slate-500">Each with its own site</div>
               </div>
+
               <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3">
                 <div class="text-[0.65rem] text-slate-400 uppercase tracking-wide">Modules</div>
                 <div class="mt-1 text-xl font-semibold">4</div>
-                <div class="mt-1 text-[0.65rem] text-slate-500">Memorials, PDF, Accounting, Scheduler</div>
+                <div class="mt-1 text-[0.65rem] text-slate-500">
+                  Memorials, PDF, Accounting, Scheduler
+                </div>
               </div>
+
               <div class="col-span-2 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 p-3 flex items-center justify-between">
                 <div>
                   <div class="text-[0.65rem] text-slate-300 uppercase tracking-wide">Super-admin ready</div>
@@ -72,23 +120,30 @@
                   Start with W. Edwards<br/>Add others later
                 </div>
               </div>
+
             </div>
           </div>
+
         </div>
       </section>
 
+      <!-- TENANTS SECTION -->
       <section id="tenants" class="bg-slate-950 border-t border-slate-900">
         <div class="max-w-6xl mx-auto px-4 py-10">
+
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-slate-50">Funeral homes on this platform</h2>
             <p class="text-xs text-slate-400">Start with W. Edwards. More can be added later.</p>
           </div>
+
           <div id="tenantGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 text-sm"></div>
+
         </div>
       </section>
     </main>
   </div>
 
+  <!-- JS: LOAD TENANTS -->
   <script>
     async function loadTenants() {
       try {
@@ -113,21 +168,28 @@
               <h3 class="text-sm font-semibold text-slate-50">${t.name}</h3>
               <p class="mt-1 text-xs text-slate-400">Slug: <span class="font-mono">${t.slug}</span></p>
             </div>
+
             <div class="mt-3 flex items-center justify-between gap-2">
-              <a href="/t/${t.slug}" class="px-3 py-1.5 rounded-full text-[0.7rem] font-medium bg-amber-400 text-slate-950 hover:bg-amber-300 transition">
+              <a href="/t/${t.slug}"
+                 class="px-3 py-1.5 rounded-full text-[0.7rem] font-medium bg-amber-400 text-slate-950 hover:bg-amber-300 transition">
                 Open public site
               </a>
-              <a href="/admin/admin-login.html?tenant=${encodeURIComponent(t.slug)}" class="px-3 py-1.5 rounded-full text-[0.7rem] border border-slate-700 text-slate-200 hover:bg-slate-800 transition">
+
+              <a href="/admin/admin-login.html?tenant=${encodeURIComponent(t.slug)}"
+                 class="px-3 py-1.5 rounded-full text-[0.7rem] border border-slate-700 text-slate-200 hover:bg-slate-800 transition">
                 Admin console
               </a>
             </div>
           </article>
         `).join("");
+
       } catch (err) {
         console.error(err);
       }
     }
+
     loadTenants();
   </script>
+
 </body>
 </html>
