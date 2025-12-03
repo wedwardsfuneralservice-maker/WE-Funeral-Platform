@@ -18,9 +18,9 @@ if (!fs.existsSync(DATA)) {
 }
 
 // JSON data files
-const tenantsFile = path.join(DATA, "tenants.json");
-const adminFile = path.join(DATA, "admin.json");
-const memorialsFile = path.join(DATA, "memorials.json");
+const tenantsFile = path.join(DATA, "tenants.json");   // array of tenants
+const adminFile = path.join(DATA, "admin.json");       // map: { [slug]: { adminKey } }
+const memorialsFile = path.join(DATA, "memorials.json"); // map: { [slug]: [memorials] }
 
 // ---------------------------------------------
 // MIDDLEWARE
@@ -56,12 +56,49 @@ function writeJSON(file, data) {
 }
 
 // ---------------------------------------------
-// LOADERS
+// LOADERS / SAVERS
 // ---------------------------------------------
-const loadTenants = () => readJSON(tenantsFile, []);
-const loadAdmins = () => readJSON(adminFile, {});
-const loadMemorials = () => readJSON(memorialsFile, {});
+const loadTenants = () => readJSON(tenantsFile, []);      // array
+const saveTenants = (tenants) => writeJSON(tenantsFile, tenants);
+
+const loadAdmins = () => readJSON(adminFile, {});         // map
+const saveAdmins = (admins) => writeJSON(adminFile, admins);
+
+const loadMemorials = () => readJSON(memorialsFile, {});  // map
 const saveMemorials = (data) => writeJSON(memorialsFile, data);
+
+// ---------------------------------------------
+// HELPERS
+// ---------------------------------------------
+function slugifyName(name) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "tenant";
+}
+
+function generateUniqueSlug(baseSlug, existingSlugs) {
+  let slug = baseSlug;
+  let i = 1;
+  while (existingSlugs.includes(slug)) {
+    slug = `${baseSlug}-${i}`;
+    i++;
+  }
+  return slug;
+}
+
+function generateTempKey(length = 10) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let key = "";
+  for (let i = 0; i < length; i++) {
+    key += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return key;
+}
+
+// Day helpers
+const DAYS = 24 * 60 * 60 * 1000;
 
 // ---------------------------------------------
 // ROOT PAGES
@@ -76,7 +113,14 @@ app.get("/t/:slug", (req, res) => {
 });
 
 // ---------------------------------------------
-// TENANT API
+// HEALTHCHECK (optional)
+// ---------------------------------------------
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true, time: Date.now() });
+});
+
+// ---------------------------------------------
+// TENANT API (READ)
 // ---------------------------------------------
 app.get("/api/tenant/:slug", (req, res) => {
   const tenants = loadTenants();
@@ -87,8 +131,105 @@ app.get("/api/tenant/:slug", (req, res) => {
   res.json(tenant);
 });
 
+// Status (includes trial info)
+app.get("/api/tenant/:slug/status", (req, res) => {
+  const tenants = loadTenants();
+  const tenant = tenants.find((t) => t.slug === req.params.slug);
+
+  if (!tenant) {
+    return res.status(404).json({ error: "Tenant not found" });
+  }
+
+  const now = Date.now();
+  const trialExpired =
+    tenant.trialEndsAt && typeof tenant.trialEndsAt === "number"
+      ? now > tenant.trialEndsAt
+      : false;
+
+  res.json({
+    slug: tenant.slug,
+    name: tenant.name,
+    package: tenant.package,
+    status: tenant.status,    // "trial", "active", "suspended", etc.
+    trialEndsAt: tenant.trialEndsAt || null,
+    trialExpired,
+    createdAt: tenant.createdAt || null,
+    paidAt: tenant.paidAt || null,
+  });
+});
+
+// List all tenants (optional admin usage)
 app.get("/api/tenants", (req, res) => {
   res.json(loadTenants());
+});
+
+// ---------------------------------------------
+// SIGNUP (AUTO-PROVISION + 14-DAY TRIAL)
+// ---------------------------------------------
+// This is called by your public signup form
+app.post("/api/signup", (req, res) => {
+  const {
+    funeralHomeName,
+    ownerName,
+    email,
+    phone,
+    website,
+    country,
+    packageName, // e.g. "starter", "pro", "premium"
+  } = req.body;
+
+  if (!funeralHomeName || !email || !packageName) {
+    return res
+      .status(400)
+      .json({ error: "funeralHomeName, email, and packageName are required" });
+  }
+
+  const tenants = loadTenants();
+  const baseSlug = slugifyName(funeralHomeName);
+  const existingSlugs = tenants.map((t) => t.slug);
+  const slug = generateUniqueSlug(baseSlug, existingSlugs);
+
+  const now = Date.now();
+  const trialEndsAt = now + 14 * DAYS;
+
+  const newTenant = {
+    slug,
+    name: funeralHomeName,
+    ownerName: ownerName || "",
+    email,
+    phone: phone || "",
+    website: website || "",
+    country: country || "",
+    package: packageName,
+    status: "trial", // trial until payment / upgrade
+    trialEndsAt,
+    createdAt: now,
+    paidAt: null,
+  };
+
+  tenants.push(newTenant);
+  saveTenants(tenants);
+
+  const admins = loadAdmins();
+  const tempAdminKey = generateTempKey();
+  admins[slug] = { adminKey: tempAdminKey };
+  saveAdmins(admins);
+
+  // TODO: plug in SMTP email here later:
+  // sendWelcomeEmail({ to: email, slug, tempAdminKey, trialEndsAt });
+
+  console.log(
+    `New tenant signup: ${slug} (${funeralHomeName}) – trial until ${new Date(
+      trialEndsAt
+    ).toISOString()}`
+  );
+
+  res.json({
+    success: true,
+    tenantSlug: slug,
+    tempAdminKey,
+    trialEndsAt,
+  });
 });
 
 // ---------------------------------------------
@@ -107,11 +248,57 @@ app.post("/api/admin/login", (req, res) => {
   if (info.adminKey !== key)
     return res.status(403).json({ error: "Invalid admin key" });
 
+  // Optional: check trial status and block if expired and not paid
+  const tenants = loadTenants();
+  const t = tenants.find((x) => x.slug === tenant);
+  if (t) {
+    const now = Date.now();
+    const trialExpired =
+      t.trialEndsAt && typeof t.trialEndsAt === "number"
+        ? now > t.trialEndsAt
+        : false;
+
+    if (trialExpired && t.status !== "active") {
+      return res.status(402).json({
+        error: "Trial expired",
+        code: "TRIAL_EXPIRED",
+        tenant: tenant,
+      });
+    }
+  }
+
   res.json({ success: true, tenant });
 });
 
 // ---------------------------------------------
-// MEMORIALS API
+// PAYMENT WEBHOOK / ACTIVATION
+// ---------------------------------------------
+// Call this from your payment provider webhook when payment succeeds
+app.post("/api/tenants/mark-paid", (req, res) => {
+  const { slug } = req.body;
+
+  if (!slug) {
+    return res.status(400).json({ error: "slug required" });
+  }
+
+  const tenants = loadTenants();
+  const tenant = tenants.find((t) => t.slug === slug);
+
+  if (!tenant) {
+    return res.status(404).json({ error: "Tenant not found" });
+  }
+
+  tenant.status = "active";
+  tenant.paidAt = Date.now();
+
+  saveTenants(tenants);
+
+  console.log(`Tenant ${slug} marked as PAID and ACTIVE.`);
+  res.json({ success: true, tenant });
+});
+
+// ---------------------------------------------
+// MEMORIALS API (per-tenant)
 // ---------------------------------------------
 app.get("/api/memorials/:tenant", (req, res) => {
   const all = loadMemorials();
@@ -190,10 +377,9 @@ app.post("/api/memorials/delete", (req, res) => {
 });
 
 // ---------------------------------------------
-// FALLBACK—Render needs this for SPA navigation
+// FALLBACK—Render needs this for SPA-ish navigation
 // ---------------------------------------------
 app.get("*", (req, res) => {
-  // Only return index.html for HTML requests
   if ((req.headers.accept || "").includes("text/html")) {
     return res.sendFile(path.join(PUBLIC, "index.html"));
   }
