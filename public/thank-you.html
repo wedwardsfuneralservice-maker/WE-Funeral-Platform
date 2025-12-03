@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Created</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+
+  <div class="bg-white max-w-lg w-full p-8 rounded-xl shadow">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Welcome Aboard!</h1>
+
+    <p class="text-gray-600 mb-6 text-center">
+      Your funeral home account has been created.<br>
+      Your <strong>14-day free trial</strong> is now active.
+    </p>
+
+    <div id="infoBox" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
+      <!-- JS will fill this -->
+    </div>
+
+    <a id="loginLink"
+       class="block bg-blue-600 hover:bg-blue-700 text-white font-semibold text-center py-3 rounded-lg text-lg">
+       Go to Login
+    </a>
+  </div>
+
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const tenant = params.get("tenant");
+  const key = params.get("key");
+  const trialEnds = params.get("trialEnds");
+
+  const infoBox = document.getElementById("infoBox");
+  const loginLink = document.getElementById("loginLink");
+
+  infoBox.innerHTML = `
+    <p class="text-gray-700">
+      <strong>Tenant ID:</strong> ${tenant}<br>
+      <strong>Temporary Admin Key:</strong> ${key}<br>
+      <strong>Trial Ends:</strong> ${new Date(parseInt(trialEnds)).toDateString()}
+    </p>
+  `;
+
+  loginLink.href = `/admin-login.html?tenant=${tenant}`;
+</script>
+
+</body>
+</html>
