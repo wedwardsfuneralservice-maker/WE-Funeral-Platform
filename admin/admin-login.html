@@ -1,8 +1,9 @@
 <script>
-async function doAdminLogin() {
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();   // 🔥 Stop form from reloading the page
+
     const urlParams = new URLSearchParams(window.location.search);
     const tenant = urlParams.get("tenant");
-
     const key = document.getElementById("adminKey").value;
 
     try {
@@ -19,12 +20,12 @@ async function doAdminLogin() {
             return;
         }
 
-        // Login success → redirect to admin dashboard
+        // Login success → go to dashboard
         window.location.href = `/admin/admin-dashboard.html?tenant=${tenant}`;
     }
     catch (err) {
-        console.error(err);
+        console.error("Login failed:", err);
         alert("Network error — unable to reach server");
     }
-}
+});
 </script>
