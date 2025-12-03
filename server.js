@@ -130,6 +130,33 @@ app.get("/api/tenant/:slug", (req, res) => {
 
   res.json(tenant);
 });
+// Save / update tenant settings (branding, business info, website options)
+app.post("/api/tenant/:slug/settings", (req, res) => {
+  const slug = req.params.slug;
+  const settings = req.body || {};
+
+  const tenants = loadTenants(); // existing helper
+  const tenant = tenants.find(t => t.slug === slug);
+
+  if (!tenant) {
+    return res.status(404).json({ error: "Tenant not found" });
+  }
+
+  // Merge new settings into tenant record
+  tenant.branding = settings.branding || tenant.branding || {};
+  tenant.business = settings.business || tenant.business || {};
+  tenant.websiteOptions = settings.website || tenant.websiteOptions || {};
+  tenant.brandColor = settings.branding?.brandColor || tenant.brandColor || null;
+  tenant.theme = settings.branding?.theme || tenant.theme || "hybrid";
+  tenant.logoUrl = settings.branding?.logoUrl || tenant.logoUrl || "";
+  tenant.heroUrl = settings.branding?.heroUrl || tenant.heroUrl || "";
+  tenant.setupComplete = true;
+
+  saveTenants(tenants);
+
+  res.json({ success: true, tenant });
+});
+
 
 // Status (includes trial info)
 app.get("/api/tenant/:slug/status", (req, res) => {
