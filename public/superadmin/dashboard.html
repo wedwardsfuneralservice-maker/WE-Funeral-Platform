@@ -1,3 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Super Admin Dashboard – WE Funeral Platform</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #0f1115;
+        color: #fff;
+    }
+    h1 { color: #ffcc66; }
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #333;
+    }
+    th {
+        background: #181a1f;
+        text-align: left;
+    }
+    tr:hover { background: #1d2128; }
+</style>
+</head>
+
+<body>
+
+<h1>Super Admin Dashboard</h1>
+<p>Manage all funeral home tenants.</p>
+
+<!-- ⭐ THIS WAS MISSING — now included -->
+<table>
+    <thead>
+        <tr>
+            <th>Slug</th>
+            <th>Funeral Home</th>
+            <th>Email</th>
+            <th>Created</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody id="tenantTable"></tbody>
+</table>
+
 <script>
 // SAFE TOKEN LOADER — retries before redirecting
 function getTokenSafely(maxRetries = 10) {
@@ -35,11 +87,10 @@ async function initDashboard() {
 async function loadTenants(token) {
     try {
         const res = await fetch("/superadmin/api/tenants", {
-    headers: {
-        "x-auth-token": token
-    }
-});
-
+            headers: {
+                "x-auth-token": token
+            }
+        });
 
         if (!res.ok) {
             // Token expired or invalid
@@ -51,7 +102,8 @@ async function loadTenants(token) {
 
         const tenants = await res.json();
         const table = document.getElementById("tenantTable");
-        table.innerHTML = "";
+
+        table.innerHTML = ""; // SAFE now — element exists
 
         tenants.forEach(t => {
             const row = document.createElement("tr");
@@ -74,3 +126,6 @@ async function loadTenants(token) {
 
 initDashboard();
 </script>
+
+</body>
+</html>
