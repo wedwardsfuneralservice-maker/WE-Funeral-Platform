@@ -1,137 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Super Admin Login – WE Funeral Platform</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-
 <style>
     body {
         margin: 0;
         padding: 0;
-        background: linear-gradient(135deg, #0d0f11, #1b1f24);
         font-family: "Segoe UI", Arial, sans-serif;
-        color: #ffffff;
+        background: #0f1115;
+        color: #fff;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
     }
-
-    .login-box {
-        background: #161a1e;
+    .box {
+        background: #181a1f;
         padding: 40px;
         width: 380px;
-        max-width: 90%;
         border-radius: 12px;
         text-align: center;
-        box-shadow: 0 0 20px rgba(0,0,0,0.45);
+        box-shadow: 0 0 25px rgba(0,0,0,0.5);
     }
-
-    h1 {
-        margin: 0 0 5px;
-        font-size: 22px;
-        color: #f7c65b;
-        letter-spacing: 1px;
-    }
-
-    h2 {
-        margin: 0 0 25px;
-        font-size: 15px;
-        color: #aaaaaa;
-        font-weight: normal;
-    }
-
+    h1 { margin-bottom: 4px; color: #ffcc66; }
+    h3 { margin-top: 0; color: #ccc; font-weight: 400; }
     input {
         width: 100%;
         padding: 12px;
-        border: none;
+        margin: 10px 0;
         border-radius: 6px;
-        margin-bottom: 12px;
+        border: none;
         font-size: 15px;
-        background: #0f1215;
-        color: #fff;
-        outline: none;
     }
-
-    .password-field {
-        position: relative;
-    }
-
-    .toggle {
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        font-size: 13px;
-        color: #f7c65b;
-    }
-
     button {
         width: 100%;
         padding: 12px;
-        background: #f7c65b;
-        color: #000;
+        background: #ffcc66;
         border: none;
         border-radius: 6px;
-        margin-top: 8px;
         cursor: pointer;
-        font-weight: bold;
-        transition: 0.2s;
+        font-size: 16px;
+        margin-top: 10px;
     }
-
-    button:hover {
-        opacity: 0.9;
-    }
-
-    .error {
-        margin-top: 12px;
-        font-size: 14px;
-        color: #ff6b6b;
-        display: none;
-    }
+    .error { color: #ff6666; margin-top: 10px; display: none; }
 </style>
 </head>
 
 <body>
 
-<div class="login-box">
+<div class="box">
     <h1>W.E. FUNERAL PLATFORM</h1>
-    <h2>SUPER ADMIN LOGIN</h2>
+    <h3>SUPER ADMIN LOGIN</h3>
 
-    <form id="superLogin">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
 
-        <input type="email" id="email" placeholder="Email" required>
+    <button id="loginBtn">Login</button>
 
-        <div class="password-field">
-            <input type="password" id="password" placeholder="Password" required>
-            <span class="toggle" id="togglePass">Show</span>
-        </div>
-
-        <button type="submit">Login</button>
-
-        <div id="errorMsg" class="error">Invalid credentials</div>
-    </form>
+    <div id="errorMsg" class="error">Invalid login</div>
 </div>
 
 <script>
-// Show/Hide password
-document.getElementById("togglePass").addEventListener("click", () => {
-    const field = document.getElementById("password");
-    if (field.type === "password") {
-        field.type = "text";
-        togglePass.innerText = "Hide";
-    } else {
-        field.type = "password";
-        togglePass.innerText = "Show";
-    }
-});
-
-// Handle login
-document.getElementById("superLogin").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
+document.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
     const errorMsg = document.getElementById("errorMsg");
@@ -146,17 +78,17 @@ document.getElementById("superLogin").addEventListener("submit", async (e) => {
 
     const data = await res.json();
 
-    if (data.success) {
-
-        // 🔥 Save token so dashboard works
-        localStorage.setItem("superadminToken", data.token);
-
-        // 🔥 Redirect to dashboard
-        window.location.href = "/superadmin/dashboard";
-    } else {
+    if (!data.success) {
+        errorMsg.innerText = data.error || "Invalid login";
         errorMsg.style.display = "block";
-        errorMsg.innerText = data.error || "Invalid credentials";
+        return;
     }
+
+    // Save JWT token
+    localStorage.setItem("superadminToken", data.token);
+
+    // Redirect to dashboard
+    window.location.href = "/superadmin/dashboard.html";
 });
 </script>
 
