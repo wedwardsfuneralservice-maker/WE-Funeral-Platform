@@ -40,12 +40,10 @@ app.post("/superadmin/login", (req, res) => {
         );
 
         if (!user) {
-            return res
-                .status(401)
-                .json({ success: false, error: "Invalid login" });
+            return res.status(401).json({ success: false, error: "Invalid login" });
         }
 
-        // Create simple session token
+        // Create session token
         const token = crypto.randomBytes(16).toString("hex");
 
         superadminSessions[token] = {
@@ -55,12 +53,9 @@ app.post("/superadmin/login", (req, res) => {
         };
 
         return res.json({ success: true, token });
-
     } catch (err) {
         console.error("Superadmin login error:", err);
-        return res
-            .status(500)
-            .json({ success: false, error: "Server error" });
+        return res.status(500).json({ success: false, error: "Server error" });
     }
 });
 
@@ -70,9 +65,7 @@ app.post("/superadmin/login", (req, res) => {
 function requireSuperadmin(req, res, next) {
     const token = req.headers["x-auth-token"];
     if (!token || !superadminSessions[token]) {
-        return res
-            .status(401)
-            .json({ success: false, error: "Unauthorized" });
+        return res.status(401).json({ success: false, error: "Unauthorized" });
     }
     next();
 }
@@ -82,11 +75,9 @@ function requireSuperadmin(req, res, next) {
 // ------------------------------------------------------
 app.post("/superadmin/logout", (req, res) => {
     const token = req.headers["x-auth-token"];
-
     if (token && superadminSessions[token]) {
         delete superadminSessions[token];
     }
-
     return res.json({ success: true, message: "Logged out" });
 });
 
@@ -95,21 +86,17 @@ app.post("/superadmin/logout", (req, res) => {
 // ------------------------------------------------------
 app.get("/superadmin", (req, res) => {
     const token = req.headers["x-auth-token"];
-
     if (token && superadminSessions[token]) {
         return res.redirect("/superadmin/dashboard");
     }
-
     return res.redirect("/superadmin/login");
 });
 
 // ------------------------------------------------------
-// SUPERADMIN DASHBOARD PAGE (Protected)
+// SUPERADMIN DASHBOARD PAGE
 // ------------------------------------------------------
 app.get("/superadmin/dashboard", requireSuperadmin, (req, res) => {
-    res.sendFile(
-        path.join(__dirname, "public/superadmin/dashboard.html")
-    );
+    res.sendFile(path.join(__dirname, "public/superadmin/dashboard.html"));
 });
 
 // ------------------------------------------------------
@@ -126,17 +113,28 @@ app.get("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
 });
 
 // ------------------------------------------------------
+// 🔥 FIX: Alias route for dashboard.html compatibility
+// ------------------------------------------------------
+app.get("/api/superadmin/tenants", requireSuperadmin, (req, res) => {
+    try {
+        const tenants = JSON.parse(fs.readFileSync("./data/tenants.json"));
+        res.json(tenants);
+    } catch (err) {
+        console.error("Error reading tenants:", err);
+        res.status(500).json({ success: false, error: "Server error" });
+    }
+});
+
+// ------------------------------------------------------
 // SUPERADMIN — CREATE NEW TENANT
 // ------------------------------------------------------
 app.post("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
     try {
         const tenants = JSON.parse(fs.readFileSync("./data/tenants.json"));
 
-        const slug = req.body.slug?.toLowerCase().replace(/\s+/g, "-");
+        const slug = req.body.slug;
         if (!slug)
-            return res
-                .status(400)
-                .json({ success: false, error: "Missing slug" });
+            return res.status(400).json({ success: false, error: "Missing slug" });
 
         if (tenants.find((t) => t.slug === slug)) {
             return res.status(400).json({
@@ -154,10 +152,7 @@ app.post("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
         };
 
         tenants.push(newTenant);
-        fs.writeFileSync(
-            "./data/tenants.json",
-            JSON.stringify(tenants, null, 2)
-        );
+        fs.writeFileSync("./data/tenants.json", JSON.stringify(tenants, null, 2));
 
         res.json({ success: true, tenant: newTenant });
     } catch (err) {
@@ -183,10 +178,7 @@ app.delete("/superadmin/api/tenants/:slug", requireSuperadmin, (req, res) => {
                 .json({ success: false, error: "Tenant not found" });
         }
 
-        fs.writeFileSync(
-            "./data/tenants.json",
-            JSON.stringify(tenants, null, 2)
-        );
+        fs.writeFileSync("./data/tenants.json", JSON.stringify(tenants, null, 2));
 
         res.json({ success: true, message: "Tenant removed" });
     } catch (err) {
@@ -195,41 +187,31 @@ app.delete("/superadmin/api/tenants/:slug", requireSuperadmin, (req, res) => {
     }
 });
 
-// ------------------------------------------------------
-// ADMIN PAGES
-// ------------------------------------------------------
+//------------------------------------------------------
+// ADMIN STATIC ROUTES
+//------------------------------------------------------
 app.get("/admin/login", (req, res) => {
-    res.sendFile(
-        path.join(__dirname, "public/admin/admin-login.html")
-    );
+    res.sendFile(path.join(__dirname, "public/admin/admin-login.html"));
 });
 
 app.get("/admin/dashboard", (req, res) => {
-    res.sendFile(
-        path.join(__dirname, "public/admin/admin-dashboard.html")
-    );
+    res.sendFile(path.join(__dirname, "public/admin/admin-dashboard.html"));
 });
 
 app.get("/admin/onboarding", (req, res) => {
-    res.sendFile(
-        path.join(__dirname, "public/admin/onboarding.html")
-    );
+    res.sendFile(path.join(__dirname, "public/admin/onboarding.html"));
 });
 
 app.get("/admin/reset-password", (req, res) => {
-    res.sendFile(
-        path.join(__dirname, "public/admin/reset-password.html")
-    );
+    res.sendFile(path.join(__dirname, "public/admin/reset-password.html"));
 });
 
 app.get("/admin/reset-confirm", (req, res) => {
-    res.sendFile(
-        path.join(__dirname, "public/admin/reset-confirm.html")
-    );
+    res.sendFile(path.join(__dirname, "public/admin/reset-confirm.html"));
 });
 
 // ------------------------------------------------------
-// EMAIL TRANSPORT
+// SAFE EMAIL TRANSPORT
 // ------------------------------------------------------
 const mailer = nodemailer.createTransport({
     service: "gmail",
@@ -253,7 +235,7 @@ async function sendMailSafe(options) {
 // ------------------------------------------------------
 function loadJSON(file) {
     const filePath = path.join(__dirname, "data", file);
-    if (!fs.existsSync(filePath)) return {};
+    if (!fs.existsSync(filePath)) return [];
     return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
@@ -265,36 +247,29 @@ function saveJSON(file, data) {
 const loadTenants = () => loadJSON("tenants.json");
 const saveTenants = (d) => saveJSON("tenants.json", d);
 
-const loadAdmins = () => loadJSON("admin.json");
-const saveAdmins = (d) => saveJSON("admin.json", d);
+const loadAdmins = () => loadJSON("admins.json");
+const saveAdmins = (d) => saveJSON("admins.json", d);
 
 // ------------------------------------------------------
-//  API: CREATE NEW TENANT (Free Trial Signup)
+// PUBLIC TENANT SIGNUP
 // ------------------------------------------------------
 app.post("/api/signup", (req, res) => {
     const { funeralHomeName, email } = req.body;
 
     if (!funeralHomeName || !email)
-        return res
-            .status(400)
-            .json({ error: "Missing required fields." });
+        return res.status(400).json({ error: "Missing required fields." });
 
     const tenants = loadTenants();
     const admins = loadAdmins();
 
-    const slug = funeralHomeName
-        .toLowerCase()
-        .replace(/\s+/g, "-");
+    const slug = funeralHomeName.toLowerCase().replace(/\s+/g, "-");
     const tempAdminKey = crypto.randomBytes(4).toString("hex");
 
     if (tenants.find((t) => t.slug === slug)) {
-        return res
-            .status(400)
-            .json({ error: "Tenant already exists." });
+        return res.status(400).json({ error: "Tenant already exists." });
     }
 
-    const trialEndsAt =
-        Date.now() + 14 * 24 * 60 * 60 * 1000;
+    const trialEndsAt = Date.now() + 14 * 24 * 60 * 60 * 1000;
 
     const newTenant = {
         slug,
@@ -310,23 +285,18 @@ app.post("/api/signup", (req, res) => {
     saveTenants(tenants);
     saveAdmins(admins);
 
-    // SEND WELCOME EMAIL
+    // Send Welcome Email
     sendMailSafe({
         from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: "Welcome to WE Funeral Platform",
         html: `
-            <h2>Welcome to the WE Funeral Platform!</h2>
+            <h2>Welcome!</h2>
             <p>Your funeral home <strong>${funeralHomeName}</strong> is now created.</p>
-
             <p><strong>Login URL:</strong><br>
             https://we-funeral-platform.onrender.com/admin/login?tenant=${slug}</p>
-
-            <p><strong>Your Temporary Admin Password:</strong><br>${tempAdminKey}</p>
-
-            <p><strong>Free Trial Ends:</strong> ${new Date(
-                trialEndsAt
-            ).toDateString()}</p>
+            <p><strong>Temporary Admin Password:</strong><br>${tempAdminKey}</p>
+            <p><strong>Free Trial Ends:</strong> ${new Date(trialEndsAt).toDateString()}</p>
         `,
     });
 
@@ -347,15 +317,10 @@ app.post("/api/admin/login", (req, res) => {
     const admins = loadAdmins();
 
     const tenant = tenants.find((t) => t.slug === slug);
-    if (!tenant)
-        return res
-            .status(400)
-            .json({ error: "Tenant not found" });
+    if (!tenant) return res.status(400).json({ error: "Tenant not found" });
 
     if (!admins[slug] || admins[slug].adminKey !== adminKey)
-        return res
-            .status(400)
-            .json({ error: "Invalid admin key" });
+        return res.status(400).json({ error: "Invalid admin key" });
 
     res.json({ success: true });
 });
@@ -369,7 +334,6 @@ app.post("/api/auth/reset-request", (req, res) => {
     const tenants = loadTenants();
     const tenant = tenants.find((t) => t.email === email);
 
-    // Always act successful
     if (!tenant) return res.json({ success: true });
 
     const token = crypto.randomBytes(32).toString("hex");
@@ -389,7 +353,7 @@ app.post("/api/auth/reset-request", (req, res) => {
             <h2>Password Reset</h2>
             <p>Click below to reset your password:</p>
             <a href="${resetURL}">${resetURL}</a>
-            <p>This link expires in 30 minutes.</p>
+            <p>Link expires in 30 minutes.</p>
         `,
     });
 
@@ -407,14 +371,10 @@ app.post("/api/auth/reset-confirm", (req, res) => {
 
     const tenant = tenants.find((t) => t.resetToken === token);
     if (!tenant)
-        return res
-            .status(400)
-            .json({ error: "Invalid or expired token" });
+        return res.status(400).json({ error: "Invalid or expired token" });
 
     if (Date.now() > tenant.resetExpiry)
-        return res
-            .status(400)
-            .json({ error: "Token expired" });
+        return res.status(400).json({ error: "Token expired" });
 
     admins[tenant.slug].adminKey = password;
 
@@ -428,15 +388,12 @@ app.post("/api/auth/reset-confirm", (req, res) => {
 });
 
 // ------------------------------------------------------
-// READ SINGLE TENANT
+// READ TENANT DATA
 // ------------------------------------------------------
 app.get("/api/tenant/:slug", (req, res) => {
     const tenants = loadTenants();
     const tenant = tenants.find((t) => t.slug === req.params.slug);
-    if (!tenant)
-        return res
-            .status(404)
-            .json({ error: "Tenant not found" });
+    if (!tenant) return res.status(404).json({ error: "Tenant not found" });
     res.json(tenant);
 });
 
@@ -449,10 +406,7 @@ app.post("/api/tenant/:slug/settings", (req, res) => {
     const tenants = loadTenants();
     const tenant = tenants.find((t) => t.slug === slug);
 
-    if (!tenant)
-        return res
-            .status(404)
-            .json({ error: "Tenant not found" });
+    if (!tenant) return res.status(404).json({ error: "Tenant not found" });
 
     Object.assign(tenant, req.body);
     saveTenants(tenants);
@@ -461,7 +415,7 @@ app.post("/api/tenant/:slug/settings", (req, res) => {
 });
 
 // ------------------------------------------------------
-// TEST EMAIL
+// TEST EMAIL ROUTE
 // ------------------------------------------------------
 app.get("/api/test-email", async (req, res) => {
     try {
