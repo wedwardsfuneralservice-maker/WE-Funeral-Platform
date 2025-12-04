@@ -161,15 +161,26 @@
     }
 
 </style>
-    <script>
-    // Redirect if no valid superadmin session
-    const token = localStorage.getItem("superadminToken");
-    if (!token) {
-        window.location.href = "/superadmin/login";
-    }
-</script>
-</head>
 
+<!-- Inject superadmin token into all requests -->
+<script>
+const superToken = localStorage.getItem("superadminToken");
+
+async function secureFetch(url, options = {}) {
+    options.headers = options.headers || {};
+    options.headers["x-auth-token"] = superToken;
+    return fetch(url, options);
+}
+</script>
+
+<!-- Redirect if token missing -->
+<script>
+if (!localStorage.getItem("superadminToken")) {
+    window.location.href = "/superadmin/login";
+}
+</script>
+
+</head>
 <body>
 
 <!-- Sidebar -->
@@ -191,7 +202,6 @@
 <!-- Main Content -->
 <div class="main">
 
-    <!-- Header -->
     <div class="header" id="pageHeader">Dashboard</div>
 
     <!-- Dashboard Section -->
@@ -235,31 +245,12 @@
     <!-- Create Tenant Section -->
     <div class="section" id="createSection" style="display:none;">
         <h2>Create New Funeral Home</h2>
-
-        <p style="opacity:0.7;">(This mirrors the public signup, but for manual creation.)</p>
+        <p style="opacity:0.7;">(This mirrors the public signup.)</p>
 
         <input id="newName" type="text" placeholder="Funeral Home Name" style="padding:12px;width:100%;border-radius:8px;margin-bottom:12px;">
         <input id="newEmail" type="email" placeholder="Email" style="padding:12px;width:100%;border-radius:8px;margin-bottom:12px;">
 
         <button class="btn" onclick="createTenant()">Create Tenant</button>
-    </div>
-
-    <!-- Billing Section -->
-    <div class="section" id="billingSection" style="display:none;">
-        <h2>Billing (Coming Soon)</h2>
-        <p>Integrations for Fygaro and recurring plans will appear here.</p>
-    </div>
-
-    <!-- Email Logs Section -->
-    <div class="section" id="emailsSection" style="display:none;">
-        <h2>Email Logs (Coming Soon)</h2>
-        <p>Success, failures, and delivery reports.</p>
-    </div>
-
-    <!-- Settings Section -->
-    <div class="section" id="settingsSection" style="display:none;">
-        <h2>Platform Settings (Coming Soon)</h2>
-        <p>Global theme, branding, restrictions, etc.</p>
     </div>
 
 </div>
@@ -272,7 +263,6 @@ document.querySelectorAll(".nav-item[data-section]").forEach(item => {
         item.classList.add("active");
 
         const section = item.getAttribute("data-section");
-
         document.getElementById("pageHeader").innerText = item.innerText;
 
         document.querySelectorAll(".section").forEach(s => s.style.display = "none");
@@ -282,13 +272,14 @@ document.querySelectorAll(".nav-item[data-section]").forEach(item => {
 
 // Logout
 function logout() {
+    localStorage.removeItem("superadminToken");
     window.location.href = "/superadmin/login";
 }
 
-// Load Tenant Data for Dashboard + Table
+// Load Tenants for Dashboard + Table
 async function loadTenants() {
     try {
-        const res = await fetch("/api/superadmin/tenants");
+        const res = await secureFetch("/superadmin/api/tenants");
         const tenants = await res.json();
 
         document.getElementById("totalTenants").innerText = tenants.length;
@@ -304,7 +295,7 @@ async function loadTenants() {
         tenants.forEach(t => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${t.funeralHomeName}</td>
+                <td>${t.businessName || t.funeralHomeName}</td>
                 <td>${t.slug}</td>
                 <td>${t.email}</td>
                 <td>${t.status || "trial"}</td>
@@ -321,34 +312,40 @@ async function loadTenants() {
         });
     } catch (err) {
         console.error(err);
+        alert("Failed to load tenants.");
     }
 }
 
 loadTenants();
 
-// Placeholder Action Functions
-function viewTenant(slug) {
-    window.location.href = `/admin/dashboard?tenant=${slug}`;
-}
+// Placeholder Functions
+function viewTenant(slug) { alert("Tenant view not implemented."); }
+function extendTrial(slug) { alert("Extend trial not implemented."); }
+function resetTenant(slug) { alert("Reset password not implemented."); }
+function sendWelcome(slug) { alert("Resend welcome not implemented."); }
+function toggleStatus(slug) { alert("Suspend/Activate not implemented."); }
 
-function extendTrial(slug) {
-    alert("Extend trial not yet implemented.");
-}
+async function createTenant() {
+    const name = document.getElementById("newName").value;
+    const email = document.getElementById("newEmail").value;
 
-function resetTenant(slug) {
-    alert("Password reset not yet implemented.");
-}
+    if (!name || !email) return alert("Enter name + email.");
 
-function sendWelcome(slug) {
-    alert("Resend welcome not yet implemented.");
-}
+    const res = await secureFetch("/superadmin/api/tenants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            slug: name.toLowerCase().replace(/\s+/g, "-"),
+            businessName: name,
+            email: email
+        })
+    });
 
-function toggleStatus(slug) {
-    alert("Suspend/Activate not yet implemented.");
-}
+    const data = await res.json();
+    if (!data.success) return alert("Error: " + data.error);
 
-function createTenant() {
-    alert("Tenant creation from panel not yet implemented.");
+    alert("Tenant created!");
+    loadTenants();
 }
 </script>
 
