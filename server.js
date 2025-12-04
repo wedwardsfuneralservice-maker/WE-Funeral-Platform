@@ -105,7 +105,7 @@ app.get("/superadmin/dashboard", requireSuperadmin, (req, res) => {
 app.get("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
     try {
         const tenants = JSON.parse(fs.readFileSync("./data/tenants.json"));
-        res.json({ success: true, tenants });
+        res.json(tenants);
     } catch (err) {
         console.error("Error reading tenants:", err);
         res.status(500).json({ success: false, error: "Server error" });
