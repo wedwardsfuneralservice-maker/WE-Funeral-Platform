@@ -2,7 +2,9 @@
   {
     "id": "tenant-w-edwards",
     "slug": "w-edwards",
-    "name": "W. Edwards Funeral Services",
+    "funeralHomeName": "W. Edwards Funeral Services",
+    "email": "info@wedwardsfuneral.com",
+    "status": "active",
     "brandColor": "#f5c242",
     "logo": "/public/assets/we-logo.png",
     "adminKey": "12345",
