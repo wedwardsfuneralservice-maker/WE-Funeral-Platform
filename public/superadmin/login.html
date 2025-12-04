@@ -88,7 +88,9 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     localStorage.setItem("superadminToken", data.token);
 
     // Redirect to dashboard
+    setTimeout(() => {
     window.location.href = "/superadmin/dashboard.html";
+}, 150);
 });
 </script>
 
