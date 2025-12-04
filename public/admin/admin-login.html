@@ -1,167 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Login – WE Funeral Platform</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: linear-gradient(135deg, #0d0f11, #1b1f24);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .login-container {
-            background: #15181c;
-            padding: 40px;
-            border-radius: 12px;
-            width: 380px;
-            max-width: 90%;
-            box-shadow: 0 0 25px rgba(0,0,0,0.5);
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-
-        .tenant-name {
-            font-size: 14px;
-            color: #aaa;
-            margin-bottom: 20px;
-        }
-
-        .warning {
-            background: #fc3b3b;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-            font-size: 14px;
-            display: none;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border: none;
-            outline: none;
-            font-size: 15px;
-        }
-
-        .password-field {
-            position: relative;
-        }
-
-        .show-toggle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 14px;
-            color: #ffd479;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #f7c65b;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: opacity 0.2s ease;
-        }
-
-        button.loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        button.loading::after {
-            content: " …";
-        }
-
-        .error-text {
-            color: #ff7373;
-            margin-top: 10px;
-            font-size: 14px;
-            display: none;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="login-container">
-    <h2>Admin Login</h2>
-    <div class="tenant-name" id="tenantName">Loading...</div>
-
-    <div id="trialWarn" class="warning">
-        Your free trial has expired. Please check your email for renewal options.
-    </div>
-
-    <form id="loginForm">
-
-        <div class="password-field">
-            <input type="password" id="adminKey" placeholder="Admin Password">
-            <span class="show-toggle" id="toggleShow">Show</span>
-        </div>
-
-        <button type="submit" id="loginBtn">Login</button>
-
-        <div id="errorMsg" class="error-text">Invalid credentials</div>
-
-    </form>
-</div>
-
 <script>
-function getTenantSlug() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("tenant");
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-    const slug = getTenantSlug();
-    const tenantName = document.getElementById("tenantName");
-    const trialWarn = document.getElementById("trialWarn");
-
-    if (!slug) {
-        tenantName.innerText = "No tenant specified.";
-        return;
-    }
-
-    // Load tenant info
-    try {
-        const res = await fetch(`/api/tenant/${slug}/status`);
-        const data = await res.json();
-
-        if (data.error) {
-            tenantName.innerText = "Tenant not found.";
-            return;
-        }
-
-        tenantName.innerText = `Funeral Home: ${slug.replace(/-/g, " ")}`;
-
-        if (data.trialExpired) {
-            trialWarn.style.display = "block";
-        }
-
-    } catch (err) {
-        tenantName.innerText = "Error loading tenant.";
-    }
-});
+// Auto-tenant selection for single-funeral-home install
+const FIXED_TENANT = "w-edwards";
 
 // Toggle password visibility
 document.getElementById("toggleShow").addEventListener("click", () => {
@@ -175,16 +14,38 @@ document.getElementById("toggleShow").addEventListener("click", () => {
     }
 });
 
+// Load tenant info automatically
+document.addEventListener("DOMContentLoaded", async () => {
+    const tenantName = document.getElementById("tenantName");
+    const trialWarn = document.getElementById("trialWarn");
+
+    try {
+        const res = await fetch(`/api/tenant/${FIXED_TENANT}/status`);
+        const data = await res.json();
+
+        if (data.error) {
+            tenantName.innerText = "Tenant not found.";
+            return;
+        }
+
+        tenantName.innerText = "Funeral Home: W. Edwards Funeral Services";
+
+        if (data.trialExpired) {
+            trialWarn.style.display = "block";
+        }
+
+    } catch (err) {
+        tenantName.innerText = "Error loading tenant.";
+    }
+});
+
 // Login handler
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const slug = getTenantSlug();
     const key = document.getElementById("adminKey").value.trim();
     const btn = document.getElementById("loginBtn");
     const errorMsg = document.getElementById("errorMsg");
-
-    errorMsg.style.display = "none";
 
     if (!key) {
         errorMsg.innerText = "Please enter your admin password.";
@@ -192,26 +53,25 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
         return;
     }
 
+    errorMsg.style.display = "none";
     btn.classList.add("loading");
 
+    // Login request
     const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tenant: slug, key })
+        body: JSON.stringify({ tenant: FIXED_TENANT, key })
     });
 
     const data = await response.json();
-
     btn.classList.remove("loading");
 
     if (data.success) {
-        window.location.href = `/admin/dashboard?tenant=${slug}`;
+        // Redirect to correct dashboard file
+        window.location.href = "/admin/admin-dashboard.html";
     } else {
         errorMsg.innerText = data.error || "Login failed.";
         errorMsg.style.display = "block";
     }
 });
 </script>
-
-</body>
-</html>
