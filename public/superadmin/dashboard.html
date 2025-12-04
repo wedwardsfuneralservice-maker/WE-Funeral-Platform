@@ -35,10 +35,11 @@ async function initDashboard() {
 async function loadTenants(token) {
     try {
         const res = await fetch("/superadmin/api/tenants", {
-            headers: {
-                "Authorization": "Bearer " + token
-            }
-        });
+    headers: {
+        "x-auth-token": token
+    }
+});
+
 
         if (!res.ok) {
             // Token expired or invalid
