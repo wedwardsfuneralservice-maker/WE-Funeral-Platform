@@ -1,131 +1,775 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Super Admin Dashboard – WE Funeral Platform</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Super Admin Dashboard – WE Funeral Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<style>
-    body {
-        margin: 0;
-        padding: 20px;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: #0f1115;
-        color: #fff;
+  <style>
+    :root {
+      /* Core colors */
+      --blue: #306cde;
+      --blue-soft: rgba(48, 108, 222, 0.13);
+      --gold: #f5c242;
+
+      /* Dark theme */
+      --bg-main-dark: #0d0f12;
+      --bg-elevated-dark: #171a22;
+      --text-primary-dark: #f9fafb;
+      --text-muted-dark: #9ca3af;
+      --border-subtle-dark: rgba(148, 163, 184, 0.18);
+
+      /* Light theme */
+      --bg-main-light: #f8fafc;
+      --bg-elevated-light: #ffffff;
+      --text-primary-light: #0f172a;
+      --text-muted-light: #6b7280;
+      --border-subtle-light: rgba(148, 163, 184, 0.35);
+
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-soft: 0 18px 35px rgba(0, 0, 0, 0.45);
     }
-    h1 { color: #ffcc66; }
-    table {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse;
+
+    /* THEME WRAPPERS --------------------------------------- */
+    body.theme-dark {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color: var(--text-primary-dark);
+      background:
+        radial-gradient(circle at top left, var(--blue-soft), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
+      display: flex;
+      min-height: 100vh;
     }
-    th, td {
-        padding: 12px;
-        border-bottom: 1px solid #333;
+
+    body.theme-light {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color: var(--text-primary-light);
+      background: var(--bg-main-light);
+      display: flex;
+      min-height: 100vh;
     }
-    th {
-        background: #181a1f;
-        text-align: left;
+
+    /* COMMON LAYOUT ---------------------------------------- */
+    .shell {
+      display: flex;
+      width: 100%;
     }
-    tr:hover { background: #1d2128; }
-</style>
+
+    /* SIDEBAR ---------------------------------------------- */
+    .sidebar {
+      width: 260px;
+      padding: 24px 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      box-shadow: 18px 0 40px rgba(0, 0, 0, 0.45);
+      z-index: 20;
+    }
+
+    body.theme-dark .sidebar {
+      background: linear-gradient(
+        180deg,
+        #05060a,
+        #0b0d12 40%,
+        #05060a 100%
+      );
+      border-right: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    body.theme-light .sidebar {
+      background: #ffffff;
+      border-right: 1px solid var(--border-subtle-light);
+      box-shadow: 12px 0 30px rgba(15, 23, 42, 0.06);
+    }
+
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    .nav-section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 6px;
+      color: var(--text-muted-dark);
+    }
+
+    body.theme-light .nav-section-label {
+      color: var(--text-muted-light);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-item {
+      border-radius: 999px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background 0.18s ease, border-color 0.18s ease,
+        transform 0.12s ease;
+    }
+
+    body.theme-dark .nav-item {
+      color: var(--text-muted-dark);
+    }
+
+    body.theme-light .nav-item {
+      color: var(--text-muted-light);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    body.theme-dark .nav-item:hover {
+      background: rgba(15, 23, 42, 0.8);
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    body.theme-light .nav-item:hover {
+      background: rgba(191, 219, 254, 0.45);
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, var(--blue), #5b8bff);
+      color: #f9fafb;
+      border-color: transparent;
+      box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.4);
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+    }
+
+    body.theme-light .nav-badge {
+      background: rgba(30, 64, 175, 0.12);
+      color: #1e3a8a;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* MAIN AREA -------------------------------------------- */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 28px;
+      box-sizing: border-box;
+      gap: 20px;
+    }
+
+    /* TOP BAR ---------------------------------------------- */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    body.theme-dark .search-box {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: #e5e7eb;
+    }
+
+    body.theme-light .search-box {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle-light);
+      color: #111827;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      color: inherit;
+      width: 150px;
+    }
+
+    .search-box span {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .pill-button {
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.18s ease, transform 0.08s ease,
+        box-shadow 0.18s ease;
+    }
+
+    .pill-button:active {
+      transform: translateY(1px);
+    }
+
+    .pill-button.primary {
+      background: linear-gradient(90deg, var(--blue), #5b8bff);
+      color: #f9fafb;
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+    }
+
+    .pill-button.secondary {
+      background: transparent;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: inherit;
+    }
+
+    .avatar-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .avatar-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, var(--gold), #4b5563);
+      border: 1px solid rgba(249, 250, 251, 0.5);
+    }
+
+    /* THEME TOGGLE */
+    .theme-toggle {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      position: relative;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      cursor: pointer;
+    }
+
+    .theme-toggle-knob {
+      position: absolute;
+      top: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: #f9fafb;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.6);
+      transition: left 0.18s ease;
+    }
+
+    body.theme-dark .theme-toggle-knob {
+      left: 20px;
+    }
+
+    body.theme-light .theme-toggle-knob {
+      left: 2px;
+    }
+
+    /* CARDS / GRID ----------------------------------------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.theme-dark .card {
+      background: radial-gradient(circle at top left, rgba(48,108,222,0.22), transparent 60%),
+        linear-gradient(145deg, #0b1020, #111827);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow: var(--shadow-soft);
+    }
+
+    body.theme-light .card {
+      background: var(--bg-elevated-light);
+      border: 1px solid var(--border-subtle-light);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .card-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      opacity: 0.7;
+    }
+
+    .card-value {
+      font-size: 22px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .card-caption {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    /* CONTENT BLOCKS -------------------------------------- */
+    .content-row {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr);
+      gap: 16px;
+    }
+
+    .block {
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      box-sizing: border-box;
+    }
+
+    body.theme-dark .block {
+      background: linear-gradient(145deg, #020617, #020617);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: var(--shadow-soft);
+    }
+
+    body.theme-light .block {
+      background: var(--bg-elevated-light);
+      border: 1px solid var(--border-subtle-light);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .block-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .block-sub {
+      font-size: 12px;
+      opacity: 0.65;
+    }
+
+    /* TENANT TABLE ---------------------------------------- */
+    .tenant-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .tenant-table thead {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+    }
+
+    .tenant-table th,
+    .tenant-table td {
+      padding: 8px 6px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      text-align: left;
+    }
+
+    body.theme-light .tenant-table th,
+    body.theme-light .tenant-table td {
+      border-bottom-color: rgba(148, 163, 184, 0.3);
+    }
+
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      text-transform: capitalize;
+      display: inline-block;
+    }
+
+    .status-active {
+      background: rgba(22, 163, 74, 0.18);
+      color: #86efac;
+    }
+
+    body.theme-light .status-active {
+      background: rgba(22, 163, 74, 0.1);
+      color: #166534;
+    }
+
+    .tag-muted {
+      opacity: 0.7;
+      font-size: 12px;
+    }
+
+    /* RESPONSIVE ------------------------------------------ */
+    @media (max-width: 900px) {
+      .sidebar {
+        display: none; /* For now, mobile hides sidebar */
+      }
+      .main {
+        padding: 16px;
+      }
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
 </head>
 
-<body>
+<body class="theme-dark">
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="brand-title">W.E. PLATFORM</div>
+        <div class="brand-sub">Super Admin Console</div>
+      </div>
 
-<h1>Super Admin Dashboard</h1>
-<p>Manage all funeral home tenants.</p>
+      <div>
+        <div class="nav-section-label">Overview</div>
+        <ul class="nav-list">
+          <li class="nav-item active" data-view="dashboard">
+            <span>Dashboard</span>
+          </li>
+          <li class="nav-item" data-view="tenants">
+            <span>Tenants</span>
+            <span class="nav-badge" id="tenantCountBadge">0</span>
+          </li>
+        </ul>
+      </div>
 
-<!-- ⭐ THIS WAS MISSING — now included -->
-<table>
-    <thead>
-        <tr>
-            <th>Slug</th>
-            <th>Funeral Home</th>
-            <th>Email</th>
-            <th>Created</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody id="tenantTable"></tbody>
-</table>
+      <div>
+        <div class="nav-section-label">System</div>
+        <ul class="nav-list">
+          <li class="nav-item" data-view="settings">
+            <span>Platform Settings</span>
+          </li>
+          <li class="nav-item" data-view="logs">
+            <span>Activity Logs</span>
+          </li>
+        </ul>
+      </div>
 
-<script>
-// SAFE TOKEN LOADER — retries before redirecting
-function getTokenSafely(maxRetries = 10) {
-    return new Promise((resolve) => {
+      <div class="sidebar-footer">
+        W.E. Funeral Platform © <span id="yearSpan"></span>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main">
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="page-title">Super Admin Dashboard</div>
+          <div class="page-subtitle">
+            Monitor all funeral home tenants and platform activity.
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="search-box">
+            <span>🔍</span>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search tenants..."
+            />
+          </div>
+
+          <button class="pill-button primary" id="createTenantBtn">
+            + Create Tenant
+          </button>
+
+          <div class="theme-toggle" id="themeToggle">
+            <div class="theme-toggle-knob"></div>
+          </div>
+
+          <div class="avatar-chip">
+            <div class="avatar-circle"></div>
+            <span>SuperAdmin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- STATS CARDS -->
+      <section class="grid" id="statsGrid">
+        <article class="card">
+          <div class="card-label">Total Tenants</div>
+          <div class="card-value" id="statTotalTenants">0</div>
+          <div class="card-caption">All funeral homes on the platform</div>
+        </article>
+
+        <article class="card">
+          <div class="card-label">Active Tenants</div>
+          <div class="card-value" id="statActiveTenants">0</div>
+          <div class="card-caption">
+            Currently active or in good standing
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-label">Trial Tenants</div>
+          <div class="card-value" id="statTrialTenants">0</div>
+          <div class="card-caption">Onboarding / evaluation phase</div>
+        </article>
+
+        <article class="card">
+          <div class="card-label">Suspended</div>
+          <div class="card-value" id="statSuspendedTenants">0</div>
+          <div class="card-caption">Temporarily disabled access</div>
+        </article>
+      </section>
+
+      <!-- TENANT TABLE BLOCK -->
+      <section class="content-row" id="tenantsBlock">
+        <div class="block">
+          <div class="block-header">
+            <div>
+              <div class="block-title">Tenants</div>
+              <div class="block-sub">
+                All funeral homes currently registered in the system.
+              </div>
+            </div>
+          </div>
+
+          <table class="tenant-table">
+            <thead>
+              <tr>
+                <th>Slug</th>
+                <th>Funeral Home</th>
+                <th>Email</th>
+                <th>Created</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tenantTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // YEAR
+    document.getElementById("yearSpan").innerText =
+      new Date().getFullYear();
+
+    // THEME HANDLING ---------------------------------------
+    const themeKey = "we_superadmin_theme";
+
+    function applyTheme(theme) {
+      document.body.classList.remove("theme-dark", "theme-light");
+      document.body.classList.add(theme === "light" ? "theme-light" : "theme-dark");
+      localStorage.setItem(themeKey, theme);
+    }
+
+    const savedTheme = localStorage.getItem(themeKey) || "dark";
+    applyTheme(savedTheme);
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const next = document.body.classList.contains("theme-dark")
+        ? "light"
+        : "dark";
+      applyTheme(next);
+    });
+
+    // NAV ACTIVE STATE ------------------------------------
+    document.querySelectorAll(".nav-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        item.classList.add("active");
+        // For now, we keep a single view; later we can switch sections.
+      });
+    });
+
+    // TOKEN LOADING ---------------------------------------
+    function getTokenSafely(maxRetries = 10) {
+      return new Promise((resolve) => {
         let attempts = 0;
 
         function check() {
-            const token = localStorage.getItem("superadminToken");
-            if (token) return resolve(token);
+          const token = localStorage.getItem("superadminToken");
+          if (token) return resolve(token);
 
-            attempts++;
-            if (attempts >= maxRetries) return resolve(null);
+          attempts++;
+          if (attempts >= maxRetries) return resolve(null);
 
-            setTimeout(check, 120); // wait 120ms then re-check
+          setTimeout(check, 120);
         }
 
         check();
-    });
-}
+      });
+    }
 
-async function initDashboard() {
-    const token = await getTokenSafely();
+    async function initDashboard() {
+      const token = await getTokenSafely();
 
-    // If still no token after retries → redirect
-    if (!token) {
+      if (!token) {
         console.warn("No token found — redirecting to login.");
         window.location.href = "/superadmin/login";
         return;
+      }
+
+      loadTenants(token);
     }
 
-    loadTenants(token);
-}
-
-// Load tenants from backend using token
-async function loadTenants(token) {
-    try {
+    async function loadTenants(token) {
+      try {
         const res = await fetch("/superadmin/api/tenants", {
-            headers: {
-                "x-auth-token": token
-            }
+          headers: {
+            "x-auth-token": token,
+          },
         });
 
         if (!res.ok) {
-            // Token expired or invalid
-            console.warn("Token rejected — clearing token and redirecting.");
-            localStorage.removeItem("superadminToken");
-            window.location.href = "/superadmin/login";
-            return;
+          console.warn("Token rejected — clearing token and redirecting.");
+          localStorage.removeItem("superadminToken");
+          window.location.href = "/superadmin/login";
+          return;
         }
 
         const tenants = await res.json();
-        const table = document.getElementById("tenantTable");
-
-        table.innerHTML = ""; // SAFE now — element exists
-
-        tenants.forEach(t => {
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${t.slug}</td>
-                <td>${t.funeralHomeName || "-"}</td>
-                <td>${t.email || "-"}</td>
-                <td>${new Date(t.createdAt).toLocaleDateString()}</td>
-                <td>${t.status || "active"}</td>
-            `;
-
-            table.appendChild(row);
-        });
-
-    } catch (err) {
+        renderTenants(tenants);
+        updateStats(tenants);
+      } catch (err) {
         console.error("Fetch error:", err);
+      }
     }
-}
 
-initDashboard();
-</script>
+    function renderTenants(tenants) {
+      const table = document.getElementById("tenantTable");
+      const badge = document.getElementById("tenantCountBadge");
+      table.innerHTML = "";
+      badge.textContent = tenants.length;
 
+      tenants.forEach((t) => {
+        const tr = document.createElement("tr");
+
+        const created = t.createdAt
+          ? new Date(t.createdAt).toLocaleDateString()
+          : "-";
+        const status = t.status || "active";
+
+        tr.innerHTML = `
+          <td>${t.slug || "-"}</td>
+          <td>${t.funeralHomeName || t.name || "-"}</td>
+          <td>${t.email || "-"}</td>
+          <td>${created}</td>
+          <td>
+            <span class="status-pill status-${status.toLowerCase()} status-active">
+              ${status}
+            </span>
+          </td>
+        `;
+
+        table.appendChild(tr);
+      });
+    }
+
+    function updateStats(tenants) {
+      const total = tenants.length;
+      const active = tenants.filter(
+        (t) => (t.status || "active") === "active"
+      ).length;
+      const trial = tenants.filter((t) => t.status === "trial").length;
+      const suspended = tenants.filter(
+        (t) => t.status === "suspended"
+      ).length;
+
+      document.getElementById("statTotalTenants").textContent = total;
+      document.getElementById("statActiveTenants").textContent = active;
+      document.getElementById("statTrialTenants").textContent = trial;
+      document.getElementById("statSuspendedTenants").textContent =
+        suspended;
+    }
+
+    initDashboard();
+  </script>
 </body>
 </html>
