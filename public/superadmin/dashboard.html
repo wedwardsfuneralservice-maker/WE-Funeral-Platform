@@ -1,107 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>Super Admin Dashboard – WE Funeral Platform</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-
-<style>
-    body {
-        margin: 0;
-        padding: 20px;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: #0f1115;
-        color: #fff;
-    }
-    h1 { color: #ffcc66; }
-    table {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse;
-    }
-    th, td {
-        padding: 12px;
-        border-bottom: 1px solid #333;
-    }
-    th {
-        background: #181a1f;
-        text-align: left;
-    }
-    tr:hover { background: #1d2128; }
-    button {
-        padding: 6px 12px;
-        border: none;
-        border-radius: 4px;
-        background: #ff6666;
-        color: #fff;
-        cursor: pointer;
-    }
-</style>
-
-</head>
-
-<body>
-
-<h1>Super Admin Dashboard</h1>
-<p>Manage all funeral home tenants.</p>
-
-<table>
-    <thead>
-        <tr>
-            <th>Slug</th>
-            <th>Funeral Home</th>
-            <th>Email</th>
-            <th>Created</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody id="tenantTable"></tbody>
-</table>
-
 <script>
-// Redirect to login if no token stored
-const token = localStorage.getItem("superadminToken");
-if (!token) {
-    window.location.href = "/superadmin/login";
+// SAFE TOKEN LOADER — retries before redirecting
+function getTokenSafely(maxRetries = 10) {
+    return new Promise((resolve) => {
+        let attempts = 0;
+
+        function check() {
+            const token = localStorage.getItem("superadminToken");
+            if (token) return resolve(token);
+
+            attempts++;
+            if (attempts >= maxRetries) return resolve(null);
+
+            setTimeout(check, 120); // wait 120ms then re-check
+        }
+
+        check();
+    });
 }
 
-// Load tenants from backend
-async function loadTenants() {
-    const res = await fetch("/superadmin/api/tenants", {
-        headers: {
-            "Authorization": "Bearer " + token
-        }
-    });
+async function initDashboard() {
+    const token = await getTokenSafely();
 
-    if (!res.ok) {
-        // Invalid or expired token
-        localStorage.removeItem("superadminToken");
+    // If still no token after retries → redirect
+    if (!token) {
+        console.warn("No token found — redirecting to login.");
         window.location.href = "/superadmin/login";
         return;
     }
 
-    const tenants = await res.json();
-    const table = document.getElementById("tenantTable");
-
-    table.innerHTML = "";
-
-    tenants.forEach(t => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${t.slug}</td>
-            <td>${t.funeralHomeName || "-"}</td>
-            <td>${t.email || "-"}</td>
-            <td>${new Date(t.createdAt).toLocaleDateString()}</td>
-            <td>${t.status || "active"}</td>
-        `;
-
-        table.appendChild(row);
-    });
+    loadTenants(token);
 }
 
-loadTenants();
-</script>
+// Load tenants from backend using token
+async function loadTenants(token) {
+    try {
+        const res = await fetch("/superadmin/api/tenants", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
 
-</body>
-</html>
+        if (!res.ok) {
+            // Token expired or invalid
+            console.warn("Token rejected — clearing token and redirecting.");
+            localStorage.removeItem("superadminToken");
+            window.location.href = "/superadmin/login";
+            return;
+        }
+
+        const tenants = await res.json();
+        const table = document.getElementById("tenantTable");
+        table.innerHTML = "";
+
+        tenants.forEach(t => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${t.slug}</td>
+                <td>${t.funeralHomeName || "-"}</td>
+                <td>${t.email || "-"}</td>
+                <td>${new Date(t.createdAt).toLocaleDateString()}</td>
+                <td>${t.status || "active"}</td>
+            `;
+
+            table.appendChild(row);
+        });
+
+    } catch (err) {
+        console.error("Fetch error:", err);
+    }
+}
+
+initDashboard();
+</script>
