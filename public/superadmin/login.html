@@ -116,6 +116,7 @@
 </div>
 
 <script>
+// Show/Hide password
 document.getElementById("togglePass").addEventListener("click", () => {
     const field = document.getElementById("password");
     if (field.type === "password") {
@@ -146,6 +147,11 @@ document.getElementById("superLogin").addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (data.success) {
+
+        // 🔥 Save token so dashboard works
+        localStorage.setItem("superadminToken", data.token);
+
+        // 🔥 Redirect to dashboard
         window.location.href = "/superadmin/dashboard";
     } else {
         errorMsg.style.display = "block";
