@@ -14,6 +14,29 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
+// ------------------------------
+// ADMIN ROUTES (Clean URLs)
+// ------------------------------
+app.get("/admin/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/admin-login.html"));
+});
+
+app.get("/admin/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/admin-dashboard.html"));
+});
+
+app.get("/admin/onboarding", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/onboarding.html"));
+});
+
+// Password reset pages (future)
+app.get("/admin/reset-password", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/reset-password.html"));
+});
+
+app.get("/admin/reset-confirm", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/reset-confirm.html"));
+});
 
 // Serve admin files (pretty URLs)
 app.get("/admin/login", (req, res) => {
