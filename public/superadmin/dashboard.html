@@ -1,352 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Super Admin Dashboard – WE Funeral Platform</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
-    :root {
-        --bg: #0d0f11;
-        --card-bg: #15181c;
-        --text: #ffffff;
-        --accent: #f7c65b;
-        --sidebar: #13161a;
-        --sidebar-hover: #1d2126;
-    }
-
     body {
         margin: 0;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        display: flex;
-        height: 100vh;
-    }
-
-    /* Sidebar */
-    .sidebar {
-        width: 240px;
-        background: var(--sidebar);
-        padding: 20px 0;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        position: fixed;
-        left: 0;
-        top: 0;
-        box-shadow: 3px 0 10px rgba(0,0,0,0.3);
-    }
-
-    .brand {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .brand h1 {
-        font-size: 18px;
-        color: var(--accent);
-        margin: 0;
-    }
-
-    .brand p {
-        font-size: 12px;
-        color: #aaa;
-        margin-top: 6px;
-    }
-
-    .nav-item {
-        padding: 14px 25px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        transition: 0.2s;
-        font-size: 15px;
-    }
-
-    .nav-item:hover {
-        background: var(--sidebar-hover);
-    }
-
-    .nav-item.active {
-        background: var(--accent);
-        color: #000;
-        font-weight: bold;
-    }
-
-    /* Main content */
-    .main {
-        margin-left: 240px;
-        padding: 30px;
-        width: calc(100% - 240px);
-        overflow-y: auto;
-    }
-
-    .header {
-        background: #1a1e23;
         padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        font-size: 22px;
-        font-weight: bold;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #0f1115;
+        color: #fff;
     }
-
-    .cards {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .card {
-        background: var(--card-bg);
-        padding: 25px;
-        border-radius: 12px;
-        min-width: 250px;
-        flex: 1;
-        box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    }
-
-    .card h3 {
-        margin: 0 0 10px;
-        font-size: 18px;
-        color: var(--accent);
-    }
-
-    .card p {
-        margin: 0;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    /* Tenant Table */
+    h1 { color: #ffcc66; }
     table {
         width: 100%;
+        margin-top: 20px;
         border-collapse: collapse;
-        margin-top: 25px;
-        background: var(--card-bg);
-        border-radius: 12px;
-        overflow: hidden;
     }
-
     th, td {
-        padding: 14px;
-        border-bottom: 1px solid #222;
+        padding: 12px;
+        border-bottom: 1px solid #333;
+    }
+    th {
+        background: #181a1f;
         text-align: left;
     }
-
-    th {
-        background: #1b1f24;
-        color: var(--accent);
-    }
-
-    .btn {
-        padding: 8px 12px;
-        background: var(--accent);
+    tr:hover { background: #1d2128; }
+    button {
+        padding: 6px 12px;
         border: none;
-        border-radius: 6px;
+        border-radius: 4px;
+        background: #ff6666;
+        color: #fff;
         cursor: pointer;
-        font-weight: bold;
-        margin-right: 6px;
-        color: #000;
     }
-
-    .danger {
-        background: #ff6b6b;
-    }
-
-    .small {
-        padding: 6px 10px;
-        font-size: 13px;
-    }
-
 </style>
 
-<!-- Inject superadmin token into all requests -->
-<script>
-const superToken = localStorage.getItem("superadminToken");
-
-async function secureFetch(url, options = {}) {
-    options.headers = options.headers || {};
-    options.headers["x-auth-token"] = superToken;
-    return fetch(url, options);
-}
-</script>
-
-<!-- Redirect if token missing -->
-<script>
-if (!localStorage.getItem("superadminToken")) {
-    window.location.href = "/superadmin/login";
-}
-</script>
-
 </head>
+
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-    <div class="brand">
-        <h1>W.E. PLATFORM</h1>
-        <p>SUPER ADMIN</p>
-    </div>
+<h1>Super Admin Dashboard</h1>
+<p>Manage all funeral home tenants.</p>
 
-    <div class="nav-item active" data-section="dashboard">Dashboard</div>
-    <div class="nav-item" data-section="tenants">Tenants</div>
-    <div class="nav-item" data-section="create">Create Tenant</div>
-    <div class="nav-item" data-section="billing">Billing</div>
-    <div class="nav-item" data-section="emails">Email Logs</div>
-    <div class="nav-item" data-section="settings">Settings</div>
-    <div class="nav-item danger" onclick="logout()">Logout</div>
-</div>
-
-<!-- Main Content -->
-<div class="main">
-
-    <div class="header" id="pageHeader">Dashboard</div>
-
-    <!-- Dashboard Section -->
-    <div class="section" id="dashboardSection">
-        <div class="cards">
-            <div class="card">
-                <h3>Total Funeral Homes</h3>
-                <p id="totalTenants">0</p>
-            </div>
-
-            <div class="card">
-                <h3>Active Trials</h3>
-                <p id="activeTrials">0</p>
-            </div>
-
-            <div class="card">
-                <h3>Active Plans</h3>
-                <p id="activePlans">0</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tenants Section -->
-    <div class="section" id="tenantsSection" style="display:none;">
-        <h2>All Funeral Homes</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Slug</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Trial Ends</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="tenantTable"></tbody>
-        </table>
-    </div>
-
-    <!-- Create Tenant Section -->
-    <div class="section" id="createSection" style="display:none;">
-        <h2>Create New Funeral Home</h2>
-        <p style="opacity:0.7;">(This mirrors the public signup.)</p>
-
-        <input id="newName" type="text" placeholder="Funeral Home Name" style="padding:12px;width:100%;border-radius:8px;margin-bottom:12px;">
-        <input id="newEmail" type="email" placeholder="Email" style="padding:12px;width:100%;border-radius:8px;margin-bottom:12px;">
-
-        <button class="btn" onclick="createTenant()">Create Tenant</button>
-    </div>
-
-</div>
+<table>
+    <thead>
+        <tr>
+            <th>Slug</th>
+            <th>Funeral Home</th>
+            <th>Email</th>
+            <th>Created</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody id="tenantTable"></tbody>
+</table>
 
 <script>
-// Sidebar Navigation
-document.querySelectorAll(".nav-item[data-section]").forEach(item => {
-    item.addEventListener("click", () => {
-        document.querySelectorAll(".nav-item").forEach(x => x.classList.remove("active"));
-        item.classList.add("active");
-
-        const section = item.getAttribute("data-section");
-        document.getElementById("pageHeader").innerText = item.innerText;
-
-        document.querySelectorAll(".section").forEach(s => s.style.display = "none");
-        document.getElementById(section + "Section").style.display = "block";
-    });
-});
-
-// Logout
-function logout() {
-    localStorage.removeItem("superadminToken");
+// Redirect to login if no token stored
+const token = localStorage.getItem("superadminToken");
+if (!token) {
     window.location.href = "/superadmin/login";
 }
 
-// Load Tenants for Dashboard + Table
+// Load tenants from backend
 async function loadTenants() {
-    try {
-        const res = await secureFetch("/superadmin/api/tenants");
-        const tenants = await res.json();
+    const res = await fetch("/superadmin/api/tenants", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
 
-        document.getElementById("totalTenants").innerText = tenants.length;
-        document.getElementById("activeTrials").innerText =
-            tenants.filter(t => Date.now() < t.trialEndsAt).length;
-
-        document.getElementById("activePlans").innerText =
-            tenants.filter(t => t.status === "active").length;
-
-        const tbody = document.getElementById("tenantTable");
-        tbody.innerHTML = "";
-
-        tenants.forEach(t => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${t.businessName || t.funeralHomeName}</td>
-                <td>${t.slug}</td>
-                <td>${t.email}</td>
-                <td>${t.status || "trial"}</td>
-                <td>${t.trialEndsAt ? new Date(t.trialEndsAt).toDateString() : "N/A"}</td>
-                <td>
-                    <button class="btn small" onclick="viewTenant('${t.slug}')">View</button>
-                    <button class="btn small" onclick="extendTrial('${t.slug}')">Extend</button>
-                    <button class="btn small" onclick="resetTenant('${t.slug}')">Reset PW</button>
-                    <button class="btn small" onclick="sendWelcome('${t.slug}')">Resend Email</button>
-                    <button class="btn small danger" onclick="toggleStatus('${t.slug}')">Suspend</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    } catch (err) {
-        console.error(err);
-        alert("Failed to load tenants.");
+    if (!res.ok) {
+        // Invalid or expired token
+        localStorage.removeItem("superadminToken");
+        window.location.href = "/superadmin/login";
+        return;
     }
+
+    const tenants = await res.json();
+    const table = document.getElementById("tenantTable");
+
+    table.innerHTML = "";
+
+    tenants.forEach(t => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${t.slug}</td>
+            <td>${t.funeralHomeName || "-"}</td>
+            <td>${t.email || "-"}</td>
+            <td>${new Date(t.createdAt).toLocaleDateString()}</td>
+            <td>${t.status || "active"}</td>
+        `;
+
+        table.appendChild(row);
+    });
 }
 
 loadTenants();
-
-// Placeholder Functions
-function viewTenant(slug) { alert("Tenant view not implemented."); }
-function extendTrial(slug) { alert("Extend trial not implemented."); }
-function resetTenant(slug) { alert("Reset password not implemented."); }
-function sendWelcome(slug) { alert("Resend welcome not implemented."); }
-function toggleStatus(slug) { alert("Suspend/Activate not implemented."); }
-
-async function createTenant() {
-    const name = document.getElementById("newName").value;
-    const email = document.getElementById("newEmail").value;
-
-    if (!name || !email) return alert("Enter name + email.");
-
-    const res = await secureFetch("/superadmin/api/tenants", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            slug: name.toLowerCase().replace(/\s+/g, "-"),
-            businessName: name,
-            email: email
-        })
-    });
-
-    const data = await res.json();
-    if (!data.success) return alert("Error: " + data.error);
-
-    alert("Tenant created!");
-    loadTenants();
-}
 </script>
 
 </body>
