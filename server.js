@@ -1,6 +1,6 @@
 // ------------------------------------------------------
 //  W.E. Funeral Platform - Multi-Tenant Backend
-//  Fully Patched with Safe Email Handling
+//  Fully Updated + Admin Folder Now in /public/admin
 // ------------------------------------------------------
 
 const express = require("express");
@@ -13,10 +13,14 @@ const nodemailer = require("nodemailer");
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Serve /public and /public/admin
 app.use(express.static("public"));
-// ------------------------------
-// ADMIN ROUTES (Clean URLs)
-// ------------------------------
+
+// ------------------------------------------------------
+//  ADMIN ROUTES (Now Corrected to Use public/admin/*)
+// ------------------------------------------------------
+
 app.get("/admin/login", (req, res) => {
   res.sendFile(path.join(__dirname, "public/admin/admin-login.html"));
 });
@@ -29,7 +33,6 @@ app.get("/admin/onboarding", (req, res) => {
   res.sendFile(path.join(__dirname, "public/admin/onboarding.html"));
 });
 
-// Password reset pages (future)
 app.get("/admin/reset-password", (req, res) => {
   res.sendFile(path.join(__dirname, "public/admin/reset-password.html"));
 });
@@ -38,22 +41,8 @@ app.get("/admin/reset-confirm", (req, res) => {
   res.sendFile(path.join(__dirname, "public/admin/reset-confirm.html"));
 });
 
-// Serve admin files (pretty URLs)
-app.get("/admin/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/admin/admin-login.html"));
-});
-
-app.get("/admin/dashboard", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/admin/admin-dashboard.html"));
-});
-
-app.get("/admin/onboarding", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/admin/onboarding.html"));
-});
-
-
 // ------------------------------------------------------
-//  SAFE EMAIL TRANSPORT (Never Crashes)
+//  SAFE EMAIL TRANSPORT
 // ------------------------------------------------------
 const mailer = nodemailer.createTransport({
   service: "gmail",
@@ -73,11 +62,11 @@ async function sendMailSafe(options) {
 }
 
 // ------------------------------------------------------
-//  Helpers: Load & Save JSON Data
+//  JSON HELPERS
 // ------------------------------------------------------
 function loadJSON(file) {
   const filePath = path.join(__dirname, "data", file);
-  if (!fs.existsSync(filePath)) return {};
+  if (!fs.existsSync(filePath)) return Array.isArray(file) ? [] : {};
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
@@ -93,13 +82,13 @@ const loadAdmins = () => loadJSON("admins.json");
 const saveAdmins = (d) => saveJSON("admins.json", d);
 
 // ------------------------------------------------------
-//  CREATE NEW TENANT (Free Trial Signup)
+//  API: CREATE NEW TENANT (Free Trial)
 // ------------------------------------------------------
 app.post("/api/signup", (req, res) => {
   const { funeralHomeName, email } = req.body;
-  if (!funeralHomeName || !email) {
+
+  if (!funeralHomeName || !email)
     return res.status(400).json({ error: "Missing required fields." });
-  }
 
   const tenants = loadTenants();
   const admins = loadAdmins();
@@ -127,9 +116,7 @@ app.post("/api/signup", (req, res) => {
   saveTenants(tenants);
   saveAdmins(admins);
 
-  // ------------------------------------------------------
-  //  SAFE WELCOME EMAIL (Never Crashes)
-  // ------------------------------------------------------
+  // SEND WELCOME EMAIL
   sendMailSafe({
     from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
     to: email,
@@ -139,7 +126,7 @@ app.post("/api/signup", (req, res) => {
       <p>Your funeral home <strong>${funeralHomeName}</strong> is now created.</p>
 
       <p><strong>Login URL:</strong><br>
-      https://we-funeral-platform.onrender.com/admin/admin-login.html?tenant=${slug}</p>
+      https://we-funeral-platform.onrender.com/admin/login?tenant=${slug}</p>
 
       <p><strong>Your Temporary Admin Password:</strong><br>${tempAdminKey}</p>
 
@@ -166,9 +153,8 @@ app.post("/api/admin/login", (req, res) => {
   const tenant = tenants.find((t) => t.slug === slug);
   if (!tenant) return res.status(400).json({ error: "Tenant not found" });
 
-  if (!admins[slug] || admins[slug].adminKey !== adminKey) {
+  if (!admins[slug] || admins[slug].adminKey !== adminKey)
     return res.status(400).json({ error: "Invalid admin key" });
-  }
 
   res.json({ success: true });
 });
@@ -178,14 +164,15 @@ app.post("/api/admin/login", (req, res) => {
 // ------------------------------------------------------
 app.post("/api/auth/reset-request", (req, res) => {
   const { email } = req.body;
-  const tenants = loadTenants();
 
+  const tenants = loadTenants();
   const tenant = tenants.find((t) => t.email === email);
 
-  // Always return success to prevent enumeration attacks
+  // Always act successful to protect privacy
   if (!tenant) return res.json({ success: true });
 
   const token = crypto.randomBytes(32).toString("hex");
+
   tenant.resetToken = token;
   tenant.resetExpiry = Date.now() + 30 * 60 * 1000;
 
@@ -200,7 +187,7 @@ app.post("/api/auth/reset-request", (req, res) => {
     html: `
       <h2>Password Reset Request</h2>
       <p>Click below to reset your password:</p>
-      <p><a href="${resetURL}">${resetURL}</a></p>
+      <a href="${resetURL}">${resetURL}</a>
       <p>This link expires in 30 minutes.</p>
     `
   });
@@ -209,7 +196,7 @@ app.post("/api/auth/reset-request", (req, res) => {
 });
 
 // ------------------------------------------------------
-//  PASSWORD RESET CONFIRMATION
+//  PASSWORD RESET CONFIRM
 // ------------------------------------------------------
 app.post("/api/auth/reset-confirm", (req, res) => {
   const { token, password } = req.body;
@@ -218,13 +205,13 @@ app.post("/api/auth/reset-confirm", (req, res) => {
   const admins = loadAdmins();
 
   const tenant = tenants.find((t) => t.resetToken === token);
-
   if (!tenant) return res.status(400).json({ error: "Invalid or expired token" });
-  if (Date.now() > tenant.resetExpiry) {
+
+  if (Date.now() > tenant.resetExpiry)
     return res.status(400).json({ error: "Token expired" });
-  }
 
   admins[tenant.slug].adminKey = password;
+
   delete tenant.resetToken;
   delete tenant.resetExpiry;
 
@@ -249,20 +236,20 @@ app.get("/api/tenant/:slug", (req, res) => {
 // ------------------------------------------------------
 app.post("/api/tenant/:slug/settings", (req, res) => {
   const slug = req.params.slug;
-  const tenants = loadTenants();
 
+  const tenants = loadTenants();
   const tenant = tenants.find((t) => t.slug === slug);
+
   if (!tenant) return res.status(404).json({ error: "Tenant not found" });
 
   Object.assign(tenant, req.body);
-
   saveTenants(tenants);
 
-  res.json({ success: true, message: "Settings updated." });
+  res.json({ success: true });
 });
 
 // ------------------------------------------------------
-//  SAFE TEST EMAIL ROUTE
+//  TEST EMAIL ROUTE
 // ------------------------------------------------------
 app.get("/api/test-email", async (req, res) => {
   try {
@@ -270,9 +257,10 @@ app.get("/api/test-email", async (req, res) => {
       from: `"WE Funeral Platform" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       subject: "Test Email",
-      text: "This is a test email from WE Funeral Platform"
+      text: "This is a test email"
     });
-    res.json({ success: true, message: "Test email attempted." });
+
+    res.json({ success: true });
   } catch (err) {
     res.json({ success: false, error: err.message });
   }
@@ -284,7 +272,6 @@ app.get("/api/test-email", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("////////////////////////////////////////////////////");
-  console.log(`✓ Server running on Render port ${PORT}`);
-  console.log("✓ Your service is live 🎉");
+  console.log(`✓ Server is running on port ${PORT}`);
   console.log("////////////////////////////////////////////////////");
 });
