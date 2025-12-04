@@ -161,6 +161,13 @@
     }
 
 </style>
+    <script>
+    // Redirect if no valid superadmin session
+    const token = localStorage.getItem("superadminToken");
+    if (!token) {
+        window.location.href = "/superadmin/login";
+    }
+</script>
 </head>
 
 <body>
