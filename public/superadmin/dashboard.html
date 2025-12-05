@@ -884,7 +884,7 @@ confirmBtn.addEventListener("click", async () => {
         return;
     }
 
-    const token = localStorage.getItem("sa_token");
+  const token = localStorage.getItem("superadminToken");
 
     const res = await fetch("/superadmin/api/tenants", {
         method: "POST",
