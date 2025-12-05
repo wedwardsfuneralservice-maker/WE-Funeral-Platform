@@ -827,9 +827,9 @@ async function loadTenants(token) {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${t.slug}</td>
-                <td>${t.businessName || "-"}</td>
+                <td>${t.funeralHomeName || "-"}</td>
                 <td>${t.email || "-"}</td>
-                <td>${t.created || "-"}</td>
+                <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}</td>
                 <td><span class="status-pill status-${t.status}">${t.status}</span></td>
             `;
             tbody.appendChild(row);
