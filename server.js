@@ -157,22 +157,26 @@ function requireSuperadmin(req, res, next) {
 
     const token = auth.replace("Bearer ", "").trim();
 
-    // Validate the JWT
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    // Must be a superadmin user
     if (!decoded || decoded.role !== "superadmin") {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }
 
-    req.superadmin = decoded; // optional
+    req.superadmin = decoded;
     next();
 
   } catch (err) {
     console.error("Superadmin auth error:", err.message);
+
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ success: false, error: "token_expired" });
+    }
+
     return res.status(401).json({ success: false, error: "Unauthorized" });
   }
 }
+
 
 
 
@@ -193,13 +197,15 @@ app.get("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
             success: true,
             tenants
         });
-    } catch (err) {
-        console.error("Error loading tenants:", err);
-        res.status(500).json({
-            success: false,
-            error: "Server error loading tenants"
-        });
+    }catch (err) {
+    console.error("Load tenants failed:", err);
+
+    if (err.message.includes("Unauthorized")) {
+        localStorage.removeItem("superadminToken");
+        window.location.href = "/superadmin/login.html";
     }
+}
+
 });
 
 
