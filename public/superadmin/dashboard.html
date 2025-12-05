@@ -1,164 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Super Admin Dashboard – WE Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Super Admin Dashboard – W.E. Platform</title>
 
-  <link rel="stylesheet" href="/superadmin/dashboard.css" />
+    <!-- Load external CSS -->
+    <link rel="stylesheet" href="dashboard.css" />
 
-  <!-- Icons (optional) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Icons -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 
 <body class="theme-dark">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="brand-block">
-      <div class="brand-title">W.E. PLATFORM</div>
-      <div class="brand-sub">Super Admin Console</div>
+    <!-- ====== LAYOUT WRAPPER ====== -->
+    <div class="shell">
+
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="sidebar">
+            <div class="brand-block">
+                <div class="brand-title">W.E. PLATFORM</div>
+                <div class="brand-sub">Super Admin Console</div>
+            </div>
+
+            <div>
+                <div class="nav-section-label">Overview</div>
+                <ul class="nav-list">
+                    <li class="nav-item active" data-view="dashboard">
+                        <i class="fa fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </li>
+
+                    <li class="nav-item" data-view="tenants">
+                        <i class="fa fa-building"></i>
+                        <span>Tenants</span>
+                        <span class="nav-badge" id="tenantCountBadge">0</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="nav-section-label">System</div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <i class="fa fa-sliders-h"></i>
+                        <span>Platform Settings</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fa fa-list-ul"></i>
+                        <span>Activity Logs</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                © 2025 W.E. Funeral Platform
+            </div>
+        </aside>
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <main class="main">
+
+            <!-- ===== TOP BAR ===== -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1 class="page-title">Super Admin Dashboard</h1>
+                    <p class="page-subtitle">
+                        Monitor all funeral home tenants & platform activity.
+                    </p>
+                </div>
+
+                <div class="topbar-right">
+
+                    <!-- Search box -->
+                    <div class="search-box">
+                        <i class="fa fa-search"></i>
+                        <input id="searchInput" type="text" placeholder="Search tenants..." />
+                    </div>
+
+                    <!-- Create Tenant Button -->
+                    <button class="pill-button primary" id="btnOpenCreateModal">
+                        <i class="fa fa-plus"></i> Add Tenant
+                    </button>
+
+                    <!-- Theme Toggle -->
+                    <div class="theme-toggle" id="themeToggle">
+                        <div class="theme-toggle-knob"></div>
+                    </div>
+
+                    <!-- Profile -->
+                    <div class="avatar-chip">
+                        <div class="avatar-circle"></div>
+                        <span>SuperAdmin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ===== STATS CARDS ===== -->
+            <section class="stats-grid">
+                <article class="card">
+                    <div class="card-label">Total Tenants</div>
+                    <div class="card-value" id="statTotalTenants">0</div>
+                </article>
+
+                <article class="card">
+                    <div class="card-label">Active</div>
+                    <div class="card-value" id="statActiveTenants">0</div>
+                </article>
+
+                <article class="card">
+                    <div class="card-label">Trial</div>
+                    <div class="card-value" id="statTrialTenants">0</div>
+                </article>
+
+                <article class="card">
+                    <div class="card-label">Suspended</div>
+                    <div class="card-value" id="statSuspendedTenants">0</div>
+                </article>
+            </section>
+
+            <!-- ===== TENANT TABLE ===== -->
+            <section class="content-block">
+                <div class="block-header">
+                    <h2 class="block-title">Tenants</h2>
+                    <p class="block-sub">All funeral homes registered on the system</p>
+                </div>
+
+                <table class="tenant-table">
+                    <thead>
+                        <tr>
+                            <th>Slug</th>
+                            <th>Funeral Home</th>
+                            <th>Email</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tenantTable"></tbody>
+                </table>
+            </section>
+
+        </main>
     </div>
 
-    <nav>
-      <div class="nav-section-label">Overview</div>
-      <ul class="nav-list">
-        <li class="nav-item active" data-view="dashboard">
-          <span>Dashboard</span>
-        </li>
+    <!-- ========== TENANT DRAWER (Manage Tenant) ========== -->
+    <div id="tenantDrawerOverlay" class="drawer-overlay">
+        <div id="tenantDrawer" class="tenant-drawer">
 
-        <li class="nav-item" data-view="tenants">
-          <span>Tenants</span>
-          <span class="nav-badge" id="tenantCountBadge">0</span>
-        </li>
-      </ul>
+            <div class="drawer-header">
+                <div>
+                    <div id="drawerTenantName" class="drawer-title">Tenant Name</div>
+                    <div id="drawerTenantSlug" class="drawer-sub">slug</div>
+                </div>
+                <button id="drawerCloseBtn" class="drawer-close-btn">✕</button>
+            </div>
 
-      <div class="nav-section-label">System</div>
-      <ul class="nav-list">
-        <li class="nav-item"><span>Platform Settings</span></li>
-        <li class="nav-item"><span>Activity Logs</span></li>
-      </ul>
-    </nav>
+            <div class="drawer-section-title">Tenant Details</div>
 
-    <footer class="sidebar-footer">
-      © <span id="yearSpan"></span> W.E. Funeral Platform
-    </footer>
-  </aside>
+            <div class="drawer-field-group">
+                <label>Funeral Home Name</label>
+                <input id="drawerNameInput" type="text" />
+            </div>
 
-  <!-- MAIN CONTENT WRAPPER -->
-  <main class="main">
+            <div class="drawer-field-group">
+                <label>Email</label>
+                <input id="drawerEmailInput" type="email" />
+            </div>
 
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <div>
-        <h1 class="page-title">Super Admin Dashboard</h1>
-        <p class="page-subtitle">
-          Monitor platform activity & manage tenants.
-        </p>
-      </div>
+            <div class="drawer-field-group">
+                <label>Logo URL</label>
+                <input id="drawerLogoInput" type="text" />
+            </div>
 
-      <div class="topbar-controls">
+            <div class="drawer-field-group">
+                <label>Status</label>
+                <select id="drawerStatusInput">
+                    <option value="active">Active</option>
+                    <option value="trial">Trial</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+            </div>
 
-        <div class="search-box">
-          <i class="fa fa-search"></i>
-          <input id="searchInput" type="text" placeholder="Search tenants..." />
+            <button id="drawerSaveBtn" class="btn-save">Save Changes</button>
+            <button id="drawerDeleteBtn" class="btn-delete">Delete Tenant</button>
         </div>
-
-        <button id="openCreateModal" class="pill-button primary">
-          + Add Tenant
-        </button>
-
-        <div id="themeToggle" class="theme-toggle">
-          <div class="theme-knob"></div>
-        </div>
-
-        <div class="avatar-chip">
-          <div class="avatar-circle"></div>
-          <span>SuperAdmin</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- STAT CARDS -->
-    <section class="grid">
-      <div class="card">
-        <div class="card-label">Total Tenants</div>
-        <div id="statTotalTenants" class="card-value">0</div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Active</div>
-        <div id="statActiveTenants" class="card-value">0</div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Trial</div>
-        <div id="statTrialTenants" class="card-value">0</div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Suspended</div>
-        <div id="statSuspendedTenants" class="card-value">0</div>
-      </div>
-    </section>
-
-    <!-- TENANT TABLE -->
-    <section class="tenant-section">
-      <h2>Tenants</h2>
-
-      <table class="tenant-table">
-        <thead>
-          <tr>
-            <th>Slug</th>
-            <th>Funeral Home</th>
-            <th>Email</th>
-            <th>Created</th>
-            <th>Status</th>
-            <th>Manage</th>
-          </tr>
-        </thead>
-
-        <tbody id="tenantTable"></tbody>
-      </table>
-    </section>
-  </main>
-
-  <!-- CREATE TENANT MODAL -->
-  <div id="createTenantModal" class="modal-overlay">
-    <div class="modal">
-      <h2>Create New Tenant</h2>
-
-      <label>Funeral Home Name</label>
-      <input id="tenantNameInput" type="text" />
-
-      <label>Slug</label>
-      <input id="tenantSlugInput" type="text" />
-
-      <label>Admin Email</label>
-      <input id="tenantEmailInput" type="email" />
-
-      <label>Admin Key</label>
-      <input id="tenantKeyInput" type="text" />
-
-      <label>Logo URL (optional)</label>
-      <input id="tenantLogoInput" type="text" />
-
-      <label>Status</label>
-      <select id="tenantStatusInput">
-        <option value="active">Active</option>
-        <option value="trial">Trial</option>
-        <option value="suspended">Suspended</option>
-      </select>
-
-      <div class="modal-actions">
-        <button id="closeCreateModal" class="pill-button secondary">Cancel</button>
-        <button id="createTenantBtn" class="pill-button primary">Create</button>
-      </div>
     </div>
-  </div>
 
-  <!-- JS FILE -->
-  <script src="/superadmin/dashboard.js"></script>
+    <!-- ========== CREATE TENANT MODAL ========== -->
+    <div id="createTenantModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>Create New Tenant</h2>
+
+            <label>Funeral Home Name</label>
+            <input id="createName" type="text" />
+
+            <label>Slug</label>
+            <input id="createSlug" type="text" />
+
+            <label>Email</label>
+            <input id="createEmail" type="email" />
+
+            <label>Admin Key</label>
+            <input id="createKey" type="text" />
+
+            <label>Logo URL (optional)</label>
+            <input id="createLogo" type="text" />
+
+            <label>Status</label>
+            <select id="createStatus">
+                <option value="active">Active</option>
+                <option value="trial">Trial</option>
+                <option value="suspended">Suspended</option>
+            </select>
+
+            <div class="modal-actions">
+                <button id="btnCancelCreate" class="btn-secondary">Cancel</button>
+                <button id="btnDoCreate" class="btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load external JS -->
+    <script src="dashboard.js"></script>
 
 </body>
 </html>
