@@ -808,28 +808,17 @@ async function initDashboard() {
 
 async function loadTenants(token) {
     try {
-        async function loadTenants() {
-    try {
-        const token = localStorage.getItem("superadminToken");
-
         const res = await fetch("/superadmin/api/tenants", {
             headers: {
                 "Authorization": "Bearer " + token
             }
         });
 
-        if (!res.ok) throw new Error(res.statusText);
+        if (!res.ok) throw new Error("Unauthorized");
 
         const tenants = await res.json();
-        populateTenantTable(tenants);
 
-    } catch (err) {
-        console.error("Tenant load error:", err);
-    }
-}
-
-
-        const tenants = data.tenants || [];
+        // TABLE BODY
         const tbody = document.getElementById("tenantTable");
         tbody.innerHTML = "";
 
@@ -840,15 +829,19 @@ async function loadTenants(token) {
                 <td>${t.funeralHomeName || "-"}</td>
                 <td>${t.email || "-"}</td>
                 <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}</td>
-                <td><span class="status-pill status-${t.status}">${t.status}</span></td>
+                <td>
+                  <span class="status-pill status-${t.status}">
+                    ${t.status}
+                  </span>
+                </td>
             `;
             tbody.appendChild(row);
         });
 
-        // Update sidebar badge
+        // Update badge
         document.getElementById("tenantCountBadge").textContent = tenants.length;
 
-        // Update stat cards
+        // Update stats
         document.getElementById("statTotalTenants").textContent = tenants.length;
         document.getElementById("statActiveTenants").textContent =
             tenants.filter(t => t.status === "active").length;
@@ -861,6 +854,7 @@ async function loadTenants(token) {
         console.error("Load tenants failed:", err);
     }
 }
+
   
 </script>
 
