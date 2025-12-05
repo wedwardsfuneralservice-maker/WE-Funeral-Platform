@@ -830,18 +830,16 @@ async function loadTenants(token) {
                 <td>${t.email || "-"}</td>
                 <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}</td>
                 <td>
-                  <span class="status-pill status-${t.status}">
-                    ${t.status}
-                  </span>
+                    <span class="status-pill status-${t.status}">
+                        ${t.status}
+                    </span>
                 </td>
             `;
             tbody.appendChild(row);
         });
 
-        // Update badge
+        // Sidebar badge + stats
         document.getElementById("tenantCountBadge").textContent = tenants.length;
-
-        // Update stats
         document.getElementById("statTotalTenants").textContent = tenants.length;
         document.getElementById("statActiveTenants").textContent =
             tenants.filter(t => t.status === "active").length;
@@ -854,6 +852,7 @@ async function loadTenants(token) {
         console.error("Load tenants failed:", err);
     }
 }
+
 
   
 </script>
