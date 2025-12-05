@@ -116,33 +116,32 @@ app.post("/superadmin/login", (req, res) => {
   }
 });
 
-// ------------------------------------------------------
-//  SUPERADMIN AUTH MIDDLEWARE
-// ------------------------------------------------------
 // -------------------------------------------------------------
-// SUPERADMIN AUTH MIDDLEWARE
+// SUPERADMIN AUTH MIDDLEWARE (JWT VERSION)
 // -------------------------------------------------------------
 function requireSuperadmin(req, res, next) {
   try {
     const auth = req.headers.authorization;
-
     if (!auth || !auth.startsWith("Bearer ")) {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }
 
     const token = auth.replace("Bearer ", "").trim();
 
-    // token must match the stored superadminToken (localStorage on login)
-    if (token !== superadminToken) {
+    // Validate the JWT
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Must be a superadmin user
+    if (!decoded || decoded.role !== "superadmin") {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }
 
+    req.superadmin = decoded; // optional
     next();
+
   } catch (err) {
     console.error("Superadmin auth error:", err.message);
-    return res
-      .status(401)
-      .json({ success: false, error: "Unauthorized" });
+    return res.status(401).json({ success: false, error: "Unauthorized" });
   }
 }
 
