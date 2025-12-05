@@ -700,232 +700,98 @@
 
   
   <script>
-    (async () => {
-    // YEAR
-    document.getElementById("yearSpan").innerText =
-      new Date().getFullYear();
+<script>
+(async () => {
 
-    // THEME HANDLING ---------------------------------------
-    const themeKey = "we_superadmin_theme";
+    // -----------------------------
+    // INITIAL DASHBOARD LOAD
+    // -----------------------------
+    initDashboard();
 
-    function applyTheme(theme) {
-      document.body.classList.remove("theme-dark", "theme-light");
-      document.body.classList.add(theme === "light" ? "theme-light" : "theme-dark");
-      localStorage.setItem(themeKey, theme);
-    }
+    // -----------------------------
+    // CREATE TENANT MODAL ELEMENTS
+    // -----------------------------
+    const modal = document.getElementById("createTenantModal");
+    const openBtn = document.getElementById("createTenantBtn");
+    const cancelBtn = document.getElementById("cancelCreateTenant");
+    const confirmBtn = document.getElementById("confirmCreateTenant");
 
-    const savedTheme = localStorage.getItem(themeKey) || "dark";
-    applyTheme(savedTheme);
-
-    document.getElementById("themeToggle").addEventListener("click", () => {
-      const next = document.body.classList.contains("theme-dark")
-        ? "light"
-        : "dark";
-      applyTheme(next);
+    // -----------------------------
+    // OPEN MODAL
+    // -----------------------------
+    openBtn.addEventListener("click", () => {
+        modal.style.display = "flex";
+        document.getElementById("tenantKeyInput").value =
+            "KEY-" + Math.random().toString(36).substring(2, 10).toUpperCase();
     });
 
-    // NAV ACTIVE STATE ------------------------------------
-    document.querySelectorAll(".nav-item").forEach((item) => {
-      item.addEventListener("click", () => {
-        document
-          .querySelectorAll(".nav-item")
-          .forEach((n) => n.classList.remove("active"));
-        item.classList.add("active");
-        // For now, we keep a single view; later we can switch sections.
-      });
+    // -----------------------------
+    // CLOSE MODAL
+    // -----------------------------
+    cancelBtn.addEventListener("click", () => {
+        modal.style.display = "none";
     });
 
-    // TOKEN LOADING ---------------------------------------
-    function getTokenSafely(maxRetries = 10) {
-      return new Promise((resolve) => {
-        let attempts = 0;
+    // -----------------------------
+    // AUTO-GENERATE SLUG
+    // -----------------------------
+    document.getElementById("tenantNameInput").addEventListener("input", (e) => {
+        const slug = e.target.value
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "");
 
-        function check() {
-          const token = localStorage.getItem("superadminToken");
-          if (token) return resolve(token);
+        document.getElementById("tenantSlugInput").value = slug;
+    });
 
-          attempts++;
-          if (attempts >= maxRetries) return resolve(null);
+    // -----------------------------
+    // CONFIRM CREATE TENANT
+    // -----------------------------
+    confirmBtn.addEventListener("click", async () => {
+        const name = document.getElementById("tenantNameInput").value.trim();
+        const slug = document.getElementById("tenantSlugInput").value.trim();
+        const email = document.getElementById("tenantEmailInput").value.trim();
+        const adminKey = document.getElementById("tenantKeyInput").value.trim();
+        const logo = document.getElementById("tenantLogoInput").value.trim();
+        const status = document.getElementById("tenantStatusInput").value;
 
-          setTimeout(check, 120);
+        if (!name || !slug || !email || !adminKey) {
+            alert("Please fill in all required fields.");
+            return;
         }
 
-        check();
-      });
-    }
+        const token = localStorage.getItem("superadminToken");
 
-    async function initDashboard() {
-      const token = await getTokenSafely();
-
-      if (!token) {
-        console.warn("No token found — redirecting to login.");
-        window.location.href = "/superadmin/login";
-        return;
-      }
-
-      loadTenants(token);
-    }
-
-    async function loadTenants(token) {
-      try {
         const res = await fetch("/superadmin/api/tenants", {
-          headers: {
-            "x-auth-token": token,
-          },
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                businessName: name,
+                slug,
+                email,
+                adminKey,
+                logo,
+                status
+            }),
         });
 
-        if (!res.ok) {
-          console.warn("Token rejected — clearing token and redirecting.");
-          localStorage.removeItem("superadminToken");
-          window.location.href = "/superadmin/login";
-          return;
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Tenant created successfully!");
+            modal.style.display = "none";
+            loadTenants(token); // Refresh table
+        } else {
+            alert("Error: " + data.error);
         }
-
-        const tenants = await res.json();
-        renderTenants(tenants);
-        updateStats(tenants);
-      } catch (err) {
-        console.error("Fetch error:", err);
-      }
-    }
-
-    function renderTenants(tenants) {
-      const table = document.getElementById("tenantTable");
-      const badge = document.getElementById("tenantCountBadge");
-      table.innerHTML = "";
-      badge.textContent = tenants.length;
-
-      tenants.forEach((t) => {
-        const tr = document.createElement("tr");
-
-        const created = t.createdAt
-          ? new Date(t.createdAt).toLocaleDateString()
-          : "-";
-        const status = t.status || "active";
-
-        tr.innerHTML = `
-          <td>${t.slug || "-"}</td>
-          <td>${t.funeralHomeName || t.name || "-"}</td>
-          <td>${t.email || "-"}</td>
-          <td>${created}</td>
-          <td>
-            <span class="status-pill status-${status.toLowerCase()} status-active">
-              ${status}
-            </span>
-          </td>
-        `;
-
-        table.appendChild(tr);
-      });
-    }
-
-    function updateStats(tenants) {
-      const total = tenants.length;
-      const active = tenants.filter(
-        (t) => (t.status || "active") === "active"
-      ).length;
-      const trial = tenants.filter((t) => t.status === "trial").length;
-      const suspended = tenants.filter(
-        (t) => t.status === "suspended"
-      ).length;
-
-      document.getElementById("statTotalTenants").textContent = total;
-      document.getElementById("statActiveTenants").textContent = active;
-      document.getElementById("statTrialTenants").textContent = trial;
-      document.getElementById("statSuspendedTenants").textContent =
-        suspended;
-    }
-
-    initDashboard();
-    /***********************************
- * CREATE TENANT MODAL LOGIC
- **********************************/
-
-const modal = document.getElementById("createTenantModal");
-const openBtn = document.getElementById("createTenantBtn");
-const cancelBtn = document.getElementById("cancelCreateTenant");
-const confirmBtn = document.getElementById("confirmCreateTenant");
-
-// OPEN MODAL
-openBtn.addEventListener("click", () => {
-    modal.style.display = "flex";
-
-    // Auto-generate admin key
-    document.getElementById("tenantKeyInput").value =
-      "KEY-" + Math.random().toString(36).substring(2, 10).toUpperCase();
-});
-
-// CLOSE MODAL
-cancelBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-});
-
-// AUTO-GENERATE SLUG FROM NAME
-document.getElementById("tenantNameInput").addEventListener("input", (e) => {
-    const slug = e.target.value
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "");
-        
-    document.getElementById("tenantSlugInput").value = slug;
-});
-
-// CONFIRM CREATE TENANT
-confirmBtn.addEventListener("click", async () => {
-    const name = document.getElementById("tenantNameInput").value.trim();
-    const slug = document.getElementById("tenantSlugInput").value.trim();
-    const email = document.getElementById("tenantEmailInput").value.trim();
-    const adminKey = document.getElementById("tenantKeyInput").value.trim();
-    const logo = document.getElementById("tenantLogoInput").value.trim();
-    const status = document.getElementById("tenantStatusInput").value;
-
-    if (!name || !slug || !email || !adminKey) {
-        alert("Please fill in all required fields.");
-        return;
-    }
-
-  const token = localStorage.getItem("superadminToken");
-
-    const res = await fetch("/superadmin/api/tenants", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({
-            businessName: name,
-            slug,
-            email,
-            adminKey,
-            logo,
-            status
-        }),
     });
 
-    const data = await res.json();
-
-    if (data.success) {
-        alert("Tenant created successfully!");
-        modal.style.display = "none";
-        loadTenants(token);
-    } else {
-        alert("Error: " + data.error);
-    }
-});
-
-    const data = await res.json();
-
-    if (data.success) {
-        alert("Tenant created successfully!");
-        modal.style.display = "none";
-        loadTenants(token); // Refresh tenant table
-    } else {
-        alert("Error: " + data.error);
-    }
-});
-
-    })(); // END async wrapper
+})(); // END WRAPPER
+</script>
 
   </script>
   
