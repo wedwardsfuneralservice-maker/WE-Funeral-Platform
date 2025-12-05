@@ -890,7 +890,7 @@ confirmBtn.addEventListener("click", async () => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + token,
+            "Authorization": "Bearer " + token
         },
         body: JSON.stringify({
             businessName: name,
@@ -898,9 +898,20 @@ confirmBtn.addEventListener("click", async () => {
             email,
             adminKey,
             logo,
-            status,
+            status
         }),
     });
+
+    const data = await res.json();
+
+    if (data.success) {
+        alert("Tenant created successfully!");
+        modal.style.display = "none";
+        loadTenants(token);
+    } else {
+        alert("Error: " + data.error);
+    }
+});
 
     const data = await res.json();
 
