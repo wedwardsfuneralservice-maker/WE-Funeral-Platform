@@ -700,6 +700,7 @@
 
   
   <script>
+    (async () => {
     // YEAR
     document.getElementById("yearSpan").innerText =
       new Date().getFullYear();
@@ -924,6 +925,7 @@ confirmBtn.addEventListener("click", async () => {
     }
 });
 
+    })(); // END async wrapper
 
   </script>
   
