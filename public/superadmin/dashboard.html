@@ -43,4 +43,396 @@
     .sidebar h3 {
         margin-top: 40px;
         font-size: 13px;
-        text-trans
+        text-transform: uppercase;
+        opacity: 0.6;
+    }
+
+    .nav-link {
+        margin-top: 10px;
+        padding: 12px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.2s;
+    }
+
+    .nav-link.active {
+        background: #306CDE;
+        box-shadow: 0 0 10px rgba(48,108,222,0.4);
+    }
+
+    .nav-link:hover {
+        background: rgba(255,255,255,0.08);
+    }
+
+    /* Main content */
+    .content {
+        flex: 1;
+        padding: 35px 45px;
+        overflow-y: auto;
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+
+    .stat-card {
+        background: rgba(255,255,255,0.06);
+        padding: 22px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat-label {
+        font-size: 13px;
+        opacity: 0.7;
+    }
+
+    .stat-value {
+        margin-top: 6px;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    /* Tenants Table */
+    table {
+        width: 100%;
+        margin-top: 30px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 14px;
+        font-size: 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    th {
+        text-align: left;
+        opacity: 0.7;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    .status-pill {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .status-active { background: #0a8f43; }
+    .status-trial { background: #306CDE; }
+    .status-suspended { background: #8f0a0a; }
+
+    /* Create Tenant Button */
+    .create-btn {
+        background: #306CDE;
+        padding: 10px 20px;
+        color: #fff;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+        font-weight: 600;
+        margin-left: auto;
+    }
+
+    /* Modal */
+    #createTenantModal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+    }
+
+    .modal-box {
+        background: #111827;
+        padding: 30px;
+        width: 420px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .modal-box input,
+    .modal-box select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        background: #0d1220;
+        border: 1px solid rgba(255,255,255,0.18);
+        color: #fff;
+        border-radius: 6px;
+    }
+
+    .modal-actions {
+        margin-top: 20px;
+        text-align: right;
+    }
+
+    .modal-actions button {
+        padding: 10px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        border: none;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .cancel-btn {
+        background: rgba(255,255,255,0.12);
+    }
+
+    .confirm-btn {
+        background: #306CDE;
+        color: #fff;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">W.E. PLATFORM</div>
+        <div style="opacity:.6;margin-bottom:20px;">Super Admin Console</div>
+
+        <h3>Overview</h3>
+        <div class="nav-link active">Dashboard</div>
+
+        <h3>System</h3>
+        <div class="nav-link">Platform Settings</div>
+        <div class="nav-link">Activity Logs</div>
+
+        <div style="margin-top:auto;font-size:13px;opacity:.5;">W.E. Funeral Platform © 2025</div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+
+        <h1>Super Admin Dashboard</h1>
+        <p>Monitor all funeral home tenants and platform activity.</p>
+
+        <!-- STAT CARDS -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Tenants</div>
+                <div class="stat-value" id="statTotalTenants">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Tenants</div>
+                <div class="stat-value" id="statActiveTenants">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Trial Tenants</div>
+                <div class="stat-value" id="statTrialTenants">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Suspended</div>
+                <div class="stat-value" id="statSuspendedTenants">0</div>
+            </div>
+        </div>
+
+        <!-- HEADER + CREATE BUTTON -->
+        <div style="display:flex;align-items:center;margin-top:35px;">
+            <h2 style="margin:0;">Tenants</h2>
+            <button class="create-btn" id="createTenantBtn">+ Create Tenant</button>
+        </div>
+
+        <!-- TENANTS TABLE -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Slug</th>
+                    <th>Funeral Home</th>
+                    <th>Email</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tenantTable"></tbody>
+        </table>
+
+    </main>
+</div>
+
+<!-- CREATE TENANT MODAL -->
+<div id="createTenantModal">
+    <div class="modal-box">
+        <h2 style="margin-top:0;">Create New Tenant</h2>
+
+        <label>Funeral Home Name</label>
+        <input id="tenantNameInput" type="text">
+
+        <label>Slug (auto-generated)</label>
+        <input id="tenantSlugInput" type="text">
+
+        <label>Email</label>
+        <input id="tenantEmailInput" type="text">
+
+        <label>Admin Key</label>
+        <input id="tenantKeyInput" type="text">
+
+        <label>Status</label>
+        <select id="tenantStatusInput">
+            <option value="active">Active</option>
+            <option value="trial">Trial</option>
+            <option value="suspended">Suspended</option>
+        </select>
+
+        <div class="modal-actions">
+            <button class="cancel-btn" id="cancelCreateTenant">Cancel</button>
+            <button class="confirm-btn" id="confirmCreateTenant">Create Tenant</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+/* -------------------------------------------------------------
+   POPULATE TENANT TABLE
+------------------------------------------------------------- */
+function populateTenantTable(tenants) {
+    const tbody = document.getElementById("tenantTable");
+    tbody.innerHTML = "";
+
+    tenants.forEach(t => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${t.slug}</td>
+            <td>${t.funeralHomeName || "-"}</td>
+            <td>${t.email || "-"}</td>
+            <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}</td>
+            <td><span class="status-pill status-${t.status}">${t.status}</span></td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+/* -------------------------------------------------------------
+   LOAD TENANTS
+------------------------------------------------------------- */
+async function loadTenants(token) {
+    try {
+        const res = await fetch("/superadmin/api/tenants", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        if (!res.ok) throw new Error("Unauthorized");
+
+        const tenants = await res.json();
+
+        // TABLE BODY
+        const tbody = document.getElementById("tenantTable");
+        tbody.innerHTML = "";
+
+        tenants.forEach(t => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${t.slug}</td>
+                <td>${t.funeralHomeName || "-"}</td>
+                <td>${t.email || "-"}</td>
+                <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}</td>
+                <td>
+                  <span class="status-pill status-${t.status}">
+                    ${t.status}
+                  </span>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Update badge
+        document.getElementById("tenantCountBadge").textContent = tenants.length;
+
+        // Update stats
+        document.getElementById("statTotalTenants").textContent = tenants.length;
+        document.getElementById("statActiveTenants").textContent =
+            tenants.filter(t => t.status === "active").length;
+        document.getElementById("statTrialTenants").textContent =
+            tenants.filter(t => t.status === "trial").length;
+        document.getElementById("statSuspendedTenants").textContent =
+            tenants.filter(t => t.status === "suspended").length;
+
+    } catch (err) {
+        console.error("Load tenants failed:", err);
+    }
+}
+
+/* -------------------------------------------------------------
+   INITIALIZE DASHBOARD
+------------------------------------------------------------- */
+async function initDashboard() {
+    const token = localStorage.getItem("superadminToken");
+    if (!token) {
+        console.error("No superadmin token found");
+        return;
+    }
+
+    loadTenants(token);
+}
+
+/* -------------------------------------------------------------
+   CREATE TENANT MODAL LOGIC
+------------------------------------------------------------- */
+document.getElementById("createTenantBtn").addEventListener("click", () => {
+    document.getElementById("createTenantModal").style.display = "flex";
+});
+
+document.getElementById("cancelCreateTenant").addEventListener("click", () => {
+    document.getElementById("createTenantModal").style.display = "none";
+});
+
+document.getElementById("confirmCreateTenant").addEventListener("click", async () => {
+    const name = document.getElementById("tenantNameInput").value.trim();
+    const slug = document.getElementById("tenantSlugInput").value.trim();
+    const email = document.getElementById("tenantEmailInput").value.trim();
+    const adminKey = document.getElementById("tenantKeyInput").value.trim();
+    const status = document.getElementById("tenantStatusInput").value;
+
+    if (!name || !slug) {
+        alert("Name and slug are required.");
+        return;
+    }
+
+    const token = localStorage.getItem("superadminToken");
+
+    const res = await fetch("/superadmin/api/create-tenant", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+            funeralHomeName: name,
+            slug,
+            email,
+            adminKey,
+            status
+        })
+    });
+
+    if (!res.ok) {
+        alert("Error creating tenant: Unauthorized");
+        return;
+    }
+
+    document.getElementById("createTenantModal").style.display = "none";
+    initDashboard();
+});
+
+/* Start dashboard */
+initDashboard();
+
+</script>
+</body>
+</html>
