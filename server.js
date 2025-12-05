@@ -104,7 +104,7 @@ app.post("/superadmin/login", (req, res) => {
         role: user.role || "superadmin"
       },
       JWT_SECRET,
-      { expiresIn: "12h" }
+      { expiresIn: "7d" }
     );
 
     return res.json({ success: true, token });
@@ -115,6 +115,35 @@ app.post("/superadmin/login", (req, res) => {
       .json({ success: false, error: "Server error" });
   }
 });
+
+// ==================================
+// SUPERADMIN TOKEN REFRESH ENDPOINT
+// ==================================
+app.post("/superadmin/api/refresh", (req, res) => {
+    try {
+        const refresh = req.body.refreshToken;
+        if (!refresh) {
+            return res.status(401).json({ success: false, error: "Missing refresh token" });
+        }
+
+        // Verify refresh token
+        const decoded = jwt.verify(refresh, process.env.JWT_REFRESH_SECRET);
+
+        // Issue new access token
+        const newAccessToken = jwt.sign(
+            { email: decoded.email, role: "superadmin" },
+            process.env.JWT_SECRET,
+            { expiresIn: "2h" }
+        );
+
+        return res.json({ success: true, accessToken: newAccessToken });
+
+    } catch (err) {
+        console.error("Refresh token error:", err.message);
+        return res.status(401).json({ success: false, error: "Invalid refresh token" });
+    }
+});
+
 
 // -------------------------------------------------------------
 // SUPERADMIN AUTH MIDDLEWARE (JWT VERSION)
