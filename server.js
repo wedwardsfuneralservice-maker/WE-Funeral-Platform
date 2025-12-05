@@ -159,72 +159,66 @@ app.post("/superadmin/logout", (req, res) => {
 // ------------------------------------------------------
 //  SUPERADMIN — READ ALL TENANTS
 // ------------------------------------------------------
-app.get("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
-    try {
-        const tenants = loadTenants() || [];
-        res.json({
-            success: true,
-            tenants
-        });
-    } catch (err) {
-        console.error("Error loading tenants:", err);
-        res.status(500).json({
-            success: false,
-            error: "Server error loading tenants"
-        });
-    }
-});
-
-
-// Alias
-app.get("/api/superadmin/tenants", requireSuperadmin, (req, res) => {
+// SUPERADMIN – READ ALL TENANTS (MongoDB)
+app.get("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
   try {
-    const tenants = loadTenants();
-    res.json(tenants);
+    const tenants = await Tenant.find({});
+    res.json({ success: true, tenants });
   } catch (err) {
-    console.error("Error reading tenants:", err);
-    res.status(500).json({ success: false, error: "Server error" });
+    console.error("Error loading tenants:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
 // ------------------------------------------------------
 //  SUPERADMIN — CREATE TENANT
 // ------------------------------------------------------
-app.post("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
+// SUPERADMIN — CREATE TENANT (MongoDB)
+app.post("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
   try {
-    const tenants = loadTenants();
+    const { slug, funeralHomeName, email, adminKey, logo, status } = req.body;
 
-    const slug = req.body.slug;
-    if (!slug) {
-      return res.status(400).json({ success: false, error: "Missing slug" });
-    }
-
-    if (tenants.find((t) => t.slug === slug)) {
+    if (!slug || !funeralHomeName || !email || !adminKey) {
       return res.status(400).json({
         success: false,
-        error: "Tenant already exists"
+        error: "Missing required fields",
       });
     }
 
-    const newTenant = {
-      slug,
-      funeralHomeName: req.body.businessName || "",
-      email: req.body.email || "",
-      status: req.body.status || "trial",
-      createdAt: Date.now(),
-      trialEndsAt:
-        req.body.trialEndsAt || Date.now() + 14 * 24 * 60 * 60 * 1000
-    };
+    // Check if tenant slug already exists
+    const existing = await Tenant.findOne({ slug });
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        error: "Tenant with this slug already exists",
+      });
+    }
 
-    tenants.push(newTenant);
-    saveTenants(tenants);
+    // Create new tenant
+    const newTenant = new Tenant({
+      slug,
+      funeralHomeName,
+      email,
+      adminKey,
+      logo: logo || "",
+      brandColor: "#306CDE",
+      status: status || "active",
+      createdAt: Date.now(),
+    });
+
+    await newTenant.save();
 
     res.json({ success: true, tenant: newTenant });
+
   } catch (err) {
     console.error("Error creating tenant:", err);
-    res.status(500).json({ success: false, error: "Server error" });
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
   }
 });
+
 
 // ------------------------------------------------------
 //  SUPERADMIN — DELETE TENANT
