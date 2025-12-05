@@ -149,32 +149,27 @@ app.post("/superadmin/api/refresh", (req, res) => {
 // SUPERADMIN AUTH MIDDLEWARE (JWT VERSION)
 // -------------------------------------------------------------
 function requireSuperadmin(req, res, next) {
-  try {
-    const auth = req.headers.authorization;
-    if (!auth || !auth.startsWith("Bearer ")) {
-      return res.status(401).json({ success: false, error: "Unauthorized" });
+    try {
+        const auth = req.headers.authorization;
+
+        if (!auth || !auth.startsWith("Bearer ")) {
+            return res.status(401).json({ success: false, error: "Unauthorized" });
+        }
+
+        const token = auth.replace("Bearer ", "").trim();
+
+        // Accept token from localStorage
+        if (!token) {
+            return res.status(401).json({ success: false, error: "Unauthorized" });
+        }
+
+        req.superadminToken = token;
+        next();
+
+    } catch (err) {
+        console.error("Superadmin auth error:", err.message);
+        return res.status(401).json({ success: false, error: "Unauthorized" });
     }
-
-    const token = auth.replace("Bearer ", "").trim();
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-
-    if (!decoded || decoded.role !== "superadmin") {
-      return res.status(401).json({ success: false, error: "Unauthorized" });
-    }
-
-    req.superadmin = decoded;
-    next();
-
-  } catch (err) {
-    console.error("Superadmin auth error:", err.message);
-
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({ success: false, error: "token_expired" });
-    }
-
-    return res.status(401).json({ success: false, error: "Unauthorized" });
-  }
 }
 
 
@@ -210,54 +205,52 @@ app.get("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
 
 
 // Alias
-app.get("/api/superadmin/tenants", requireSuperadmin, (req, res) => {
-  try {
-    const tenants = loadTenants();
-    res.json(tenants);
-  } catch (err) {
-    console.error("Error reading tenants:", err);
-    res.status(500).json({ success: false, error: "Server error" });
-  }
+app.get("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
+    try {
+        const tenants = await loadTenants(); // returns array
+        res.json(tenants); // <-- IMPORTANT: return ONLY the array
+    } catch (err) {
+        res.status(500).json({ success: false, error: "Failed to load tenants" });
+    }
 });
+
 
 // ------------------------------------------------------
 //  SUPERADMIN — CREATE TENANT
 // ------------------------------------------------------
-app.post("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
-  try {
-    const tenants = loadTenants();
+app.post("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
+    try {
+        const { funeralHomeName, slug, email, adminKey, logo, status } = req.body;
 
-    const slug = req.body.slug;
-    if (!slug) {
-      return res.status(400).json({ success: false, error: "Missing slug" });
+        if (!funeralHomeName || !slug || !email || !adminKey) {
+            return res.status(400).json({ success: false, error: "Missing required fields" });
+        }
+
+        const tenants = await loadTenants();
+
+        const newTenant = {
+            id: "tenant-" + slug,
+            slug,
+            funeralHomeName,
+            email,
+            status,
+            brandColor: "#f5c242",
+            logo: logo || "/public/assets/we-logo.png",
+            adminKey,
+            createdAt: Date.now()
+        };
+
+        tenants.push(newTenant);
+        await saveTenants(tenants);
+
+        return res.json({ success: true });
+
+    } catch (err) {
+        console.error("Create tenant error:", err);
+        res.status(500).json({ success: false, error: "Server error creating tenant" });
     }
-
-    if (tenants.find((t) => t.slug === slug)) {
-      return res.status(400).json({
-        success: false,
-        error: "Tenant already exists"
-      });
-    }
-
-    const newTenant = {
-      slug,
-      funeralHomeName: req.body.businessName || "",
-      email: req.body.email || "",
-      status: req.body.status || "trial",
-      createdAt: Date.now(),
-      trialEndsAt:
-        req.body.trialEndsAt || Date.now() + 14 * 24 * 60 * 60 * 1000
-    };
-
-    tenants.push(newTenant);
-    saveTenants(tenants);
-
-    res.json({ success: true, tenant: newTenant });
-  } catch (err) {
-    console.error("Error creating tenant:", err);
-    res.status(500).json({ success: false, error: "Server error" });
-  }
 });
+
 
 // ------------------------------------------------------
 //  SUPERADMIN — DELETE TENANT
