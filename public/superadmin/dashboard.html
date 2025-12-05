@@ -1,696 +1,484 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Super Admin Dashboard – WE Funeral Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <style>
-    :root {
-      /* Core colors */
-      --blue: #306cde;
-      --blue-soft: rgba(48, 108, 222, 0.13);
-      --gold: #f5c242;
-
-      /* Dark theme */
-      --bg-main-dark: #0d0f12;
-      --bg-elevated-dark: #171a22;
-      --text-primary-dark: #f9fafb;
-      --text-muted-dark: #9ca3af;
-      --border-subtle-dark: rgba(148, 163, 184, 0.18);
-
-      /* Light theme */
-      --bg-main-light: #f8fafc;
-      --bg-elevated-light: #ffffff;
-      --text-primary-light: #0f172a;
-      --text-muted-light: #6b7280;
-      --border-subtle-light: rgba(148, 163, 184, 0.35);
-
-      --radius-lg: 16px;
-      --radius-md: 10px;
-      --shadow-soft: 0 18px 35px rgba(0, 0, 0, 0.45);
-    }
-
-    /* THEME WRAPPERS --------------------------------------- */
-    body.theme-dark {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      color: var(--text-primary-dark);
-      background:
-        radial-gradient(circle at top left, var(--blue-soft), transparent 60%),
-        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
-      display: flex;
-      min-height: 100vh;
-    }
-
-    body.theme-light {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      color: var(--text-primary-light);
-      background: var(--bg-main-light);
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* COMMON LAYOUT ---------------------------------------- */
-    .shell {
-      display: flex;
-      width: 100%;
-    }
-
-    /* SIDEBAR ---------------------------------------------- */
-    .sidebar {
-      width: 260px;
-      padding: 24px 20px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-      box-shadow: 18px 0 40px rgba(0, 0, 0, 0.45);
-      z-index: 20;
-    }
-
-    body.theme-dark .sidebar {
-      background: linear-gradient(
-        180deg,
-        #05060a,
-        #0b0d12 40%,
-        #05060a 100%
-      );
-      border-right: 1px solid rgba(148, 163, 184, 0.25);
-    }
-
-    body.theme-light .sidebar {
-      background: #ffffff;
-      border-right: 1px solid var(--border-subtle-light);
-      box-shadow: 12px 0 30px rgba(15, 23, 42, 0.06);
-    }
-
-    .brand-block {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .brand-title {
-      font-size: 18px;
-      letter-spacing: 0.14em;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .brand-sub {
-      font-size: 12px;
-      text-transform: uppercase;
-      opacity: 0.75;
-    }
-
-    .nav-section-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      margin-bottom: 6px;
-      color: var(--text-muted-dark);
-    }
-
-    body.theme-light .nav-section-label {
-      color: var(--text-muted-light);
-    }
-
-    .nav-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .nav-item {
-      border-radius: 999px;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: background 0.18s ease, border-color 0.18s ease,
-        transform 0.12s ease;
-    }
-
-    body.theme-dark .nav-item {
-      color: var(--text-muted-dark);
-    }
-
-    body.theme-light .nav-item {
-      color: var(--text-muted-light);
-    }
-
-    .nav-item:hover {
-      transform: translateX(2px);
-    }
-
-    body.theme-dark .nav-item:hover {
-      background: rgba(15, 23, 42, 0.8);
-      border-color: rgba(148, 163, 184, 0.3);
-    }
-
-    body.theme-light .nav-item:hover {
-      background: rgba(191, 219, 254, 0.45);
-      border-color: rgba(59, 130, 246, 0.35);
-    }
-
-    .nav-item.active {
-      background: linear-gradient(90deg, var(--blue), #5b8bff);
-      color: #f9fafb;
-      border-color: transparent;
-      box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.4);
-    }
-
-    .nav-badge {
-      margin-left: auto;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.8);
-      color: #e5e7eb;
-    }
-
-    body.theme-light .nav-badge {
-      background: rgba(30, 64, 175, 0.12);
-      color: #1e3a8a;
-    }
-
-    .sidebar-footer {
-      margin-top: auto;
-      font-size: 12px;
-      opacity: 0.7;
-    }
-
-    /* MAIN AREA -------------------------------------------- */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 28px;
-      box-sizing: border-box;
-      gap: 20px;
-    }
-
-    /* TOP BAR ---------------------------------------------- */
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .topbar-left {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .page-title {
-      font-size: 22px;
-      font-weight: 600;
-    }
-
-    .page-subtitle {
-      font-size: 13px;
-      opacity: 0.7;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-    }
-
-    body.theme-dark .search-box {
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      color: #e5e7eb;
-    }
-
-    body.theme-light .search-box {
-      background: #ffffff;
-      border: 1px solid var(--border-subtle-light);
-      color: #111827;
-    }
-
-    .search-box input {
-      border: none;
-      outline: none;
-      background: transparent;
-      font-size: 13px;
-      color: inherit;
-      width: 150px;
-    }
-
-    .search-box span {
-      font-size: 13px;
-      opacity: 0.7;
-    }
-
-    .pill-button {
-      border-radius: 999px;
-      padding: 8px 14px;
-      border: none;
-      cursor: pointer;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.18s ease, transform 0.08s ease,
-        box-shadow 0.18s ease;
-    }
-
-    .pill-button:active {
-      transform: translateY(1px);
-    }
-
-    .pill-button.primary {
-      background: linear-gradient(90deg, var(--blue), #5b8bff);
-      color: #f9fafb;
-      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
-    }
-
-    .pill-button.secondary {
-      background: transparent;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      color: inherit;
-    }
-
-    .avatar-chip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-    }
-
-    .avatar-circle {
-      width: 24px;
-      height: 24px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, var(--gold), #4b5563);
-      border: 1px solid rgba(249, 250, 251, 0.5);
-    }
-
-    /* THEME TOGGLE */
-    .theme-toggle {
-      width: 40px;
-      height: 22px;
-      border-radius: 999px;
-      position: relative;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      cursor: pointer;
-    }
-
-    .theme-toggle-knob {
-      position: absolute;
-      top: 2px;
-      width: 16px;
-      height: 16px;
-      border-radius: 999px;
-      background: #f9fafb;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.6);
-      transition: left 0.18s ease;
-    }
-
-    body.theme-dark .theme-toggle-knob {
-      left: 20px;
-    }
-
-    body.theme-light .theme-toggle-knob {
-      left: 2px;
-    }
-
-    /* CARDS / GRID ----------------------------------------- */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      border-radius: var(--radius-lg);
-      padding: 14px 16px;
-      box-sizing: border-box;
-      position: relative;
-      overflow: hidden;
-    }
-
-    body.theme-dark .card {
-      background: radial-gradient(circle at top left, rgba(48,108,222,0.22), transparent 60%),
-        linear-gradient(145deg, #0b1020, #111827);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      box-shadow: var(--shadow-soft);
-    }
-
-    body.theme-light .card {
-      background: var(--bg-elevated-light);
-      border: 1px solid var(--border-subtle-light);
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
-    }
-
-    .card-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      opacity: 0.7;
-    }
-
-    .card-value {
-      font-size: 22px;
-      font-weight: 600;
-      margin-top: 6px;
-    }
-
-    .card-caption {
-      font-size: 12px;
-      opacity: 0.7;
-      margin-top: 4px;
-    }
-
-    /* CONTENT BLOCKS -------------------------------------- */
-    .content-row {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr);
-      gap: 16px;
-    }
-
-    .block {
-      border-radius: var(--radius-lg);
-      padding: 16px 18px;
-      box-sizing: border-box;
-    }
-
-    body.theme-dark .block {
-      background: linear-gradient(145deg, #020617, #020617);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      box-shadow: var(--shadow-soft);
-    }
-
-    body.theme-light .block {
-      background: var(--bg-elevated-light);
-      border: 1px solid var(--border-subtle-light);
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
-    }
-
-    .block-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .block-title {
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .block-sub {
-      font-size: 12px;
-      opacity: 0.65;
-    }
-
-    /* TENANT TABLE ---------------------------------------- */
-    .tenant-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    .tenant-table thead {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.11em;
-    }
-
-    .tenant-table th,
-    .tenant-table td {
-      padding: 8px 6px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-      text-align: left;
-    }
-
-    body.theme-light .tenant-table th,
-    body.theme-light .tenant-table td {
-      border-bottom-color: rgba(148, 163, 184, 0.3);
-    }
-
-    .status-pill {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      text-transform: capitalize;
-      display: inline-block;
-    }
-
-    .status-active {
-      background: rgba(22, 163, 74, 0.18);
-      color: #86efac;
-    }
-
-    body.theme-light .status-active {
-      background: rgba(22, 163, 74, 0.1);
-      color: #166534;
-    }
-
-    .tag-muted {
-      opacity: 0.7;
-      font-size: 12px;
-    }
-
-    /* RESPONSIVE ------------------------------------------ */
-    @media (max-width: 900px) {
-      .sidebar {
-        display: none; /* For now, mobile hides sidebar */
-      }
-      .main {
-        padding: 16px;
-      }
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 600px) {
-      .grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>W.E. SuperAdmin – Dashboard v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* ============================================================
+   PREMIUM SAAS DESIGN – GLOBAL VARIABLES
+============================================================ */
+:root {
+  --blue1: #1E3A8A;      /* Navy */
+  --blue2: #306CDE;      /* Royal Blue */
+  --glass-bg-dark: rgba(15, 18, 28, 0.45);
+  --glass-bg-light: rgba(255, 255, 255, 0.55);
+  --border-light: rgba(255,255,255,0.18);
+  --border-dark: rgba(0,0,0,0.28);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --transition: 0.22s ease;
+}
+
+/* ============================================================
+   THEME SYSTEM (Dark / Light)
+============================================================ */
+body.theme-dark {
+  background: radial-gradient(circle at top left, rgba(48,108,222,0.25), transparent 60%),
+              linear-gradient(145deg, #0b0f19, #0A0D14 60%, #020307);
+  color: #e8edf5;
+  transition: background var(--transition), color var(--transition);
+}
+
+body.theme-light {
+  background: #f2f5fb;
+  color: #111827;
+  transition: background var(--transition), color var(--transition);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ============================================================
+   LAYOUT SHELL
+============================================================ */
+.shell {
+  display: flex;
+  height: 100%;
+}
+
+/* ============================================================
+   GLASSMORPHIC SIDEBAR
+============================================================ */
+.sidebar {
+  width: 260px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-right: 1px solid var(--border-light);
+  background: var(--glass-bg-dark);
+  transition: transform var(--transition);
+}
+
+body.theme-light .sidebar {
+  background: var(--glass-bg-light);
+  border-right: 1px solid rgba(0,0,0,0.15);
+}
+
+/* Auto-collapse on smaller screens */
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-270px);
+    z-index: 30;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* ============================================================
+   SIDEBAR BRAND
+============================================================ */
+.brand-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--blue2);
+  text-transform: uppercase;
+}
+
+.brand-sub {
+  font-size: 12px;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   SIDEBAR NAVIGATION
+============================================================ */
+.nav-section-label {
+  font-size: 10px;
+  opacity: 0.7;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  padding: 10px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  transition: background var(--transition), transform 0.12s ease;
+  border: 1px solid transparent;
+}
+
+body.theme-dark .nav-item {
+  color: #cbd5e1;
+}
+
+body.theme-light .nav-item {
+  color: #374151;
+}
+
+.nav-item:hover {
+  transform: translateX(2px);
+  background: rgba(48,108,222,0.10);
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, var(--blue1), var(--blue2));
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
+}
+
+/* ============================================================
+   MAIN CONTENT AREA
+============================================================ */
+.main {
+  flex: 1;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.page-subtitle {
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+/* ============================================================
+   THEME TOGGLE SWITCH
+============================================================ */
+.theme-toggle {
+  width: 46px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.4);
+  position: relative;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: border var(--transition);
+}
+
+.theme-toggle-knob {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: left var(--transition);
+}
+
+body.theme-light .theme-toggle {
+  border-color: rgba(0,0,0,0.35);
+}
+
+body.theme-dark .theme-toggle-knob {
+  left: 25px;
+}
+
+/* ============================================================
+   SEARCH BAR
+============================================================ */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+body.theme-light .search-box {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.15);
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  width: 160px;
+}
+
+/* ============================================================
+   STATS CARDS – GLASS PANELS
+============================================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.stat-card {
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: transform var(--transition);
+}
+
+body.theme-light .stat-card {
+  background: rgba(255,255,255,0.55);
+  border-color: rgba(0,0,0,0.15);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.stat-label {
+  font-size: 12px;
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 28px;
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+/* ============================================================
+   TENANT TABLE WRAPPER (HTML continues in Part 1B)
+============================================================ */
+.table-block {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+body.theme-light .table-block {
+  background: rgba(255,255,255,0.6);
+  border-color: rgba(0,0,0,0.15);
+}
+</style>
 </head>
 
 <body class="theme-dark">
-  <div class="shell">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="brand-block">
-        <div class="brand-title">W.E. PLATFORM</div>
-        <div class="brand-sub">Super Admin Console</div>
-      </div>
+<div class="shell">
 
-      <div>
-        <div class="nav-section-label">Overview</div>
-        <ul class="nav-list">
-          <li class="nav-item active" data-view="dashboard">
-            <span>Dashboard</span>
-          </li>
-          <li class="nav-item" data-view="tenants">
-            <span>Tenants</span>
-            <span class="nav-badge" id="tenantCountBadge">0</span>
-          </li>
-        </ul>
-      </div>
+<!-- ============================================================
+     SIDEBAR (glassmorphic)
+============================================================ -->
+<aside class="sidebar" id="sidebar">
 
-      <div>
-        <div class="nav-section-label">System</div>
-        <ul class="nav-list">
-          <li class="nav-item" data-view="settings">
-            <span>Platform Settings</span>
-          </li>
-          <li class="nav-item" data-view="logs">
-            <span>Activity Logs</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="sidebar-footer">
-        W.E. Funeral Platform © <span id="yearSpan"></span>
-      </div>
-    </aside>
-
-    <!-- MAIN AREA -->
-    <main class="main">
-      <!-- TOP BAR -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <div class="page-title">Super Admin Dashboard</div>
-          <div class="page-subtitle">
-            Monitor all funeral home tenants and platform activity.
-          </div>
-        </div>
-
-        <div class="topbar-right">
-          <div class="search-box">
-            <span>🔍</span>
-            <input
-              id="searchInput"
-              type="text"
-              placeholder="Search tenants..."
-            />
-          </div>
-
-          <button class="pill-button primary" id="createTenantBtn">
-            + Create Tenant
-          </button>
-
-          <div class="theme-toggle" id="themeToggle">
-            <div class="theme-toggle-knob"></div>
-          </div>
-
-          <div class="avatar-chip">
-            <div class="avatar-circle"></div>
-            <span>SuperAdmin</span>
-          </div>
-        </div>
-      </header>
-
-      <!-- STATS CARDS -->
-      <section class="grid" id="statsGrid">
-        <article class="card">
-          <div class="card-label">Total Tenants</div>
-          <div class="card-value" id="statTotalTenants">0</div>
-          <div class="card-caption">All funeral homes on the platform</div>
-        </article>
-
-        <article class="card">
-          <div class="card-label">Active Tenants</div>
-          <div class="card-value" id="statActiveTenants">0</div>
-          <div class="card-caption">
-            Currently active or in good standing
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-label">Trial Tenants</div>
-          <div class="card-value" id="statTrialTenants">0</div>
-          <div class="card-caption">Onboarding / evaluation phase</div>
-        </article>
-
-        <article class="card">
-          <div class="card-label">Suspended</div>
-          <div class="card-value" id="statSuspendedTenants">0</div>
-          <div class="card-caption">Temporarily disabled access</div>
-        </article>
-      </section>
-
-      <!-- TENANT TABLE BLOCK -->
-      <section class="content-row" id="tenantsBlock">
-        <div class="block">
-          <div class="block-header">
-            <div>
-              <div class="block-title">Tenants</div>
-              <div class="block-sub">
-                All funeral homes currently registered in the system.
-              </div>
-            </div>
-          </div>
-
-          <table class="tenant-table">
-            <thead>
-              <tr>
-                <th>Slug</th>
-                <th>Funeral Home</th>
-                <th>Email</th>
-                <th>Created</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="tenantTable"></tbody>
-          </table>
-        </div>
-      </section>
-    </main>
+  <div class="brand-block">
+    <div class="brand-title">W.E. PLATFORM</div>
+    <div class="brand-sub">Super Admin</div>
   </div>
 
-<!-- CREATE TENANT MODAL -->
-<div id="createTenantModal"
-     style="position:fixed; inset:0; background:rgba(0,0,0,0.55);
-            display:none; align-items:center; justify-content:center; z-index:999;">
-  
-  <div style="background:#111827; padding:24px; width:420px;
-              border-radius:14px; border:1px solid rgba(148,163,184,0.35);
-              box-shadow:0 18px 45px rgba(0,0,0,0.6); color:white;">
+  <div>
+    <div class="nav-section-label">Overview</div>
+    <ul class="nav-list">
+      <li class="nav-item active" data-view="dashboard">Dashboard</li>
+      <li class="nav-item" data-view="tenants">Tenants</li>
+    </ul>
+  </div>
 
-    <h2 style="margin:0 0 14px;">Create New Tenant</h2>
+  <div>
+    <div class="nav-section-label">System</div>
+    <ul class="nav-list">
+      <li class="nav-item" data-view="settings">Platform Settings</li>
+      <li class="nav-item" data-view="logs">Activity Logs</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:auto; opacity:0.7; font-size:12px;">
+    © <span id="yearSpan"></span> W.E. Funeral Platform
+  </div>
+
+</aside>
+<!-- ============================================================
+     MAIN CONTENT AREA
+============================================================ -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="page-title">Super Admin Dashboard</div>
+      <div class="page-subtitle">Monitor platform activity & manage tenants</div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div class="search-box">
+        <span>🔍</span>
+        <input id="searchInput" type="text" placeholder="Search tenants...">
+      </div>
+
+      <button id="createTenantBtn"
+              style="padding:10px 16px; border-radius:999px;
+                     background:linear-gradient(90deg,var(--blue1),var(--blue2));
+                     border:none; color:white; cursor:pointer;">
+        + Add Tenant
+      </button>
+
+      <div class="theme-toggle" id="themeToggle">
+        <div class="theme-toggle-knob"></div>
+      </div>
+
+      <div class="avatar-chip"
+           style="display:flex; align-items:center; gap:8px;
+                  padding:6px 12px; backdrop-filter:blur(10px);
+                  border-radius:999px; border:1px solid rgba(255,255,255,0.25);">
+        <div style="width:26px; height:26px; background:linear-gradient(135deg,var(--blue1),var(--blue2));
+                    border-radius:999px;"></div>
+        <span>SuperAdmin</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       STATS CARDS
+  ============================================================ -->
+  <section class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Tenants</div>
+      <div class="stat-value" id="statTotalTenants">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Active</div>
+      <div class="stat-value" id="statActiveTenants">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Trial</div>
+      <div class="stat-value" id="statTrialTenants">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Suspended</div>
+      <div class="stat-value" id="statSuspendedTenants">0</div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TENANT TABLE BLOCK
+  ============================================================ -->
+  <section class="table-block">
+    <h3 style="margin-top:0; margin-bottom:12px;">Tenants</h3>
+
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <thead>
+          <tr style="text-align:left; opacity:0.7;">
+            <th style="padding:10px 6px;">Slug</th>
+            <th style="padding:10px 6px;">Funeral Home</th>
+            <th style="padding:10px 6px;">Email</th>
+            <th style="padding:10px 6px;">Created</th>
+            <th style="padding:10px 6px;">Status</th>
+            <th style="padding:10px 6px;">Manage</th>
+          </tr>
+        </thead>
+        <tbody id="tenantTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</div> <!-- END .shell -->
+
+<!-- ============================================================
+     CREATE TENANT MODAL
+============================================================ -->
+<div id="createTenantModal"
+     style="position:fixed; inset:0; background:rgba(0,0,0,0.55); 
+            display:none; align-items:center; justify-content:center; z-index:200;">
+  
+  <div style="background:rgba(15,18,28,0.85); backdrop-filter:blur(20px);
+              padding:26px; width:440px; border-radius:var(--radius-lg);
+              border:1px solid rgba(255,255,255,0.18); color:white;">
+    
+    <h2 style="margin-top:0; margin-bottom:18px;">Create New Tenant</h2>
 
     <div style="display:flex; flex-direction:column; gap:12px;">
-      
       <label>Funeral Home Name</label>
       <input id="tenantNameInput" type="text"
-             style="padding:10px;border-radius:8px;background:#0f172a;
-             border:1px solid #334155;color:#fff;">
+             style="padding:10px; border-radius:var(--radius-md);
+                    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);
+                    color:white;">
 
-      <label>Slug (auto-generated)</label>
+      <label>Slug (auto)</label>
       <input id="tenantSlugInput" type="text"
-             style="padding:10px;border-radius:8px;background:#0f172a;
-             border:1px solid #334155;color:#fff;">
+             style="padding:10px; border-radius:var(--radius-md);
+                    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);
+                    color:white;">
 
       <label>Admin Email</label>
       <input id="tenantEmailInput" type="email"
-             style="padding:10px;border-radius:8px;background:#0f172a;
-             border:1px solid #334155;color:#fff;">
+             style="padding:10px; border-radius:var(--radius-md);
+                    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);
+                    color:white;">
 
       <label>Admin Key</label>
       <input id="tenantKeyInput" type="text"
-             style="padding:10px;border-radius:8px;background:#0f172a;
-             border:1px solid #334155;color:#fff;">
+             style="padding:10px; border-radius:var(--radius-md);
+                    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);
+                    color:white;">
 
-      <label>Logo URL (optional)</label>
-      <input id="tenantLogoInput" type="text"
-             style="padding:10px;border-radius:8px;background:#0f172a;
-             border:1px solid #334155;color:#fff;">
-
-      <label>Status</label>
-      <select id="tenantStatusInput"
-              style="padding:10px;border-radius:8px;background:#0f172a;
-              border:1px solid #334155;color:#fff;">
-        <option value="active">Active</option>
-        <option value="trial">Trial</option>
-        <option value="suspended">Suspended</option>
-      </select>
-
-      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;">
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:10px;">
         <button id="cancelCreateTenant"
-                style="padding:10px 14px;border-radius:8px;background:#334155;
-                color:#fff;border:none;cursor:pointer;">
+                style="padding:8px 14px; border-radius:var(--radius-md);
+                       background:rgba(255,255,255,0.15); border:none; color:white;">
           Cancel
         </button>
 
         <button id="confirmCreateTenant"
-                style="padding:10px 14px;border-radius:8px;background:#306CDE;
-                color:#fff;border:none;cursor:pointer;">
-          Create Tenant
+                style="padding:8px 14px; border-radius:var(--radius-md);
+                       background:linear-gradient(90deg,var(--blue1),var(--blue2)); border:none; color:white;">
+          Create
         </button>
       </div>
 
@@ -698,164 +486,409 @@
   </div>
 </div>
 
-  
+<!-- ============================================================
+     MANAGE TENANT DRAWER (glassmorphic)
+============================================================ -->
+<div id="drawerOverlay"
+     style="position:fixed; inset:0; background:rgba(0,0,0,0.55);
+            display:none; z-index:250; backdrop-filter:blur(6px);"></div>
 
-<script>
+<div id="tenantDrawer"
+     style="position:fixed; top:0; right:0; width:420px; height:100%;
+            background:rgba(255,255,255,0.08); backdrop-filter:blur(22px);
+            border-left:1px solid rgba(255,255,255,0.25);
+            transform:translateX(420px); transition:transform 0.32s ease;
+            z-index:300; padding:24px; overflow-y:auto; color:white;">
 
-  
-(async () => {
+  <h2 style="margin-top:0;">Manage Tenant</h2>
 
-    // -----------------------------
-    // INITIAL DASHBOARD LOAD
-    // -----------------------------
-    initDashboard();
+  <button id="closeDrawerBtn"
+          style="position:absolute; top:16px; right:20px; 
+                 background:none; border:none; color:white; font-size:22px; cursor:pointer;">
+    ✕
+  </button>
 
-    // -----------------------------
-    // CREATE TENANT MODAL ELEMENTS
-    // -----------------------------
-    const modal = document.getElementById("createTenantModal");
-    const openBtn = document.getElementById("createTenantBtn");
-    const cancelBtn = document.getElementById("cancelCreateTenant");
-    const confirmBtn = document.getElementById("confirmCreateTenant");
+  <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
 
-    // -----------------------------
-    // OPEN MODAL
-    // -----------------------------
-    openBtn.addEventListener("click", () => {
-        modal.style.display = "flex";
-        document.getElementById("tenantKeyInput").value =
-            "KEY-" + Math.random().toString(36).substring(2, 10).toUpperCase();
-    });
+    <label>Funeral Home Name</label>
+    <input id="drawerName" type="text"
+           style="padding:10px; border-radius:var(--radius-md);
+                  background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.2);
+                  color:white;">
 
-    // -----------------------------
-    // CLOSE MODAL
-    // -----------------------------
-    cancelBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
+    <label>Email</label>
+    <input id="drawerEmail" type="email"
+           style="padding:10px; border-radius:var(--radius-md);
+                  background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.2);
+                  color:white;">
 
-    // -----------------------------
-    // AUTO-GENERATE SLUG
-    // -----------------------------
-    document.getElementById("tenantNameInput").addEventListener("input", (e) => {
-        const slug = e.target.value
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, "");
+    <label>Logo URL</label>
+    <input id="drawerLogo" type="text"
+           style="padding:10px; border-radius:var(--radius-md);
+                  background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.2);
+                  color:white;">
 
-        document.getElementById("tenantSlugInput").value = slug;
-    });
+    <label>Brand Color</label>
+    <input id="drawerColor" type="color"
+           style="padding:6px; width:80px; height:40px; border-radius:var(--radius-md);
+                  background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.2);
+                  color:white;">
 
-    // -----------------------------
-    // CONFIRM CREATE TENANT
-    // -----------------------------
-    confirmBtn.addEventListener("click", async () => {
-        const name = document.getElementById("tenantNameInput").value.trim();
-        const slug = document.getElementById("tenantSlugInput").value.trim();
-        const email = document.getElementById("tenantEmailInput").value.trim();
-        const adminKey = document.getElementById("tenantKeyInput").value.trim();
-        const logo = document.getElementById("tenantLogoInput").value.trim();
-        const status = document.getElementById("tenantStatusInput").value;
+    <h3 style="margin-top:16px;">Features</h3>
+    <div id="featureList" style="display:flex; flex-direction:column; gap:10px;"></div>
 
-        if (!name || !slug || !email || !adminKey) {
-            alert("Please fill in all required fields.");
-            return;
-        }
+    <button id="saveTenantBtn"
+            style="margin-top:20px; padding:12px 18px; border-radius:var(--radius-md);
+                   background:linear-gradient(90deg,var(--blue1),var(--blue2)); 
+                   border:none; color:white; font-size:15px; cursor:pointer;">
+      Save Changes
+    </button>
 
-        const token = localStorage.getItem("superadminToken");
+  </div>
+</div>
 
-        const res = await fetch("/superadmin/api/tenants", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({
-                funeralHomeName: name,
-                slug,
-                email,
-                adminKey,
-                logo,
-                status
-            }),
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            alert("Tenant created successfully!");
-            modal.style.display = "none";
-            loadTenants(token); // Refresh table
-        } else {
-            alert("Error: " + data.error);
-        }
-    });
-
-})(); // END WRAPPER
-  
-async function initDashboard() {
-    const token = localStorage.getItem("superadminToken");
-
-    if (!token) {
-        console.warn("No superadmin token found — redirecting.");
-        window.location.href = "/superadmin/login.html";
-        return;
-    }
-
-    loadTenants(token);
-}
-
-async function loadTenants(token) {
-    try {
-        const res = await fetch("/superadmin/api/tenants", {
-            headers: { "Authorization": "Bearer " + token }
-        });
-
-        const data = await res.json();
-
-        if (!data.success) {
-            console.error("Tenant load error:", data.error);
-            return;
-        }
-
-        const tenants = data.tenants || [];
-        const tbody = document.getElementById("tenantTable");
-        tbody.innerHTML = "";
-
-        tenants.forEach(t => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${t.slug}</td>
-                <td>${t.funeralHomeName || "-"}</td>
-                <td>${t.email || "-"}</td>
-                <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}</td>
-                <td><span class="status-pill status-${t.status}">${t.status}</span></td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        // Update sidebar badge
-        document.getElementById("tenantCountBadge").textContent = tenants.length;
-
-        // Update stat cards
-        document.getElementById("statTotalTenants").textContent = tenants.length;
-        document.getElementById("statActiveTenants").textContent =
-            tenants.filter(t => t.status === "active").length;
-        document.getElementById("statTrialTenants").textContent =
-            tenants.filter(t => t.status === "trial").length;
-        document.getElementById("statSuspendedTenants").textContent =
-            tenants.filter(t => t.status === "suspended").length;
-
-    } catch (err) {
-        console.error("Load tenants failed:", err);
-    }
-}
-  
-</script>
-
-  
-  
+<!-- ============================================================
+     INCLUDE JAVASCRIPT (PART 2 WILL PROVIDE CONTENT)
+============================================================ -->
+<script src="dashboard_v2.js"></script>
 
 </body>
 </html>
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
+let tenants = [];
+let currentTenant = null;
+let drawerOpen = false;
+let unsavedChanges = false;
+
+const FEATURES = [
+  "Memorial Pages",
+  "Condolence Messages",
+  "Funeral Intake Form",
+  "Hymn Sheet Designer",
+  "Appointment Scheduler",
+  "PDF Auto-Fill",
+  "Accounting & Payments",
+  "Inventory Tracking",
+  "Staff Management",
+  "Analytics Dashboard"
+];
+
+/* ============================================================
+   ON LOAD
+============================================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("yearSpan").textContent = new Date().getFullYear();
+
+  setupThemeToggle();
+  setupSidebarCollapse();
+  setupSearch();
+  setupCreateTenantModal();
+  setupDrawer();
+
+  loadTenants();
+});
+
+/* ============================================================
+   SECURE FETCH WRAPPER (prep for new server_v2)
+============================================================ */
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    credentials: "include", // important for session cookies
+    headers: { "Content-Type": "application/json" },
+    ...options
+  });
+
+  if (res.status === 401) {
+    window.location.href = "/superadmin/login.html";
+    return;
+  }
+
+  return res.json();
+}
+
+/* ============================================================
+   LOAD TENANTS
+============================================================ */
+async function loadTenants() {
+  const data = await api("/api/tenants");
+
+  if (!data || !data.success) {
+    console.error("Failed loading tenants:", data?.error);
+    return;
+  }
+
+  tenants = data.tenants;
+  renderTenantTable();
+  updateStats();
+}
+
+/* ============================================================
+   RENDER TENANT TABLE
+============================================================ */
+function renderTenantTable() {
+  const tbody = document.getElementById("tenantTable");
+  tbody.innerHTML = "";
+
+  tenants.forEach(t => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td style="padding:8px 6px;">${t.slug}</td>
+      <td style="padding:8px 6px;">${t.funeralHomeName}</td>
+      <td style="padding:8px 6px;">${t.email}</td>
+      <td style="padding:8px 6px;">${new Date(t.createdAt).toLocaleDateString()}</td>
+      <td style="padding:8px 6px;">${t.status}</td>
+      <td style="padding:8px 6px;">
+        <button class="manage-btn" data-slug="${t.slug}"
+                style="padding:6px 12px; border-radius:8px; border:none;
+                background:linear-gradient(90deg,var(--blue1),var(--blue2));
+                color:white; cursor:pointer;">
+          Manage
+        </button>
+      </td>
+    `;
+
+    row.querySelector(".manage-btn").addEventListener("click", () => openDrawer(t.slug));
+
+    tbody.appendChild(row);
+  });
+}
+
+/* ============================================================
+   UPDATE STAT CARDS
+============================================================ */
+function updateStats() {
+  document.getElementById("statTotalTenants").textContent = tenants.length;
+  document.getElementById("statActiveTenants").textContent =
+    tenants.filter(t => t.status === "active").length;
+  document.getElementById("statTrialTenants").textContent =
+    tenants.filter(t => t.status === "trial").length;
+  document.getElementById("statSuspendedTenants").textContent =
+    tenants.filter(t => t.status === "suspended").length;
+}
+
+/* ============================================================
+   SEARCH FILTER
+============================================================ */
+function setupSearch() {
+  document.getElementById("searchInput").addEventListener("input", e => {
+    const term = e.target.value.toLowerCase();
+    const filtered = tenants.filter(t =>
+      t.funeralHomeName.toLowerCase().includes(term) ||
+      t.slug.toLowerCase().includes(term)
+    );
+    renderFilteredTable(filtered);
+  });
+}
+
+function renderFilteredTable(list) {
+  const tbody = document.getElementById("tenantTable");
+  tbody.innerHTML = "";
+
+  list.forEach(t => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td style="padding:8px 6px;">${t.slug}</td>
+      <td style="padding:8px 6px;">${t.funeralHomeName}</td>
+      <td style="padding:8px 6px;">${t.email}</td>
+      <td style="padding:8px 6px;">${new Date(t.createdAt).toLocaleDateString()}</td>
+      <td style="padding:8px 6px;">${t.status}</td>
+      <td style="padding:8px 6px;">
+        <button class="manage-btn" data-slug="${t.slug}"
+                style="padding:6px 12px; border-radius:8px; border:none;
+                background:linear-gradient(90deg,var(--blue1),var(--blue2));
+                color:white; cursor:pointer;">
+          Manage
+        </button>
+      </td>
+    `;
+    row.querySelector(".manage-btn").addEventListener("click", () => openDrawer(t.slug));
+    tbody.appendChild(row);
+  });
+}
+
+/* ============================================================
+   CREATE TENANT MODAL
+============================================================ */
+function setupCreateTenantModal() {
+  const modal = document.getElementById("createTenantModal");
+
+  document.getElementById("createTenantBtn").onclick = () => {
+    modal.style.display = "flex";
+    document.getElementById("tenantKeyInput").value =
+      "KEY-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+  };
+
+  document.getElementById("cancelCreateTenant").onclick = () => {
+    modal.style.display = "none";
+  };
+
+  document.getElementById("tenantNameInput").addEventListener("input", e => {
+    const slug = e.target.value.trim().toLowerCase().replace(/\s+/g, "-");
+    document.getElementById("tenantSlugInput").value = slug;
+  });
+
+  document.getElementById("confirmCreateTenant").onclick = async () => {
+    const name = tenantNameInput.value.trim();
+    const slug = tenantSlugInput.value.trim();
+    const email = tenantEmailInput.value.trim();
+    const key = tenantKeyInput.value.trim();
+
+    if (!name || !slug || !email || !key) {
+      alert("All fields required.");
+      return;
+    }
+
+    const data = await api("/api/tenant", {
+      method: "POST",
+      body: JSON.stringify({ funeralHomeName: name, slug, email, adminKey: key })
+    });
+
+    if (data.success) {
+      alert("Tenant created!");
+      modal.style.display = "none";
+      loadTenants();
+    } else {
+      alert("Error: " + data.error);
+    }
+  };
+}
+
+/* ============================================================
+   MANAGE DRAWER
+============================================================ */
+function setupDrawer() {
+  document.getElementById("closeDrawerBtn").onclick = () => closeDrawer();
+  document.getElementById("drawerOverlay").onclick = () => closeDrawer();
+}
+
+function openDrawer(slug) {
+  currentTenant = tenants.find(t => t.slug === slug);
+  if (!currentTenant) return;
+
+  drawerOpen = true;
+  unsavedChanges = false;
+
+  drawerName.value = currentTenant.funeralHomeName;
+  drawerEmail.value = currentTenant.email;
+  drawerLogo.value = currentTenant.logo || "";
+  drawerColor.value = currentTenant.brandColor || "#306CDE";
+
+  const featureList = document.getElementById("featureList");
+  featureList.innerHTML = "";
+
+  FEATURES.forEach(f => {
+    const active = currentTenant.features?.[f] === true;
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.justifyContent = "space-between";
+    row.style.alignItems = "center";
+
+    row.innerHTML = `
+      <span>${f}</span>
+      <div class="toggle-switch ${active ? "active" : ""}" data-feature="${f}"
+           style="width:46px; height:24px; border-radius:999px;
+                  background:${active ? "var(--blue2)" : "rgba(255,255,255,0.2)"};
+                  position:relative; cursor:pointer; transition:0.2s;">
+        <div class="knob"
+             style="width:18px; height:18px; background:white; border-radius:50%;
+                    position:absolute; top:3px; left:${active ? "25px" : "3px"};
+                    transition:0.2s;"></div>
+      </div>
+    `;
+
+    row.querySelector(".toggle-switch").addEventListener("click", e => {
+      const sw = e.currentTarget;
+      const isActive = sw.classList.toggle("active");
+      sw.style.background = isActive ? "var(--blue2)" : "rgba(255,255,255,0.2)";
+      sw.querySelector(".knob").style.left = isActive ? "25px" : "3px";
+      unsavedChanges = true;
+    });
+
+    featureList.appendChild(row);
+  });
+
+  document.getElementById("drawerOverlay").style.display = "block";
+  document.getElementById("tenantDrawer").style.transform = "translateX(0)";
+}
+
+/* ============================================================
+   CLOSE DRAWER
+============================================================ */
+function closeDrawer() {
+  if (unsavedChanges && !confirm("You have unsaved changes. Close anyway?")) {
+    return;
+  }
+
+  drawerOpen = false;
+  document.getElementById("tenantDrawer").style.transform = "translateX(420px)";
+  setTimeout(() => {
+    document.getElementById("drawerOverlay").style.display = "none";
+  }, 300);
+}
+
+/* ============================================================
+   SAVE TENANT CHANGES
+============================================================ */
+document.getElementById("saveTenantBtn").onclick = async () => {
+  if (!currentTenant) return;
+
+  const payload = {
+    funeralHomeName: drawerName.value.trim(),
+    email: drawerEmail.value.trim(),
+    logo: drawerLogo.value.trim(),
+    brandColor: drawerColor.value,
+    features: {}
+  };
+
+  document.querySelectorAll(".toggle-switch").forEach(sw => {
+    payload.features[sw.dataset.feature] = sw.classList.contains("active");
+  });
+
+  const data = await api(`/api/tenant/${currentTenant.slug}`, {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+
+  if (data.success) {
+    alert("Saved!");
+    closeDrawer(true);
+    loadTenants();
+  } else {
+    alert("Error: " + data.error);
+  }
+};
+
+/* ============================================================
+   THEME TOGGLE
+============================================================ */
+function setupThemeToggle() {
+  const toggle = document.getElementById("themeToggle");
+  const knob = toggle.querySelector(".theme-toggle-knob");
+
+  let theme = localStorage.getItem("we_theme") || "dark";
+  document.body.className = "theme-" + theme;
+  knob.style.left = theme === "dark" ? "25px" : "3px";
+
+  toggle.onclick = () => {
+    theme = theme === "dark" ? "light" : "dark";
+    document.body.className = "theme-" + theme;
+    knob.style.left = theme === "dark" ? "25px" : "3px";
+    localStorage.setItem("we_theme", theme);
+  };
+}
+
+/* ============================================================
+   SIDEBAR AUTO COLLAPSE
+============================================================ */
+function setupSidebarCollapse() {
+  const sidebar = document.getElementById("sidebar");
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) {
+      sidebar.classList.remove("open");
+    }
+  });
+}
