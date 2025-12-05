@@ -119,30 +119,33 @@ app.post("/superadmin/login", (req, res) => {
 // ------------------------------------------------------
 //  SUPERADMIN AUTH MIDDLEWARE
 // ------------------------------------------------------
+// -------------------------------------------------------------
+// SUPERADMIN AUTH MIDDLEWARE
+// -------------------------------------------------------------
 function requireSuperadmin(req, res, next) {
-    try {
-        const auth = req.headers.authorization;
+  try {
+    const auth = req.headers.authorization;
 
-        if (!auth || !auth.startsWith("Bearer ")) {
-            return res.status(401).json({ success: false, error: "Unauthorized" });
-        }
-
-        const token = auth.replace("Bearer ", "").trim();
-
-        if (
-            token !== process.env.SUPERADMIN_MASTER_KEY &&
-            token !== superadminToken   // if you use a generated token
-        ) {
-            return res.status(401).json({ success: false, error: "Unauthorized" });
-        }
-
-        next();
-
-    } catch (err) {
-        console.error("Superadmin auth error:", err.message);
-        return res.status(401).json({ success: false, error: "Unauthorized" });
+    if (!auth || !auth.startsWith("Bearer ")) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
     }
+
+    const token = auth.replace("Bearer ", "").trim();
+
+    // token must match the stored superadminToken (localStorage on login)
+    if (token !== superadminToken) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
+    next();
+  } catch (err) {
+    console.error("Superadmin auth error:", err.message);
+    return res
+      .status(401)
+      .json({ success: false, error: "Unauthorized" });
+  }
 }
+
 
 
 // ------------------------------------------------------
