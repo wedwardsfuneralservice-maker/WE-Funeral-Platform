@@ -120,28 +120,23 @@ app.post("/superadmin/login", (req, res) => {
 //  SUPERADMIN AUTH MIDDLEWARE
 // ------------------------------------------------------
 function requireSuperadmin(req, res, next) {
-  let raw = req.headers["x-auth-token"] || req.headers["authorization"];
-  if (!raw) {
-    return res
-      .status(401)
-      .json({ success: false, error: "Unauthorized" });
-  }
+    const auth = req.headers.authorization;
 
-  if (raw.startsWith("Bearer ")) {
-    raw = raw.slice(7);
-  }
-
-  try {
-    const payload = jwt.verify(raw, JWT_SECRET);
-    if (payload.role !== "superadmin") {
-      return res
-        .status(403)
-        .json({ success: false, error: "Forbidden" });
+    if (!auth || !auth.startsWith("Bearer ")) {
+        return res.status(401).json({ success: false, error: "Unauthorized" });
     }
 
-    req.superadmin = payload;
+    const token = auth.replace("Bearer ", "").trim();
+
+    if (token !== process.env.SUPERADMIN_MASTER_KEY &&
+        token !== superadminToken /* your generated token var */) {
+
+        return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
     next();
-  } catch (err) {
+}
+ catch (err) {
     console.error("JWT verify error:", err.message);
     return res
       .status(401)
