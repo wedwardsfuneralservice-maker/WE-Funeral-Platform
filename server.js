@@ -183,33 +183,21 @@ app.post("/superadmin/logout", (req, res) => {
 });
 
 // ------------------------------------------------------
-//  SUPERADMIN — READ ALL TENANTS
+//  SUPERADMIN — READ ALL TENANTS (FINAL VERSION)
 // ------------------------------------------------------
-app.get("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
+app.get("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
     try {
-        const data = await loadTenants(); // returns { success, tenants: [...] }
+        const tenants = loadTenants() || [];
 
-        // Return ONLY the array for frontend compatibility
-        res.json(data.tenants || []);
+        // ALWAYS return an ARRAY (dashboard expects this)
+        res.json(tenants);
+
     } catch (err) {
         console.error("Load tenants error:", err);
         res.status(500).json({ error: "Failed to load tenants" });
     }
 });
 
-
-
-
-
-// Alias
-app.get("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
-    try {
-        const tenants = await loadTenants(); // returns array
-        res.json(tenants); // <-- IMPORTANT: return ONLY the array
-    } catch (err) {
-        res.status(500).json({ success: false, error: "Failed to load tenants" });
-    }
-});
 
 
 // ------------------------------------------------------
