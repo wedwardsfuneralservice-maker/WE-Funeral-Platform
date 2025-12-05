@@ -1,0 +1,306 @@
+/* -----------------------------------------------------------
+   W.E. PLATFORM — SUPERADMIN DASHBOARD STYLE SHEET
+   Clean, modern SaaS theme (Dark/Light mode)
+----------------------------------------------------------- */
+
+/* ROOT VARIABLES */
+:root {
+  --blue: #306cde;
+  --blue-soft: rgba(48, 108, 222, 0.13);
+  --gold: #f5c242;
+
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --shadow-soft: 0 18px 35px rgba(0, 0, 0, 0.45);
+
+  --bg-dark-1: #0d0f12;
+  --bg-dark-2: #171a22;
+  --text-dark-main: #f9fafb;
+  --text-dark-muted: #9ca3af;
+  --border-dark: rgba(148, 163, 184, 0.18);
+
+  --bg-light-1: #f8fafc;
+  --bg-light-2: #ffffff;
+  --text-light-main: #0f172a;
+  --text-light-muted: #6b7280;
+  --border-light: rgba(148, 163, 184, 0.35);
+}
+
+/* BODY THEMES */
+body.theme-dark {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--text-dark-main);
+  background: radial-gradient(circle at top left, var(--blue-soft), transparent 60%),
+              radial-gradient(circle at bottom right, rgba(15,23,42,0.9), #020617);
+  display: flex;
+  min-height: 100vh;
+}
+
+body.theme-light {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--text-light-main);
+  background: var(--bg-light-1);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* LAYOUT -------------------------------------------------- */
+.shell {
+  display: flex;
+  width: 100%;
+}
+
+/* SIDEBAR ------------------------------------------------- */
+.sidebar {
+  width: 260px;
+  padding: 24px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  box-shadow: 18px 0 40px rgba(0,0,0,0.45);
+  z-index: 30;
+}
+
+body.theme-dark .sidebar {
+  background: linear-gradient(180deg, #05060a, #0b0d12 40%, #05060a 100%);
+  border-right: 1px solid rgba(148,163,184,0.25);
+}
+
+body.theme-light .sidebar {
+  background: #fff;
+  border-right: 1px solid var(--border-light);
+  box-shadow: 12px 0 30px rgba(15,23,42,0.06);
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.brand-sub {
+  font-size: 12px;
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+
+/* NAVIGATION --------------------------------------------- */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  transition: 0.18s ease;
+}
+
+body.theme-dark .nav-item {
+  color: var(--text-dark-muted);
+}
+body.theme-light .nav-item {
+  color: var(--text-light-muted);
+}
+
+.nav-item:hover {
+  transform: translateX(2px);
+}
+
+body.theme-dark .nav-item:hover {
+  background: rgba(15,23,42,0.8);
+  border-color: rgba(148,163,184,0.3);
+}
+
+body.theme-light .nav-item:hover {
+  background: rgba(191,219,254,0.45);
+  border-color: rgba(59,130,246,0.35);
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, var(--blue), #5b8bff);
+  color: #fff !important;
+  border-color: transparent;
+  box-shadow: 0 0 0 1px rgba(147,197,253,0.4);
+}
+
+.nav-badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: rgba(15,23,42,0.8);
+  color: white;
+}
+
+body.theme-light .nav-badge {
+  background: rgba(30,64,175,0.12);
+  color: #1e3a8a;
+}
+
+/* MAIN ---------------------------------------------------- */
+.main {
+  flex: 1;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* TOPBAR -------------------------------------------------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+body.theme-dark .search-box {
+  background: rgba(15,23,42,0.9);
+  border: 1px solid rgba(148,163,184,0.35);
+  color: white;
+}
+body.theme-light .search-box {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  color: #111;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+.pill-button {
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill-button.primary {
+  background: linear-gradient(90deg, var(--blue), #5b8bff);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(37,99,235,0.45);
+}
+
+/* THEME TOGGLE ------------------------------------------- */
+.theme-toggle {
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.6);
+  position: relative;
+  cursor: pointer;
+}
+
+.theme-toggle-knob {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: white;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: 0.18s;
+}
+
+body.theme-dark .theme-toggle-knob {
+  left: 20px;
+}
+
+/* CARDS --------------------------------------------------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+}
+
+body.theme-dark .card {
+  background: linear-gradient(145deg,#0b1020,#111827);
+  border: 1px solid rgba(148,163,184,0.3);
+}
+
+body.theme-light .card {
+  background: #fff;
+  border: 1px solid var(--border-light);
+}
+
+/* TABLE --------------------------------------------------- */
+.tenant-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tenant-table th,
+.tenant-table td {
+  padding: 10px 6px;
+  border-bottom: 1px solid rgba(148,163,184,0.25);
+  font-size: 14px;
+}
+
+.status-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.status-active {
+  background: rgba(22,163,74,0.18);
+  color: #86efac;
+}
+
+.manage-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--blue);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+}
+
+/* RESPONSIVE --------------------------------------------- */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+}
