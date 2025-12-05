@@ -808,16 +808,26 @@ async function initDashboard() {
 
 async function loadTenants(token) {
     try {
+        async function loadTenants() {
+    try {
+        const token = localStorage.getItem("superadminToken");
+
         const res = await fetch("/superadmin/api/tenants", {
-            headers: { "Authorization": "Bearer " + token }
+            headers: {
+                "Authorization": "Bearer " + token
+            }
         });
 
-        const data = await res.json();
+        if (!res.ok) throw new Error(res.statusText);
 
-        if (!data.success) {
-            console.error("Tenant load error:", data.error);
-            return;
-        }
+        const tenants = await res.json();
+        populateTenantTable(tenants);
+
+    } catch (err) {
+        console.error("Tenant load error:", err);
+    }
+}
+
 
         const tenants = data.tenants || [];
         const tbody = document.getElementById("tenantTable");
