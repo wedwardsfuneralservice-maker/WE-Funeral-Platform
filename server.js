@@ -160,14 +160,21 @@ app.post("/superadmin/logout", (req, res) => {
 //  SUPERADMIN — READ ALL TENANTS
 // ------------------------------------------------------
 app.get("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
-  try {
-    const tenants = loadTenants();
-    res.json(tenants);
-  } catch (err) {
-    console.error("Error reading tenants:", err);
-    res.status(500).json({ success: false, error: "Server error" });
-  }
+    try {
+        const tenants = loadTenants() || [];
+        res.json({
+            success: true,
+            tenants
+        });
+    } catch (err) {
+        console.error("Error loading tenants:", err);
+        res.status(500).json({
+            success: false,
+            error: "Server error loading tenants"
+        });
+    }
 });
+
 
 // Alias
 app.get("/api/superadmin/tenants", requireSuperadmin, (req, res) => {
