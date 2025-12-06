@@ -230,6 +230,30 @@
       gap: 16px;
     }
 
+.actions-cell button {
+    padding: 4px 10px;
+    margin-right: 5px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.toggle-btn {
+    background: #eab308;
+    color: black;
+}
+
+.delete-btn {
+    background: #dc2626;
+    color: white;
+}
+
+    
     .topbar-left {
       flex: 1;
       display: flex;
@@ -866,8 +890,69 @@ async function loadTenants(token) {
                         ${t.status}
                     </span>
                 </td>
+                </td>
+    <td class="actions-cell">
+        
+        <!-- EDIT BUTTON -->
+        <button class="edit-btn" data-id="${t.id}">
+            Edit
+        </button>
+
+        <!-- SUSPEND/ACTIVATE BUTTON -->
+        <button class="toggle-btn" data-id="${t.id}">
+            ${t.status === "active" ? "Suspend" : "Activate"}
+        </button>
+
+        <!-- DELETE BUTTON -->
+        <button class="delete-btn" data-id="${t.id}">
+            Delete
+        </button>
+
+    </td>
             `;
             tbody.appendChild(row);
+        });
+
+       // -------------------------------------------------------
+        // ⭐⭐⭐ INSERT ALL ACTION HANDLERS *RIGHT HERE*
+        // -------------------------------------------------------
+
+        // EDIT BUTTONS
+        document.querySelectorAll(".edit-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                openEditModal(id);
+            });
+        });
+
+        // SUSPEND / ACTIVATE BUTTONS
+        document.querySelectorAll(".toggle-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.dataset.id;
+
+                await fetch(`/superadmin/api/tenants/${id}/toggle`, {
+                    method: "POST",
+                    headers: { "Authorization": "Bearer " + token }
+                });
+
+                loadTenants(token); // Refresh table
+            });
+        });
+
+        // DELETE BUTTONS
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.dataset.id;
+
+                if (!confirm("Delete this tenant?")) return;
+
+                await fetch(`/superadmin/api/tenants/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": "Bearer " + token }
+                });
+
+                loadTenants(token);
+            });
         });
 
         // Sidebar badge + stats
