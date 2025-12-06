@@ -236,6 +236,31 @@ app.post("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
     }
 });
 
+// ------------------------------------------------------
+// UPDATE TENANT (PUT)  ← PLACE THE ROUTE RIGHT HERE
+// ------------------------------------------------------
+app.put("/superadmin/api/tenants/:id", requireSuperadmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+
+        const tenants = loadTenants();
+        const index = tenants.findIndex(t => t.id === id);
+
+        if (index === -1) {
+            return res.status(404).json({ success: false, error: "Tenant not found" });
+        }
+
+        tenants[index] = { ...tenants[index], ...updates };
+        saveTenants(tenants);
+
+        res.json({ success: true, tenant: tenants[index] });
+    } catch (err) {
+        console.error("Edit tenant error:", err);
+        res.status(500).json({ success: false, error: "Server error" });
+    }
+});
+
 
 // ------------------------------------------------------
 //  SUPERADMIN — DELETE TENANT
