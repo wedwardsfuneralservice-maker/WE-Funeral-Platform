@@ -660,43 +660,29 @@
         
       </section>
       
-<!-- =============================================================
-     ANALYTICS SECTION (PLACED BELOW CARDS / ABOVE TENANT TABLE)
-     ============================================================= -->
-<section id="analyticsSection" class="mt-8 mb-10">
-
-    <!-- Summary Stats -->
-    <div class="analytics-summary grid grid-cols-4 gap-5 mb-6">
-
-        <div class="summary-card bg-[#111827] p-5 rounded-xl shadow">
-            <p class="text-gray-400 text-sm">Total Memorials</p>
-            <h2 id="analyticTotalMemorials" class="text-3xl font-bold text-white mt-2">0</h2>
+<!-- INTERACTIVE ANALYTICS GRAPH -->
+<section class="block" style="padding:20px; margin-bottom:20px;">
+    <div class="block-header">
+        <div>
+            <div class="block-title">Tenant Analytics</div>
+            <div class="block-sub">Visual breakdown of activity for the selected tenant.</div>
         </div>
-
-        <div class="summary-card bg-[#111827] p-5 rounded-xl shadow">
-            <p class="text-gray-400 text-sm">Total Uploads</p>
-            <h2 id="analyticTotalUploads" class="text-3xl font-bold text-white mt-2">0</h2>
-        </div>
-
-        <div class="summary-card bg-[#111827] p-5 rounded-xl shadow">
-            <p class="text-gray-400 text-sm">Disk Usage (MB)</p>
-            <h2 id="analyticDiskUsage" class="text-3xl font-bold text-white mt-2">0</h2>
-        </div>
-
-        <div class="summary-card bg-[#111827] p-5 rounded-xl shadow">
-            <p class="text-gray-400 text-sm">Monthly Traffic</p>
-            <h2 id="analyticMonthlyTraffic" class="text-3xl font-bold text-white mt-2">0</h2>
-        </div>
-
     </div>
 
-    <!-- Chart Container -->
-    <div class="bg-[#111827] p-6 rounded-xl shadow">
-        <h2 class="text-xl font-bold text-white mb-4">Tenant Activity Overview</h2>
-        <canvas id="analyticsChart" height="120"></canvas>
-    </div>
-
+    <canvas id="tenantAnalyticsChart" height="120"></canvas>
 </section>
+
+      <!-- TENANT TABLE BLOCK -->
+      <section class="content-row" id="tenantsBlock">
+        <div class="block">
+          <div class="block-header">
+            <div>
+              <div class="block-title">Tenants</div>
+              <div class="block-sub">
+                All funeral homes currently registered in the system.
+              </div>
+            </div>
+          </div>
 
           <table class="tenant-table">
             <thead>
@@ -1017,7 +1003,6 @@ async function loadTenants(token) {
     </td>
             `;
             tbody.appendChild(row);
-          loadAnalytics(t.id);
         });
 
        // -------------------------------------------------------
@@ -1080,61 +1065,101 @@ async function loadTenants(token) {
 
 
   
-async function loadAnalytics(tenantId) {
-    try {
-        const token = localStorage.getItem("superadminToken");
-        const res = await fetch(`/superadmin/api/analytics/${tenantId}`, {
-            headers: { "Authorization": "Bearer " + token }
-        });
+// -----------------------------------------------
+// TENANT ANALYTICS LOADER
+// (Point 5 goes here — directly below loadTenants)
+// -----------------------------------------------
+async function loadAnalytics(id) {
+    const token = localStorage.getItem("superadminToken");
 
-        const stats = await res.json();
+    const res = await fetch(`/superadmin/api/analytics/${id}`, {
+        headers: { "Authorization": "Bearer " + token }
+    });
 
-        // Update summary boxes
-        document.getElementById("analyticTotalMemorials").textContent = stats.totalMemorials;
-        document.getElementById("analyticTotalUploads").textContent = stats.totalUploads;
-        document.getElementById("analyticDiskUsage").textContent = (stats.diskUsageKB / 1024).toFixed(1);
-        document.getElementById("analyticMonthlyTraffic").textContent = stats.monthlyTraffic;
+    const data = await res.json();
+    if (!data.success) return;
 
-        // Chart Data
-        const chartData = {
-            labels: ["Memorials", "Uploads", "Traffic"],
-            datasets: [{
-                label: "Tenant Metrics",
-                data: [
-                    stats.totalMemorials,
-                    stats.totalUploads,
-                    stats.monthlyTraffic
-                ],
-                backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"]
-            }]
-        };
+    const a = data.analytics;
 
-        // Destroy old chart if exists
-        if (window.analyticsChartInstance) {
-            window.analyticsChartInstance.destroy();
-        }
-
-        const ctx = document.getElementById("analyticsChart").getContext("2d");
-
-        window.analyticsChartInstance = new Chart(ctx, {
-            type: "bar",
-            data: chartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-
-    } catch (err) {
-        console.error("Analytics load failed:", err);
-    }
+    document.getElementById("a-totalMemorials").textContent = a.totalMemorials;
+    document.getElementById("a-totalUploads").textContent = a.totalUploads;
+    document.getElementById("a-diskUsageKB").textContent = a.diskUsageKB;
+    document.getElementById("a-monthlyTraffic").textContent = a.monthlyTraffic;
+    document.getElementById("a-activeUsers").textContent = a.activeUsers;
+    renderAnalyticsChart(a);
 }
 
+ 
+// -----------------------------------------
+// GLOBAL CHART REFERENCE
+// -----------------------------------------
+let analyticsChart = null;
+
+// -----------------------------------------
+// RENDER / UPDATE ANALYTICS CHART
+// -----------------------------------------
+function renderAnalyticsChart(data) {
+    const ctx = document.getElementById("tenantAnalyticsChart").getContext("2d");
+
+    const labels = [
+        "Memorials",
+        "Uploads",
+        "Disk (KB)",
+        "Monthly Traffic",
+        "Active Users"
+    ];
+
+    const dataset = [
+        data.totalMemorials,
+        data.totalUploads,
+        data.diskUsageKB,
+        data.monthlyTraffic,
+        data.activeUsers
+    ];
+
+    // If chart exists, update it instead of recreating
+    if (analyticsChart) {
+        analyticsChart.data.datasets[0].data = dataset;
+        analyticsChart.update();
+        return;
+    }
+
+    analyticsChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Tenant Analytics",
+                    data: dataset,
+                    backgroundColor: [
+                        "#3b82f6",
+                        "#10b981",
+                        "#f59e0b",
+                        "#8b5cf6",
+                        "#ef4444"
+                    ],
+                    borderRadius: 8
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: "rgba(255,255,255,0.1)" }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
 
 
   
