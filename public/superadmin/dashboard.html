@@ -755,6 +755,7 @@
   
 
 <script>
+let currentTenants = [];   // <-- GLOBAL tenant cache
 
   
 (async () => {
@@ -891,6 +892,9 @@ async function loadTenants(token) {
         if (!res.ok) throw new Error("Unauthorized");
 
         const tenants = await res.json();
+
+       // 👉 SAVE to global variable
+        currentTenants = tenants;
 
         // TABLE BODY
         const tbody = document.getElementById("tenantTable");
