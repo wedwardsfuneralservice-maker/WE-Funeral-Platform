@@ -851,7 +851,19 @@ let currentTenants = [];   // <-- GLOBAL tenant cache
 
 })(); // END WRAPPER
 function openEditModal(id) {
+     if (!currentTenants || !Array.isArray(currentTenants)) {
+        console.error("currentTenants is missing!", currentTenants);
+        alert("Tenants not loaded yet—please refresh.");
+        return;
+    }
+
     const tenant = currentTenants.find(t => t.id === id);
+    if (!tenant) {
+        alert("Tenant not found.");
+        return;
+    }
+  
+    
 
     // Prefill modal fields
     document.getElementById("tenantNameInput").value = tenant.funeralHomeName;
@@ -892,6 +904,7 @@ async function loadTenants(token) {
         if (!res.ok) throw new Error("Unauthorized");
 
         const tenants = await res.json();
+        currentTenants = tenants;
 
        // 👉 SAVE to global variable
         currentTenants = tenants;
