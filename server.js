@@ -261,6 +261,34 @@ app.put("/superadmin/api/tenants/:id", requireSuperadmin, async (req, res) => {
     }
 });
 
+// ------------------------------------
+// ⭐ SUSPEND / ACTIVATE TENANT (TOGGLE)
+// ------------------------------------
+app.post("/superadmin/api/tenants/:id/toggle", requireSuperadmin, (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const tenants = loadTenants();
+        const tenant = tenants.find(t => t.id === id);
+
+        if (!tenant) {
+            return res.status(404).json({ success: false, error: "Tenant not found" });
+        }
+
+        // Switch state
+        tenant.status = tenant.status === "active" ? "suspended" : "active";
+
+        saveTenants(tenants);
+
+        res.json({
+            success: true,
+            status: tenant.status,
+        });
+    } catch (err) {
+        console.error("Toggle status error:", err);
+        res.status(500).json({ success: false, error: "Server error toggling tenant" });
+    }
+});
 
 // ------------------------------------------------------
 //  SUPERADMIN — DELETE TENANT
