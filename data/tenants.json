@@ -8,6 +8,13 @@
     "brandColor": "#f5c242",
     "logo": "/public/assets/we-logo.png",
     "adminKey": "12345",
-    "createdAt": 1764709000000
+    "createdAt": 1764709000000,
+
+     // NEW ANALYTICS FIELDS 
+    "totalMemorials": 0,
+    "totalUploads": 0,
+    "diskUsageKB": 0,
+    "monthlyTraffic": 0,
+    "activeUsers": 0
   }
 ]
