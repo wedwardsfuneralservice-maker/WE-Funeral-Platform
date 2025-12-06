@@ -552,6 +552,7 @@
       }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="theme-dark">
@@ -694,6 +695,18 @@
 
         
       </section>
+      
+<!-- INTERACTIVE ANALYTICS GRAPH -->
+<section class="block" style="padding:20px; margin-bottom:20px;">
+    <div class="block-header">
+        <div>
+            <div class="block-title">Tenant Analytics</div>
+            <div class="block-sub">Visual breakdown of activity for the selected tenant.</div>
+        </div>
+    </div>
+
+    <canvas id="tenantAnalyticsChart" height="120"></canvas>
+</section>
 
       <!-- TENANT TABLE BLOCK -->
       <section class="content-row" id="tenantsBlock">
@@ -1085,6 +1098,9 @@ async function loadTenants(token) {
         console.error("Load tenants failed:", err);
     }
 }
+
+
+  
 // -----------------------------------------------
 // TENANT ANALYTICS LOADER
 // (Point 5 goes here — directly below loadTenants)
@@ -1106,7 +1122,81 @@ async function loadAnalytics(id) {
     document.getElementById("a-diskUsageKB").textContent = a.diskUsageKB;
     document.getElementById("a-monthlyTraffic").textContent = a.monthlyTraffic;
     document.getElementById("a-activeUsers").textContent = a.activeUsers;
+    renderAnalyticsChart(a);
 }
+
+ 
+// -----------------------------------------
+// GLOBAL CHART REFERENCE
+// -----------------------------------------
+let analyticsChart = null;
+
+// -----------------------------------------
+// RENDER / UPDATE ANALYTICS CHART
+// -----------------------------------------
+function renderAnalyticsChart(data) {
+    const ctx = document.getElementById("tenantAnalyticsChart").getContext("2d");
+
+    const labels = [
+        "Memorials",
+        "Uploads",
+        "Disk (KB)",
+        "Monthly Traffic",
+        "Active Users"
+    ];
+
+    const dataset = [
+        data.totalMemorials,
+        data.totalUploads,
+        data.diskUsageKB,
+        data.monthlyTraffic,
+        data.activeUsers
+    ];
+
+    // If chart exists, update it instead of recreating
+    if (analyticsChart) {
+        analyticsChart.data.datasets[0].data = dataset;
+        analyticsChart.update();
+        return;
+    }
+
+    analyticsChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Tenant Analytics",
+                    data: dataset,
+                    backgroundColor: [
+                        "#3b82f6",
+                        "#10b981",
+                        "#f59e0b",
+                        "#8b5cf6",
+                        "#ef4444"
+                    ],
+                    borderRadius: 8
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: "rgba(255,255,255,0.1)" }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+
 
   
   // ---------------------------------------------
