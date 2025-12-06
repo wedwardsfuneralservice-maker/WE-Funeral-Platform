@@ -849,6 +849,24 @@
     });
 
 })(); // END WRAPPER
+function openEditModal(id) {
+    const tenant = currentTenants.find(t => t.id === id);
+
+    // Prefill modal fields
+    document.getElementById("tenantNameInput").value = tenant.funeralHomeName;
+    document.getElementById("tenantEmailInput").value = tenant.email;
+    document.getElementById("tenantSlugInput").value = tenant.slug;
+    document.getElementById("tenantKeyInput").value = tenant.adminKey;
+    document.getElementById("tenantStatusInput").value = tenant.status;
+    document.getElementById("tenantLogoInput").value = tenant.logo || "";
+
+    // Make modal visible
+    document.getElementById("createTenantModal").style.display = "flex";
+
+    // Store ID globally
+    window.editTenantId = id;
+}
+
   
 async function initDashboard() {
     const token = localStorage.getItem("superadminToken");
