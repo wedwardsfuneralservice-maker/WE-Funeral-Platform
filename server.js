@@ -198,6 +198,32 @@ app.get("/superadmin/api/tenants", requireSuperadmin, (req, res) => {
     }
 });
 
+app.get("/superadmin/api/analytics/:id", requireSuperadmin, (req, res) => {
+    try {
+        const id = req.params.id;
+        const tenants = loadTenants();
+        const tenant = tenants.find(t => t.id === id);
+
+        if (!tenant) {
+            return res.status(404).json({ success: false, error: "Tenant not found" });
+        }
+
+        res.json({
+            success: true,
+            analytics: {
+                totalMemorials: tenant.totalMemorials || 0,
+                totalUploads: tenant.totalUploads || 0,
+                diskUsageKB: tenant.diskUsageKB || 0,
+                monthlyTraffic: tenant.monthlyTraffic || 0,
+                activeUsers: tenant.activeUsers || 0
+            }
+        });
+
+    } catch (err) {
+        console.error("Analytics load error:", err);
+        res.status(500).json({ success: false, error: "Server error" });
+    }
+});
 
 
 // ------------------------------------------------------
@@ -223,6 +249,13 @@ app.post("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
             logo: logo || "/public/assets/we-logo.png",
             adminKey,
             createdAt: Date.now()
+
+          // ⭐ ANALYTICS FIELDS ⭐
+            totalMemorials: 0,
+            totalUploads: 0,
+            diskUsageKB: 0,
+            monthlyTraffic: 0,
+            activeUsers: 0
         };
 
         tenants.push(newTenant);
@@ -338,6 +371,8 @@ app.get("/admin/reset-password", (req, res) => {
 app.get("/admin/reset-confirm", (req, res) => {
   res.sendFile(path.join(__dirname, "public/admin/reset-confirm.html"));
 });
+
+
 
 // ------------------------------------------------------
 //  PUBLIC TENANT SIGNUP
