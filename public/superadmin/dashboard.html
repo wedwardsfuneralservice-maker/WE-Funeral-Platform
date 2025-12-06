@@ -656,6 +656,34 @@
           <div class="card-value" id="statSuspendedTenants">0</div>
           <div class="card-caption">Temporarily disabled access</div>
         </article>
+<div class="analytics-grid">
+    <div class="analytics-card">
+        <h4>Total Memorials</h4>
+        <p id="a-totalMemorials">0</p>
+    </div>
+
+    <div class="analytics-card">
+        <h4>Total Uploads</h4>
+        <p id="a-totalUploads">0</p>
+    </div>
+
+    <div class="analytics-card">
+        <h4>Disk Usage (KB)</h4>
+        <p id="a-diskUsageKB">0</p>
+    </div>
+
+    <div class="analytics-card">
+        <h4>Monthly Traffic</h4>
+        <p id="a-monthlyTraffic">0</p>
+    </div>
+
+    <div class="analytics-card">
+        <h4>Active Users</h4>
+        <p id="a-activeUsers">0</p>
+    </div>
+</div>
+
+        
       </section>
 
       <!-- TENANT TABLE BLOCK -->
@@ -1000,6 +1028,7 @@ async function loadTenants(token) {
             btn.addEventListener("click", () => {
                 const id = btn.dataset.id;
                 openEditModal(id);
+                loadAnalytics(id); 
             });
         });
 
@@ -1047,7 +1076,30 @@ async function loadTenants(token) {
         console.error("Load tenants failed:", err);
     }
 }
+// -----------------------------------------------
+// TENANT ANALYTICS LOADER
+// (Point 5 goes here — directly below loadTenants)
+// -----------------------------------------------
+async function loadAnalytics(id) {
+    const token = localStorage.getItem("superadminToken");
 
+    const res = await fetch(`/superadmin/api/analytics/${id}`, {
+        headers: { "Authorization": "Bearer " + token }
+    });
+
+    const data = await res.json();
+    if (!data.success) return;
+
+    const a = data.analytics;
+
+    document.getElementById("a-totalMemorials").textContent = a.totalMemorials;
+    document.getElementById("a-totalUploads").textContent = a.totalUploads;
+    document.getElementById("a-diskUsageKB").textContent = a.diskUsageKB;
+    document.getElementById("a-monthlyTraffic").textContent = a.monthlyTraffic;
+    document.getElementById("a-activeUsers").textContent = a.activeUsers;
+}
+
+  
   // ---------------------------------------------
 // DARK / LIGHT THEME TOGGLE (FINAL FIX)
 // ---------------------------------------------
