@@ -290,31 +290,31 @@ app.post("/superadmin/api/tenants/:id/toggle", requireSuperadmin, (req, res) => 
     }
 });
 
-// ------------------------------------------------------
-//  SUPERADMIN — DELETE TENANT
-// ------------------------------------------------------
-app.delete("/superadmin/api/tenants/:slug", requireSuperadmin, (req, res) => {
-  try {
-    const slug = req.params.slug;
-    let tenants = loadTenants();
+// ------------------------------------
+// DELETE TENANT
+// ------------------------------------
+app.delete("/superadmin/api/tenants/:id", requireSuperadmin, (req, res) => {
+    try {
+        const { id } = req.params;
 
-    const existed = tenants.some((t) => t.slug === slug);
-    tenants = tenants.filter((t) => t.slug !== slug);
+        const tenants = loadTenants();
+        const existing = tenants.find(t => t.id === id);
 
-    if (!existed) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Tenant not found" });
+        if (!existing) {
+            return res.status(404).json({ success: false, error: "Tenant not found" });
+        }
+
+        // Remove tenant
+        const updated = tenants.filter(t => t.id !== id);
+        saveTenants(updated);
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Delete tenant error:", err);
+        res.status(500).json({ success: false, error: "Server error deleting tenant" });
     }
-
-    saveTenants(tenants);
-
-    res.json({ success: true, message: "Tenant removed" });
-  } catch (err) {
-    console.error("Error deleting tenant:", err);
-    res.status(500).json({ success: false, error: "Server error" });
-  }
 });
+
 
 // ------------------------------------------------------
 //  ADMIN STATIC ROUTES
