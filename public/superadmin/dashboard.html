@@ -772,12 +772,17 @@ let currentTenants = [];   // <-- GLOBAL tenant cache
     const openBtn = document.getElementById("createTenantBtn");
     const cancelBtn = document.getElementById("cancelCreateTenant");
     const confirmBtn = document.getElementById("confirmCreateTenant");
+  
 
     // -----------------------------
     // OPEN MODAL
     // -----------------------------
     openBtn.addEventListener("click", () => {
+      window.editTenantId = null;  // <-- RESET EDIT MODE
         modal.style.display = "flex";
+
+      document.getElementById("confirmCreateTenant").textContent = "Create Tenant"; // <-- RESET BUTTON TEXT
+
         document.getElementById("tenantKeyInput").value =
             "KEY-" + Math.random().toString(36).substring(2, 10).toUpperCase();
     });
@@ -808,22 +813,26 @@ let currentTenants = [];   // <-- GLOBAL tenant cache
     // CONFIRM CREATE TENANT
     // -----------------------------
     confirmBtn.addEventListener("click", async () => {
-        const name = document.getElementById("tenantNameInput").value.trim();
-        const slug = document.getElementById("tenantSlugInput").value.trim();
-        const email = document.getElementById("tenantEmailInput").value.trim();
-        const adminKey = document.getElementById("tenantKeyInput").value.trim();
-        const logo = document.getElementById("tenantLogoInput").value.trim();
-        const status = document.getElementById("tenantStatusInput").value;
+    const name = document.getElementById("tenantNameInput").value.trim();
+    const slug = document.getElementById("tenantSlugInput").value.trim();
+    const email = document.getElementById("tenantEmailInput").value.trim();
+    const adminKey = document.getElementById("tenantKeyInput").value.trim();
+    const logo = document.getElementById("tenantLogoInput").value.trim();
+    const status = document.getElementById("tenantStatusInput").value;
 
-        if (!name || !slug || !email || !adminKey) {
-            alert("Please fill in all required fields.");
-            return;
-        }
+    if (!name || !slug || !email || !adminKey) {
+        alert("Please fill in all required fields.");
+        return;
+    }
 
-        const token = localStorage.getItem("superadminToken");
+    const token = localStorage.getItem("superadminToken");
 
-        const res = await fetch("/superadmin/api/tenants", {
-            method: "POST",
+    // ------------------------------------------------------
+    // IF EDIT MODE: SEND PUT REQUEST
+    // ------------------------------------------------------
+    if (window.editTenantId) {
+        const res = await fetch(`/superadmin/api/tenants/${window.editTenantId}`, {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + token
@@ -839,18 +848,52 @@ let currentTenants = [];   // <-- GLOBAL tenant cache
         });
 
         const data = await res.json();
-
         if (data.success) {
-            alert("Tenant created successfully!");
+            alert("Tenant updated successfully!");
             modal.style.display = "none";
-            loadTenants(token); // Refresh table
+            window.editTenantId = null;
+            loadTenants(token);
         } else {
             alert("Error: " + data.error);
         }
+        return; // <-- IMPORTANT
+    }
+
+    // ------------------------------------------------------
+    // OTHERWISE: CREATE NEW TENANT
+    // ------------------------------------------------------
+    const res = await fetch("/superadmin/api/tenants", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+            funeralHomeName: name,
+            slug,
+            email,
+            adminKey,
+            logo,
+            status
+        }),
     });
+
+    const data = await res.json();
+
+    if (data.success) {
+        alert("Tenant created successfully!");
+        modal.style.display = "none";
+        loadTenants(token);
+    } else {
+        alert("Error: " + data.error);
+    }
+});
+
 
 })(); // END WRAPPER
 function openEditModal(id) {
+    document.getElementById("confirmCreateTenant").textContent = "Save Changes";
+
      if (!currentTenants || !Array.isArray(currentTenants)) {
         console.error("currentTenants is missing!", currentTenants);
         alert("Tenants not loaded yet—please refresh.");
