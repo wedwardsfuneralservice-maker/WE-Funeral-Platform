@@ -248,7 +248,7 @@ app.post("/superadmin/api/tenants", requireSuperadmin, async (req, res) => {
             brandColor: "#f5c242",
             logo: logo || "/public/assets/we-logo.png",
             adminKey,
-            createdAt: Date.now()
+            createdAt: Date.now(),
 
           // ⭐ ANALYTICS FIELDS ⭐
             totalMemorials: 0,
