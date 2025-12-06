@@ -755,37 +755,36 @@
     cancelBtn.addEventListener("click", () => {
         modal.style.display = "none";
     });
-
 // ---------------------------------------------
-// DARK MODE TOGGLE
+// DARK MODE TOGGLE (FIXED FOR <div> SWITCH)
 // ---------------------------------------------
 const themeToggle = document.getElementById("themeToggle");
 
-// Load saved theme on startup
+// Load saved theme
 (function loadTheme() {
     const saved = localStorage.getItem("we_superadmin_theme") || "dark";
 
     if (saved === "dark") {
         document.body.classList.add("theme-dark");
         document.body.classList.remove("theme-light");
-        themeToggle.checked = true;
     } else {
         document.body.classList.add("theme-light");
         document.body.classList.remove("theme-dark");
-        themeToggle.checked = false;
     }
 })();
 
 // Toggle theme on click
-themeToggle.addEventListener("change", () => {
-    if (themeToggle.checked) {
-        document.body.classList.add("theme-dark");
-        document.body.classList.remove("theme-light");
-        localStorage.setItem("we_superadmin_theme", "dark");
-    } else {
-        document.body.classList.add("theme-light");
+themeToggle.addEventListener("click", () => {
+    const isDark = document.body.classList.contains("theme-dark");
+
+    if (isDark) {
         document.body.classList.remove("theme-dark");
+        document.body.classList.add("theme-light");
         localStorage.setItem("we_superadmin_theme", "light");
+    } else {
+        document.body.classList.remove("theme-light");
+        document.body.classList.add("theme-dark");
+        localStorage.setItem("we_superadmin_theme", "dark");
     }
 });
 
