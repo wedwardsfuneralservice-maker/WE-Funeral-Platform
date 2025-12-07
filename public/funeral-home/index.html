@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>W.E. Funeral Services – Compassionate Care</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Blue → White Gradient Background */
+    body {
+      background: linear-gradient(
+        to bottom right,
+        #0a2a43,
+        #0e4a7e,
+        #eaf4ff
+      );
+      color: #1a2a3a;
+    }
+
+    /* Animation base */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(25px);
+      transition: all 0.9s ease;
+    }
+    .fade-up.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fade-in {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    .fade-in.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+
+  <!-- NAVBAR -->
+  <header id="navbar" class="fade-in bg-white/40 backdrop-blur-md sticky top-0 z-50 border-b border-blue-300/30 shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <h1 class="text-2xl font-semibold tracking-wide text-blue-900">
+        W.E. Funeral Services
+      </h1>
+
+      <nav class="space-x-6 text-blue-900 font-medium">
+        <a href="#about" class="hover:text-blue-600">About</a>
+        <a href="#services" class="hover:text-blue-600">Services</a>
+        <a href="#memorials" class="hover:text-blue-600">Memorials</a>
+        <a href="/admin/login.html" class="hover:text-blue-600">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="relative h-[70vh] flex items-center justify-center bg-cover bg-center fade-up"
+    style="background-image:url('https://images.unsplash.com/photo-1505685296765-3a2736de412f?auto=format&fit=crop&w=1600&q=80');">
+    <div class="absolute inset-0 bg-blue-900/50"></div>
+
+    <div class="relative z-10 text-center max-w-2xl px-4 fade-up">
+      <h2 class="text-4xl sm:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+        Compassionate Care When You Need It Most
+      </h2>
+      <p class="text-lg text-blue-100">
+        Providing dignified funeral services with compassion, respect, and professionalism.
+      </p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="max-w-6xl mx-auto py-20 px-6 fade-up">
+    <h3 class="text-3xl font-bold text-blue-900 mb-6">About Us</h3>
+
+    <p class="text-lg leading-relaxed text-blue-900/90 max-w-3xl">
+      At W.E. Funeral Services, we are committed to supporting families with guidance,
+      dignity, and compassion. Our dedicated team ensures that every service reflects
+      the life, values, and wishes of your loved one.
+    </p>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="py-20 border-t border-blue-200/40 fade-up">
+    <div class="max-w-6xl mx-auto px-6">
+      <h3 class="text-3xl font-bold text-blue-900 mb-10">Our Services</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+        <div class="p-6 rounded-xl shadow-lg border border-blue-200 bg-white/70 hover:bg-white 
+                    transition fade-up">
+          <h4 class="text-xl font-semibold text-blue-900 mb-3">Funeral Arrangements</h4>
+          <p class="text-blue-900/80">
+            Comprehensive support in planning and coordinating meaningful funeral services.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-xl shadow-lg border border-blue-200 bg-white/70 hover:bg-white
+                    transition fade-up">
+          <h4 class="text-xl font-semibold text-blue-900 mb-3">Memorial Services</h4>
+          <p class="text-blue-900/80">
+            Honoring cherished memories with personalized memorial options.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-xl shadow-lg border border-blue-200 bg-white/70 hover:bg-white 
+                    transition fade-up">
+          <h4 class="text-xl font-semibold text-blue-900 mb-3">Pre-Planning</h4>
+          <p class="text-blue-900/80">
+            Plan ahead with clarity and confidence to ease the burden on your family.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMORIALS -->
+  <section id="memorials" class="max-w-7xl mx-auto py-20 px-6 fade-up">
+    <h3 class="text-3xl font-bold text-blue-900 mb-10">Recent Memorials</h3>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+
+      <div class="rounded-xl overflow-hidden shadow-md border border-blue-200 bg-white/70 fade-up">
+        <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover" />
+        <div class="p-5">
+          <h4 class="text-xl font-semibold text-blue-900">Memorial Name</h4>
+          <p class="text-blue-900/80 mb-3">Sunrise – Sunset</p>
+          <a href="#" class="text-blue-700 hover:underline">View Memorial →</a>
+        </div>
+      </div>
+
+      <div class="rounded-xl overflow-hidden shadow-md border border-blue-200 bg-white/70 fade-up">
+        <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover" />
+        <div class="p-5">
+          <h4 class="text-xl font-semibold text-blue-900">Memorial Name</h4>
+          <p class="text-blue-900/80 mb-3">Sunrise – Sunset</p>
+          <a href="#" class="text-blue-700 hover:underline">View Memorial →</a>
+        </div>
+      </div>
+
+      <div class="rounded-xl overflow-hidden shadow-md border border-blue-200 bg-white/70 fade-up">
+        <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover" />
+        <div class="p-5">
+          <h4 class="text-xl font-semibold text-blue-900">Memorial Name</h4>
+          <p class="text-blue-900/80 mb-3">Sunrise – Sunset</p>
+          <a href="#" class="text-blue-700 hover:underline">View Memorial →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-white/40 backdrop-blur-md text-blue-900 py-8 mt-12 border-t border-blue-200 fade-in">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <p>© 2025 W.E. Funeral Services — All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- SCROLL ANIMATION SCRIPT -->
+  <script>
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll(".fade-up, .fade-in").forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
