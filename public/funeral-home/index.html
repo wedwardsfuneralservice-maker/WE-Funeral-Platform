@@ -8,23 +8,49 @@
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* ---------------- GLOBAL THEME ---------------- */
+    /* ---------------- FONT SYSTEM ---------------- */
+    :root {
+      --heading-font: "Playfair Display", serif;
+      --body-font: "Inter", sans-serif;
+
+      --primary-blue: #0a2a43;
+      --gold: #f6c945;
+      --light-blue: #eaf4ff;
+      --soft-white: rgba(255,255,255,0.85);
+
+      --max-width: 1280px;
+    }
+
     body {
+      margin: 0;
+      font-family: var(--body-font);
       background: linear-gradient(to bottom right, #0a2a43, #0e4a7e, #eaf4ff);
       color: white;
       overflow-x: hidden;
-      position: relative;
-      scroll-behavior: smooth;
     }
 
-    /* Section Shadow */
-    .section-shadow {
-      box-shadow: 0 12px 28px rgba(0,0,0,0.25);
-      border-radius: 20px;
+    /* Centered content width (modern layout) */
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem;
     }
 
-    /* ---------------- PAGE ANIMATIONS ---------------- */
+    /* ---------------- HEADING ANIMATION ---------------- */
+    @keyframes headingReveal {
+      0% { opacity: 0; transform: translateY(20px) scale(0.96); letter-spacing: -2px; }
+      70% { opacity: 1; transform: translateY(0) scale(1.02); letter-spacing: 0px; }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .heading-animate {
+      animation: headingReveal 1.4s ease-out forwards;
+    }
+
+    /* ---------------- SECTION FADE ---------------- */
     .fade-up {
       opacity: 0;
       transform: translateY(25px);
@@ -35,89 +61,54 @@
       transform: translateY(0);
     }
 
-    .slide-right {
-      opacity: 0;
-      transform: translateX(40px);
-      transition: all 0.9s ease;
+    /* ---------------- CARD HOVER EFFECTS (Templately) ---------------- */
+    .hover-card {
+      transition: 0.35s ease;
+      transform: translateY(0) scale(1);
     }
-    .slide-right.show {
-      opacity: 1;
-      transform: translateX(0);
+    .hover-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.22);
     }
 
-    /* ---------------- BUTTONS ---------------- */
-    .btn-yellow {
-      background: #F6C945;
-      color: #0a2a43;
+    /* Buttons */
+    .btn-gold {
+      background: var(--gold);
+      color: var(--primary-blue);
       padding: 12px 26px;
-      font-weight: 700;
       border-radius: 12px;
-      transition: 0.25s;
+      font-weight: 600;
       display: inline-block;
+      transition: 0.3s ease;
     }
-    .btn-yellow:hover {
+    .btn-gold:hover {
       background: #ffe387;
       transform: translateY(-2px);
     }
 
-    /* ---------------- FLOATING PARTICLES ---------------- */
-    #particles {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 3;
-      overflow: hidden;
-    }
-    .particle {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: white;
-      opacity: 0.18;
-      border-radius: 50%;
-      animation: floatUp linear infinite;
-    }
-    @keyframes floatUp {
-      from { transform: translateY(0); opacity: 0.18; }
-      to { transform: translateY(-110vh); opacity: 0; }
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
     }
 
-    /* ---------------- HERO GLOW ---------------- */
-    .candle-glow {
-      position: absolute;
-      bottom: 15%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 260px;
-      height: 260px;
-      background: radial-gradient(circle,
-        rgba(255,205,96,0.35),
-        rgba(255,205,96,0)
-      );
-      filter: blur(45px);
-      border-radius: 50%;
-      animation: glowFlicker 4s ease-in-out infinite;
-      pointer-events: none;
-      z-index: 2;
-    }
-    @keyframes glowFlicker {
-      0%   { opacity: 0.45; transform: translateX(-50%) scale(1); }
-      50%  { opacity: 0.75; transform: translateX(-50%) scale(1.12); }
-      100% { opacity: 0.45; transform: translateX(-50%) scale(1); }
-    }
+/* 3D Carousel Container */
+.carousel-3d-wrapper {
+  width: 100%;
+  height: 480px;
+  position: relative;
+  perspective: 1400px;
+}
 
-    /* ---------------- HERO ZOOM (one-time) ---------------- */
-    @keyframes heroZoom {
-      from { transform: scale(1); }
-      to   { transform: scale(1.06); }
-    }
-    .hero-zoom {
-      animation: heroZoom 14s ease-out forwards;
-    }
+/* 3D Track */
+.carousel-3d-track {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transform-style: preserve-3d;
+  transition: transform 1.2s ease;
+}
 
-/* === 3D CAROUSEL: CLEAN, SHARP, PREMIUM (NO BLUR) === */
-
-/* Card container */
+/* Base Card Styling (sharp, modern, no blur) */
 .carousel-3d-card {
   width: 260px;
   height: 330px;
@@ -131,41 +122,34 @@
   left: 50%;
   transform-style: preserve-3d;
   transition: all 0.6s ease;
-
-  /* Depth instead of blur */
   opacity: 0.65;
   box-shadow: 0 8px 22px rgba(0,0,0,0.18);
 }
 
-/* Active (front) card */
+/* Active Card */
 .carousel-3d-card.active {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1.10);
   box-shadow:
     0 14px 35px rgba(0,0,0,0.28),
-    0 0 50px rgba(255,220,160,0.25); /* warm subtle halo */
+    0 0 50px rgba(255,220,160,0.25);
 }
 
-/* Circular photo frame (restored) */
+/* Circular Photo Frame */
 .carousel-3d-card img {
   width: 150px;
   height: 150px;
   object-fit: cover;
-
   border-radius: 50%;
   border: 6px solid rgba(255,255,255,0.95);
-
-  /* Soft premium glow */
   box-shadow:
     0 4px 10px rgba(0,0,0,0.22),
     0 0 35px rgba(255,255,255,0.45);
-
   margin: 0 auto 20px;
-
   filter: none !important;
 }
 
-/* Warm glow for active card */
+/* Active Glow */
 .carousel-3d-card.active::after {
   content: "";
   position: absolute;
@@ -179,7 +163,7 @@
   z-index: -1;
 }
 
-/* Cool glow for others */
+/* Side Glow */
 .carousel-3d-card:not(.active)::after {
   content: "";
   position: absolute;
@@ -192,113 +176,176 @@
   filter: blur(35px);
   z-index: -1;
 }
-
-    
-  </style>
+</style>
 </head>
-
+  
 <body>
-
-<!-- FLOATING PARTICLES -->
-<div id="particles"></div>
-
 <!-- NAVBAR -->
-<header class="bg-white/20 backdrop-blur-md sticky top-0 z-50 shadow-md fade-up">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-    <h1 class="text-2xl font-semibold text-white">W.E. Funeral Services</h1>
+<header id="navbar" class="fixed top-0 left-0 w-full z-50 transition-all duration-500 bg-transparent">
+  <div class="container flex items-center justify-between py-5">
 
-    <nav class="space-x-6 font-medium">
-      <a href="#memorials" class="hover:text-blue-300">Memorials</a>
-      <a href="#services" class="hover:text-blue-300">Services</a>
-      <a href="#platform" class="hover:text-blue-300">Platform</a>
-      <a href="#about" class="hover:text-blue-300">About</a>
-      <a href="/" class="hover:text-blue-300">Platform Home</a>
+    <!-- LOGO / BRAND -->
+    <div class="flex items-center space-x-3">
+      <span class="text-3xl font-semibold" style="font-family: var(--heading-font);">
+        W.E. Funeral Services
+      </span>
+    </div>
+
+    <!-- NAV LINKS -->
+    <nav class="hidden md:flex items-center space-x-10 text-lg">
+      <a href="#memorials" class="hover:text-yellow-300 transition">Memorials</a>
+      <a href="#services" class="hover:text-yellow-300 transition">Services</a>
+      <a href="#platform" class="hover:text-yellow-300 transition">Platform</a>
+      <a href="#about" class="hover:text-yellow-300 transition">About</a>
     </nav>
+
+    <!-- SEARCH BAR -->
+    <div class="relative hidden md:block">
+      <input
+        id="navSearch"
+        type="text"
+        placeholder="Search memorials..."
+        class="transition-all duration-500 py-2 px-4 rounded-full bg-white/60 text-blue-900 w-32 focus:w-64 focus:bg-white focus:shadow-lg outline-none"
+      />
+      <svg class="w-5 h-5 absolute right-4 top-2.5 text-blue-900 opacity-60" fill="currentColor"
+        viewBox="0 0 20 20">
+        <path fill-rule="evenodd"
+          d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z"
+          clip-rule="evenodd" />
+      </svg>
+    </div>
   </div>
 </header>
 
-<!-- HERO -->
-<section class="relative h-[70vh] bg-cover bg-center hero-zoom flex items-center justify-center"
-  style="background-image:url('hearse-banner.jpg');">
+<!-- NAVBAR SCROLL SCRIPT -->
+<script>
+  const navbar = document.getElementById("navbar");
 
-  <!-- Candle Glow -->
-  <div class="candle-glow"></div>
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 50) {
+      navbar.style.background = "rgba(255,255,255,0.95)";
+      navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.15)";
+      navbar.style.color = "#0a2a43";
+    } else {
+      navbar.style.background = "transparent";
+      navbar.style.boxShadow = "none";
+      navbar.style.color = "white";
+    }
+  });
+</script>
 
-  <div class="absolute inset-0 bg-blue-900/50"></div>
+<!-- HERO SECTION -->
+<section
+  id="hero"
+  class="w-full h-[80vh] relative flex items-center"
+  style="
+    background-image: url('hero-bathsheba-placeholder.jpg');
+    background-size: cover;
+    background-position: center;
+  "
+>
 
-  <div class="relative z-10 text-center px-4">
-    <h2 class="text-5xl font-bold slide-right">
-      Compassionate Care When You Need It Most
-    </h2>
-    <p class="text-xl text-blue-100 mt-3 slide-right">
-      Providing dignified funeral services with compassion.
+  <!-- Dark Gradient Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20"></div>
+
+  <!-- HERO TEXT -->
+  <div class="container relative z-10 max-w-2xl">
+
+    <h1
+      class="text-5xl md:text-6xl font-bold mb-6 heading-animate"
+      style="font-family: var(--heading-font);"
+    >
+      Compassionate Care <br />
+      When You Need It Most
+    </h1>
+
+    <p
+      class="text-xl md:text-2xl text-white/85 mb-8 fade-up"
+      style="animation-delay: 0.4s;"
+    >
+      Professional funeral services with dignity, respect,
+      and unwavering support for your family.
     </p>
+
+    <a href="#memorials" class="btn-gold fade-up" style="animation-delay: 0.6s;">
+      View Recent Memorials →
+    </a>
   </div>
+
 </section>
 
-<!-- SPACING BEFORE MEMORIALS (80px) -->
-<div style="height:80px;"></div>
+<!-- SPACING AFTER HERO -->
+<div style="height: 80px;"></div>
+  
+<!-- MEMORIALS SECTION -->
+<section id="memorials" class="container fade-up">
+  
+  <h2
+    class="text-4xl font-bold mb-10 heading-animate"
+    style="font-family: var(--heading-font);"
+  >
+    Recent Memorials
+  </h2>
 
-<!-- MEMORIALS SECTION START -->
-<section id="memorials" class="max-w-7xl mx-auto px-6 fade-up">
-  <h3 class="text-3xl font-bold mb-6 slide-right">Recent Memorials</h3>
-
-  <input id="searchInput" type="text"
+  <!-- Search Bar -->
+  <input
+    id="memorialSearch"
+    type="text"
     placeholder="Search memorials…"
-    class="w-full max-w-md px-4 py-3 rounded-lg text-blue-900 shadow-lg mb-10">
- 
+    class="w-full max-w-md px-5 py-3 rounded-xl bg-white/80 text-blue-900 shadow-lg mb-10 outline-none"
+  />
 
-  <!-- 3D CAROUSEL HTML -->
+  <!-- 3D CAROUSEL WRAPPER -->
   <div class="carousel-3d-wrapper">
 
     <div id="carousel3D" class="carousel-3d-track">
 
       <!-- CARD 1 -->
       <div class="carousel-3d-card active">
-        <img src="https://via.placeholder.com/300" />
-        <h4 class="font-bold text-xl">John Doe</h4>
+        <img src="portrait1.jpg" alt="">
+        <h4 class="text-xl font-semibold">John Doe</h4>
         <p class="text-blue-700">Sunrise – Sunset</p>
-        <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+        <a class="mt-3 inline-block font-medium text-blue-900 hover:underline">
           View Memorial →
         </a>
       </div>
 
       <!-- CARD 2 -->
       <div class="carousel-3d-card">
-        <img src="https://via.placeholder.com/300" />
-        <h4 class="font-bold text-xl">Mary Ann</h4>
+        <img src="portrait2.jpg" alt="">
+        <h4 class="text-xl font-semibold">Mary Ann</h4>
         <p class="text-blue-700">Sunrise – Sunset</p>
-        <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+        <a class="mt-3 inline-block font-medium text-blue-900 hover:underline">
           View Memorial →
         </a>
       </div>
 
       <!-- CARD 3 -->
       <div class="carousel-3d-card">
-        <img src="https://via.placeholder.com/300" />
-        <h4 class="font-bold text-xl">Samuel Green</h4>
+        <img src="portrait3.jpg" alt="">
+        <h4 class="text-xl font-semibold">Samuel Green</h4>
         <p class="text-blue-700">Sunrise – Sunset</p>
-        <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+        <a class="mt-3 inline-block font-medium text-blue-900 hover:underline">
           View Memorial →
         </a>
       </div>
 
       <!-- CARD 4 -->
       <div class="carousel-3d-card">
-        <img src="https://via.placeholder.com/300" />
-        <h4 class="font-bold text-xl">Lydia James</h4>
+        <img src="portrait4.jpg" alt="">
+        <h4 class="text-xl font-semibold">Lydia James</h4>
         <p class="text-blue-700">Sunrise – Sunset</p>
-        <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+        <a class="mt-3 inline-block font-medium text-blue-900 hover:underline">
           View Memorial →
         </a>
       </div>
 
       <!-- CARD 5 -->
       <div class="carousel-3d-card">
-        <img src="https://via.placeholder.com/300" />
-        <h4 class="font-bold text-xl">Peter Clarke</h4>
+        <img src="portrait5.jpg" alt="">
+        <h4 class="text-xl font-semibold">Peter Clarke</h4>
         <p class="text-blue-700">Sunrise – Sunset</p>
-        <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+        <a class="mt-3 inline-block font-medium text-blue-900 hover:underline">
           View Memorial →
         </a>
       </div>
@@ -306,209 +353,83 @@
     </div>
   </div>
 
-<!-- SPACING AFTER CAROUSEL (80px) -->
-<div style="height:80px;"></div>
-
-</section>
-<!-- SERVICES SECTION -->
-<section id="services" class="max-w-7xl mx-auto px-6 fade-up section-shadow bg-white/10 rounded-2xl py-20">
-  <h3 class="text-3xl font-bold mb-10 slide-right">Our Services</h3>
-
-  <div class="grid md:grid-cols-3 gap-10">
-    <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
-      <h4 class="text-xl font-semibold mb-3">Funeral Arrangements</h4>
-      <p>Planning and coordinating meaningful services.</p>
-    </div>
-
-    <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
-      <h4 class="text-xl font-semibold mb-3">Memorial Services</h4>
-      <p>Honoring cherished memories with dignity.</p>
-    </div>
-
-    <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
-      <h4 class="text-xl font-semibold mb-3">Pre-Planning</h4>
-      <p>Plan ahead with clarity and peace of mind.</p>
-    </div>
-  </div>
-
-  <div class="mt-10 text-center">
-    <a href="/" class="btn-yellow">Learn More →</a>
-  </div>
 </section>
 
-<!-- SPACING -->
-<div style="height:80px;"></div>
+<!-- SPACING AFTER CAROUSEL -->
+<div style="height: 80px;"></div>
 
-<!-- PLATFORM SECTION -->
-<section id="platform" class="max-w-7xl mx-auto px-6 fade-up section-shadow bg-white/10 rounded-2xl py-20">
-  <h3 class="text-3xl font-bold mb-10 slide-right">W.E. Funeral Platform</h3>
-
-  <div class="grid md:grid-cols-3 gap-10">
-    <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
-      <h4 class="font-semibold text-xl mb-3">Multi-Tenant Console</h4>
-      <p>Manage multiple funeral homes easily.</p>
-    </div>
-
-    <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
-      <h4 class="font-semibold text-xl mb-3">Memorial Page Builder</h4>
-      <p>Create beautiful obituary pages.</p>
-    </div>
-
-    <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
-      <h4 class="font-semibold text-xl mb-3">PDF Automation</h4>
-      <p>Generate funeral documents instantly.</p>
-    </div>
-  </div>
-
-  <div class="mt-10 text-center">
-    <a href="/" class="btn-yellow">Learn More →</a>
-  </div>
-</section>
-
-<!-- SPACING -->
-<div style="height:80px;"></div>
-
-<!-- ABOUT SECTION -->
-<section id="about" class="max-w-7xl mx-auto px-6 fade-up section-shadow bg-white/10 rounded-2xl py-20">
-  <h3 class="text-3xl font-bold mb-6 slide-right">About Us</h3>
-
-  <p class="max-w-3xl text-lg text-white/90 leading-relaxed">
-    At W.E. Funeral Services, we support families with compassion and dignity.
-    Our mission is to guide you through difficult moments with care,
-    providing meaningful ceremonies and memorial experiences.
-  </p>
-</section>
-
-<!-- SPACING -->
-<div style="height:80px;"></div>
-
-<!-- FOOTER -->
-<footer class="bg-white/20 backdrop-blur-md text-blue-900 py-8 text-center border-t border-blue-200 mt-20">
-  © 2025 W.E. Funeral Services — All Rights Reserved.
-</footer>
-<!-- ---------------- ANIMATION SCRIPT ---------------- -->
 <script>
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) e.target.classList.add("show");
-    });
-  }, { threshold: 0.2 });
+const carousel = document.getElementById("carousel3D");
+const cards = Array.from(carousel.children);
+const total = cards.length;
 
-  document.querySelectorAll(".fade-up, .slide-right").forEach(el =>
-    obs.observe(el)
-  );
-</script>
+let angle = 0;
+const step = 360 / total;
+const radius = 420;
+let autoRotate;
 
+// Position the cards
+function positionCards() {
+  cards.forEach((card, i) => {
+    const theta = (i * step + angle) * Math.PI / 180;
+    const x = Math.sin(theta) * radius;
+    const z = Math.cos(theta) * radius;
 
-<!-- ---------------- PARTICLES SCRIPT ---------------- -->
-<script>
-  const pWrap = document.getElementById("particles");
-  const COUNT = 25;
+    card.style.transform =
+      `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px)`;
 
-  for (let i = 0; i < COUNT; i++) {
-    const p = document.createElement("div");
-    p.className = "particle";
-    p.style.left = Math.random() * 100 + "vw";
-    p.style.top = Math.random() * 100 + "vh";
-    p.style.animationDuration = 6 + Math.random() * 8 + "s";
-    p.style.animationDelay = Math.random() * 5 + "s";
-    pWrap.appendChild(p);
-  }
-</script>
-
-
-<!-- ---------------- 3D CAROUSEL SCRIPT ---------------- -->
-<script>
-  const carousel = document.getElementById("carousel3D");
-  const cards = Array.from(carousel.children);
-  const total = cards.length;
-
-  let angle = 0;
-  const step = 360 / total;   // 72 degrees per card
-  const radius = 420;         // Medium 3D depth
-  let autoRotate;
-
-  // Position cards around a 3D circle
-  function positionCards() {
-    cards.forEach((card, i) => {
-      const theta = (i * step + angle) * Math.PI / 180;
-      const x = Math.sin(theta) * radius;
-      const z = Math.cos(theta) * radius;
-
-      card.style.transform =
-        `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px)`;
-
-      // Active card = closest (largest Z)
-      card.classList.toggle("active", z > 0);
-      card.style.zIndex = Math.round(z);
-    });
-  }
-
-  // Auto rotation
-  function startAuto() {
-    autoRotate = setInterval(() => {
-      angle -= 0.3;   // rotation speed
-      positionCards();
-    }, 30);
-  }
-
-  function stopAuto() {
-    clearInterval(autoRotate);
-  }
-
-  // Hover pause
-  carousel.addEventListener("mouseover", stopAuto);
-  carousel.addEventListener("mouseout", startAuto);
-
-  // Drag / swipe
-  let dragging = false;
-  let startX = 0;
-
-  carousel.addEventListener("mousedown", e => {
-    dragging = true;
-    startX = e.clientX;
-    stopAuto();
+    card.classList.toggle("active", z > 0);
+    card.style.zIndex = Math.round(z);
   });
+}
 
-  window.addEventListener("mouseup", () => {
-    if (dragging) {
-      dragging = false;
-      startAuto();
-    }
-  });
-
-  carousel.addEventListener("mousemove", e => {
-    if (!dragging) return;
-    const dx = e.clientX - startX;
-    angle -= dx * 0.15;   // drag sensitivity
-    startX = e.clientX;
+// Auto-rotation
+function startAuto() {
+  autoRotate = setInterval(() => {
+    angle -= 0.3;
     positionCards();
-  });
+  }, 30);
+}
+function stopAuto() { clearInterval(autoRotate); }
 
-  // Touch support
-  carousel.addEventListener("touchstart", e => {
-    dragging = true;
-    startX = e.touches[0].clientX;
-    stopAuto();
-  });
+// Hover pause
+carousel.addEventListener("mouseover", stopAuto);
+carousel.addEventListener("mouseout", startAuto);
 
-  carousel.addEventListener("touchmove", e => {
-    if (!dragging) return;
-    const dx = e.touches[0].clientX - startX;
-    angle -= dx * 0.15;
-    startX = e.touches[0].clientX;
-    positionCards();
-  });
+// Drag support
+let dragging = false;
+let startX = 0;
 
-  carousel.addEventListener("touchend", () => {
-    dragging = false;
-    startAuto();
-  });
-
-  // Init
+carousel.addEventListener("mousedown", e => {
+  dragging = true; startX = e.clientX; stopAuto();
+});
+window.addEventListener("mouseup", () => {
+  dragging = false; startAuto();
+});
+carousel.addEventListener("mousemove", e => {
+  if (!dragging) return;
+  angle -= (e.clientX - startX) * 0.15;
+  startX = e.clientX;
   positionCards();
-  startAuto();
-</script>
+});
 
+// Touch support
+carousel.addEventListener("touchstart", e => {
+  dragging = true; startX = e.touches[0].clientX; stopAuto();
+});
+carousel.addEventListener("touchmove", e => {
+  if (!dragging) return;
+  angle -= (e.touches[0].clientX - startX) * 0.15;
+  startX = e.touches[0].clientX;
+  positionCards();
+});
+carousel.addEventListener("touchend", () => {
+  dragging = false; startAuto();
+});
+
+// Init
+positionCards();
+startAuto();
+</script>
 </body>
 </html>
