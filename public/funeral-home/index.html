@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>W.Edwards Funeral Services – Compassionate Care</title>
+  <title>W.E. Funeral Services – Compassionate Care</title>
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+    /* ---------------- GLOBAL THEME ---------------- */
     body {
       background: linear-gradient(to bottom right, #0a2a43, #0e4a7e, #eaf4ff);
       color: white;
@@ -16,15 +17,34 @@
       position: relative;
     }
 
-    /* Fade-up */
-    .fade-up { opacity: 0; transform: translateY(25px); transition: all 0.9s ease; }
-    .fade-up.show { opacity: 1; transform: translateY(0); }
+    /* Soft section shadow */
+    .section-shadow {
+      box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+      border-radius: 20px;
+    }
 
-    /* Slide-right */
-    .slide-right { opacity: 0; transform: translateX(40px); transition: all 0.9s ease; }
-    .slide-right.show { opacity: 1; transform: translateX(0); }
+    /* ---------------- PAGE ANIMATIONS ---------------- */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(25px);
+      transition: all 0.9s ease;
+    }
+    .fade-up.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-    /* Yellow Buttons */
+    .slide-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: all 0.9s ease;
+    }
+    .slide-right.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ---------------- BUTTONS ---------------- */
     .btn-yellow {
       background: #F6C945;
       color: #0a2a43;
@@ -39,14 +59,7 @@
       transform: translateY(-2px);
     }
 
-    /* WAVE DIVIDER */
-    .wave-divider svg {
-      width: 100%;
-      height: 90px;
-      fill: rgba(255,255,255,0.35);
-    }
-
-    /* PARTICLES */
+    /* ---------------- FLOATING PARTICLES ---------------- */
     #particles {
       position: fixed;
       inset: 0;
@@ -68,16 +81,19 @@
       to { transform: translateY(-110vh); opacity: 0; }
     }
 
-    /* Candle Glow */
+    /* ---------------- HERO GLOW ---------------- */
     .candle-glow {
       position: absolute;
       bottom: 15%;
       left: 50%;
       transform: translateX(-50%);
-      width: 240px;
-      height: 240px;
-      background: radial-gradient(circle, rgba(255,205,96,0.35), rgba(255,205,96,0));
-      filter: blur(40px);
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle,
+        rgba(255,205,96,0.35),
+        rgba(255,205,96,0)
+      );
+      filter: blur(45px);
       border-radius: 50%;
       animation: glowFlicker 4s ease-in-out infinite;
       pointer-events: none;
@@ -85,11 +101,35 @@
     }
     @keyframes glowFlicker {
       0%   { opacity: 0.45; transform: translateX(-50%) scale(1); }
-      50%  { opacity: 0.75; transform: translateX(-50%) scale(1.15); }
+      50%  { opacity: 0.75; transform: translateX(-50%) scale(1.12); }
       100% { opacity: 0.45; transform: translateX(-50%) scale(1); }
     }
 
-    /* CAROUSEL */
+    /* ---------------- HERO ZOOM (one-time) ---------------- */
+    @keyframes heroZoom {
+      from { transform: scale(1); }
+      to   { transform: scale(1.06); }
+    }
+    .hero-zoom {
+      animation: heroZoom 14s ease-out forwards;
+    }
+
+    /* ---------------- FULL-WIDTH WAVE DIVIDER ---------------- */
+    .wave-wrapper {
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      overflow: hidden;
+    }
+
+    /* Multi-stop premium gradient fill */
+    .wave-fill {
+      fill: url(#gradWave);
+    }
+
+    /* ---------------- CAROUSEL ---------------- */
     .carousel-wrapper {
       width: 100%;
       overflow: hidden;
@@ -99,29 +139,56 @@
 
     .carousel-track {
       display: flex;
-      gap: 40px;
+      gap: 50px;
       transition: transform 0.6s ease;
+      padding-bottom: 20px;
     }
 
     .carousel-card {
       width: 260px;
       height: 350px;
-      background: rgba(255,255,255,0.90);
-      border-radius: 20px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 22px;
       padding: 20px;
       text-align: center;
       color: #0a2a43;
-      box-shadow: 0 12px 25px rgba(0,0,0,0.20);
       transition: all 0.5s ease;
       transform-origin: center;
       filter: blur(3px) brightness(0.9);
       opacity: 0.8;
+      position: relative;
+    }
+
+    /* Warm center glow */
+    .carousel-card.active::after {
+      content: "";
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle,
+        rgba(255,220,160,0.45),
+        rgba(255,220,160,0)
+      );
+      filter: blur(22px);
+      z-index: -1;
+    }
+
+    /* Cool side-card glow */
+    .carousel-card:not(.active)::after {
+      content: "";
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle,
+        rgba(130,180,255,0.25),
+        rgba(130,180,255,0)
+      );
+      filter: blur(18px);
+      z-index: -1;
     }
 
     .carousel-card.active {
       width: 330px;
       height: 420px;
-      transform: scale(1.18);
+      transform: scale(1.20);
       filter: blur(0) brightness(1);
       opacity: 1;
       z-index: 5;
@@ -134,7 +201,7 @@
       border-radius: 50%;
       margin: 0 auto 20px;
       border: 5px solid white;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.25);
     }
 
   </style>
@@ -161,10 +228,10 @@
   </header>
 
   <!-- HERO -->
-  <section class="relative h-[70vh] bg-cover bg-center flex items-center justify-center"
+  <section class="relative h-[70vh] bg-cover bg-center hero-zoom flex items-center justify-center"
     style="background-image:url('hearse-banner.jpg');">
 
-    <!-- Glow -->
+    <!-- Candle Glow -->
     <div class="candle-glow"></div>
 
     <div class="absolute inset-0 bg-blue-900/50"></div>
@@ -180,31 +247,42 @@
 
   </section>
 
-  <!-- DIVIDER -->
-  <div class="wave-divider">
-    <svg viewBox="0 0 1440 120">
-      <path d="M0,64 C360,160 1080,-32 1440,64 L1440,160 L0,160 Z"></path>
+  <!-- FULL-WIDTH DIVIDER -->
+  <div class="wave-wrapper">
+    <svg viewBox="0 0 1440 160" preserveAspectRatio="none" class="w-screen h-[130px]">
+      <defs>
+        <linearGradient id="gradWave" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="white" stop-opacity="0.35"/>
+          <stop offset="40%" stop-color="#bcd4ff" stop-opacity="0.55"/>
+          <stop offset="70%" stop-color="#ddebff" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="white" stop-opacity="0.35"/>
+        </linearGradient>
+      </defs>
+      <path class="wave-fill"
+        d="M0,64 C360,160 1080,-32 1440,64 L1440,160 L0,160 Z">
+      </path>
     </svg>
   </div>
 
-  <!-- MEMORIAL CAROUSEL -->
+  <!-- MEMORIALS SECTION -->
   <section id="memorials" class="max-w-7xl mx-auto py-20 px-6 fade-up">
-
     <h3 class="text-3xl font-bold mb-4 slide-right">Recent Memorials</h3>
 
     <input id="searchInput" type="text"
       placeholder="Search memorials…"
       class="w-full max-w-md px-4 py-3 rounded-lg text-blue-900 mb-10 shadow-lg">
 
-    <div class="carousel-wrapper">
-      <div id="carouselTrack" class="carousel-track">
+    <div class="carousel-wrapper section-shadow p-6 bg-white/10 rounded-2xl">
 
+      <div id="carouselTrack" class="carousel-track">
         <!-- CARD 1 -->
         <div class="carousel-card active">
           <img src="https://via.placeholder.com/300">
           <h4 class="font-bold text-xl">John Doe</h4>
           <p class="text-blue-700">Sunrise – Sunset</p>
-          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">View Memorial →</a>
+          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+            View Memorial →
+          </a>
         </div>
 
         <!-- CARD 2 -->
@@ -212,7 +290,9 @@
           <img src="https://via.placeholder.com/300">
           <h4 class="font-bold text-xl">Mary Ann</h4>
           <p class="text-blue-700">Sunrise – Sunset</p>
-          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">View Memorial →</a>
+          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+            View Memorial →
+          </a>
         </div>
 
         <!-- CARD 3 -->
@@ -220,7 +300,9 @@
           <img src="https://via.placeholder.com/300">
           <h4 class="font-bold text-xl">Samuel Green</h4>
           <p class="text-blue-700">Sunrise – Sunset</p>
-          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">View Memorial →</a>
+          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+            View Memorial →
+          </a>
         </div>
 
         <!-- CARD 4 -->
@@ -228,18 +310,22 @@
           <img src="https://via.placeholder.com/300">
           <h4 class="font-bold text-xl">Lydia James</h4>
           <p class="text-blue-700">Sunrise – Sunset</p>
-          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">View Memorial →</a>
+          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+            View Memorial →
+          </a>
         </div>
 
         <!-- CARD 5 -->
         <div class="carousel-card">
           <img src="https://via.placeholder.com/300">
           <h4 class="font-bold text-xl">Peter Clarke</h4>
-          <p class="text-blue-700">Sunset – Sunset</p>
-          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">View Memorial →</a>
+          <p class="text-blue-700">Sunrise – Sunset</p>
+          <a class="mt-3 inline-block font-semibold text-blue-900 hover:underline">
+            View Memorial →
+          </a>
         </div>
 
-      </div>
+      </div> <!-- end track -->
 
       <!-- Buttons -->
       <div class="flex justify-center mt-10 gap-6">
@@ -251,33 +337,34 @@
   </section>
 
   <!-- DIVIDER -->
-  <div class="wave-divider">
-    <svg viewBox="0 0 1440 120">
-      <path d="M0,64 C360,160 1080,-32 1440,64 L1440,160 L0,160 Z"></path>
+  <div class="wave-wrapper">
+    <svg viewBox="0 0 1440 160" preserveAspectRatio="none" class="w-screen h-[130px]">
+      <use href="#gradWave"></use>
+      <path class="wave-fill"
+        d="M0,64 C360,160 1080,-32 1440,64 L1440,160 L0,160 Z">
+      </path>
     </svg>
   </div>
 
   <!-- SERVICES -->
-  <section id="services" class="max-w-7xl mx-auto py-20 px-6 fade-up">
+  <section id="services" class="max-w-7xl mx-auto py-20 px-6 fade-up section-shadow bg-white/10 rounded-2xl">
     <h3 class="text-3xl font-bold mb-10 slide-right">Our Services</h3>
 
     <div class="grid md:grid-cols-3 gap-10">
-
-      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
         <h4 class="text-xl font-semibold mb-3">Funeral Arrangements</h4>
         <p>Planning and coordinating meaningful services.</p>
       </div>
 
-      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
         <h4 class="text-xl font-semibold mb-3">Memorial Services</h4>
-        <p>Honouring cherished memories with dignity.</p>
+        <p>Honoring cherished memories with dignity.</p>
       </div>
 
-      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
         <h4 class="text-xl font-semibold mb-3">Pre-Planning</h4>
         <p>Plan ahead with clarity and peace of mind.</p>
       </div>
-
     </div>
 
     <div class="mt-10 text-center">
@@ -286,147 +373,155 @@
   </section>
 
   <!-- DIVIDER -->
-  <div class="wave-divider">
-    <svg viewBox="0 0 1440 120">
-      <path d="M0,64 C360,160 1080,-32 1440,64 L1440,160 L0,160 Z"></path>
+  <div class="wave-wrapper">
+    <svg viewBox="0 0 1440 160" preserveAspectRatio="none" class="w-screen h-[130px]">
+      <path class="wave-fill"
+        d="M0,64 C360,160 1080,-32 1440,64 L1440,160 L0,160 Z"></path>
     </svg>
   </div>
 
   <!-- PLATFORM -->
-  <section id="platform" class="max-w-7xl mx-auto py-20 px-6 fade-up">
+  <section id="platform" class="max-w-7xl mx-auto py-20 px-6 fade-up section-shadow bg-white/10 rounded-2xl">
     <h3 class="text-3xl font-bold mb-10 slide-right">W.E. Funeral Platform</h3>
 
     <div class="grid md:grid-cols-3 gap-10">
-
-      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
         <h4 class="font-semibold text-xl mb-3">Multi-Tenant Console</h4>
-        Manage multiple funeral homes easily.
+        <p>Manage multiple funeral homes easily.</p>
       </div>
 
-      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
         <h4 class="font-semibold text-xl mb-3">Memorial Page Builder</h4>
-        Create beautiful obituary pages.
+        <p>Create beautiful obituary pages.</p>
       </div>
 
-      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 shadow-xl">
         <h4 class="font-semibold text-xl mb-3">PDF Automation</h4>
-        Generate funeral documents instantly.
+        <p>Generate funeral documents instantly.</p>
       </div>
-
     </div>
 
-    <div class="mt-10">
+    <div class="mt-10 text-center">
       <a href="/" class="btn-yellow">Learn More →</a>
     </div>
   </section>
 
   <!-- DIVIDER -->
-  <div class="wave-divider">
-    <svg viewBox="0 0 1440 120">
-      <path d="M0,64 C360,160 1080,-32 1440,64 L1440,160 L0,160 Z"></path>
+  <div class="wave-wrapper">
+    <svg viewBox="0 0 1440 160" preserveAspectRatio="none" class="w-screen h-[130px]">
+      <path class="wave-fill"
+        d="M0,64 C360,160 1080,-32 1440,64 L1440,160 L0,160 Z"></path>
     </svg>
   </div>
 
   <!-- ABOUT -->
-  <section id="about" class="max-w-7xl mx-auto py-20 px-6 fade-up">
-
+  <section id="about" class="max-w-7xl mx-auto py-20 px-6 fade-up section-shadow bg-white/10 rounded-2xl">
     <h3 class="text-3xl font-bold mb-6 slide-right">About Us</h3>
 
-    <p class="max-w-3xl text-lg text-white/90">
+    <p class="max-w-3xl text-lg text-white/90 leading-relaxed">
       At W.E. Funeral Services, we support families with compassion and dignity.
-      Our team is dedicated to creating meaningful funeral experiences.
+      Our mission is to guide you through difficult moments with care,
+      providing meaningful ceremonies and memorial experiences.
     </p>
-
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-white/20 backdrop-blur-md text-blue-900 py-8 text-center border-t border-blue-200">
+  <footer class="bg-white/20 backdrop-blur-md text-blue-900 py-8 text-center border-t border-blue-200 mt-20">
     © 2025 W.E. Funeral Services — All Rights Reserved.
   </footer>
 
-  <!-- ANIMATION SCRIPT -->
+  <!-- ---------------- ANIMATION SCRIPT ---------------- -->
   <script>
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add("show");
-      });
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("show"); });
     }, { threshold: 0.2 });
-
-    document.querySelectorAll(".fade-up, .slide-right")
-      .forEach(el => observer.observe(el));
+    document.querySelectorAll(".fade-up, .slide-right").forEach(el => obs.observe(el));
   </script>
 
-  <!-- PARTICLES SCRIPT -->
+  <!-- ---------------- PARTICLES ---------------- -->
   <script>
-    const particleContainer = document.getElementById("particles");
-    const particleCount = 25; // Light intensity
+    const pWrap = document.getElementById("particles");
+    const COUNT = 25;
 
-    for (let i = 0; i < particleCount; i++) {
+    for (let i = 0; i < COUNT; i++) {
       const p = document.createElement("div");
-      p.classList.add("particle");
-
+      p.className = "particle";
       p.style.left = Math.random() * 100 + "vw";
       p.style.top = Math.random() * 100 + "vh";
       p.style.animationDuration = (6 + Math.random() * 8) + "s";
       p.style.animationDelay = Math.random() * 5 + "s";
-
-      particleContainer.appendChild(p);
+      pWrap.appendChild(p);
     }
   </script>
 
-  <!-- CAROUSEL SCRIPT -->
+  <!-- ---------------- CAROUSEL LOGIC ---------------- -->
   <script>
     const track = document.getElementById("carouselTrack");
     const cards = Array.from(track.children);
     let current = 0;
-    let isDragging = false;
-    let startX = 0;
-    let scrollLeft = 0;
+    let interval;
 
     function updateCarousel() {
-      cards.forEach((card, index) => {
-        card.classList.toggle("active", index === current);
+      cards.forEach((card, i) => {
+        card.classList.toggle("active", i === current);
       });
-      track.style.transform = `translateX(${-(current - 2) * 300}px)`;
+      track.style.transform = `translateX(${-(current - 2) * 310}px)`;
+    }
+
+    function startAuto() {
+      interval = setInterval(() => {
+        current = (current + 1) % cards.length;
+        updateCarousel();
+      }, 4000);
+    }
+
+    function stopAuto() {
+      clearInterval(interval);
     }
 
     // Buttons
     document.getElementById("nextBtn").onclick = () => {
+      stopAuto();
       current = (current + 1) % cards.length;
       updateCarousel();
+      startAuto();
     };
+
     document.getElementById("prevBtn").onclick = () => {
+      stopAuto();
       current = (current - 1 + cards.length) % cards.length;
       updateCarousel();
+      startAuto();
     };
 
-    // Auto-slide
-    setInterval(() => {
-      current = (current + 1) % cards.length;
-      updateCarousel();
-    }, 4000);
+    // Pause on hover
+    track.addEventListener("mouseover", stopAuto);
+    track.addEventListener("mouseout", startAuto);
 
-    // Drag / Swipe
+    // Drag / swipe support
+    let isDragging = false;
+    let startX = 0;
+
     track.addEventListener("mousedown", e => {
       isDragging = true;
-      startX = e.pageX - track.offsetLeft;
-      scrollLeft = track.offsetLeft;
+      startX = e.pageX;
+      stopAuto();
     });
 
-    track.addEventListener("mouseleave", () => isDragging = false);
-    track.addEventListener("mouseup", () => {
+    track.addEventListener("mouseup", e => {
       isDragging = false;
-      const closest = Math.round((window.innerWidth/2 - scrollLeft) / 300);
-      current = Math.max(0, Math.min(cards.length - 1, closest));
+      const diff = e.pageX - startX;
+      if (diff > 60) current = (current - 1 + cards.length) % cards.length;
+      if (diff < -60) current = (current + 1) % cards.length;
       updateCarousel();
+      startAuto();
     });
 
     track.addEventListener("mousemove", e => {
       if (!isDragging) return;
-      const x = e.pageX - track.offsetLeft;
-      const walk = (x - startX) * 1.2;
-      track.style.transform = `translateX(${-(current - 2) * 300 + walk}px)`;
     });
+
+    startAuto();
   </script>
 
 </body>
