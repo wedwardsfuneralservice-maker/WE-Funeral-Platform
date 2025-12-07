@@ -2,474 +2,457 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create New Funeral Record – W.E. Funeral Service Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
+  <!-- ========================================= -->
+  <!-- ADMIN THEME (MATCHES SUPER ADMIN EXACTLY) -->
+  <!-- ========================================= -->
   <style>
     :root {
-      --sidebar-bg: #0c0f16;
-      --sidebar-active: #1e293b;
-      --sidebar-text: #b8c4d9;
-      --primary-accent: #4b7cff;
-      --gold: #f6c945;
-      --card-bg: #ffffff;
-      --heading-font: "Playfair Display", serif;
-      --body-font: "Inter", sans-serif;
+      --blue: #306cde;
+      --blue-soft: rgba(48, 108, 222, 0.13);
+      --gold: #f5c242;
+
+      --bg-main-dark: #0d0f12;
+      --bg-elevated-dark: #171a22;
+      --text-primary-dark: #f9fafb;
+      --text-muted-dark: #9ca3af;
+      --border-subtle-dark: rgba(148, 163, 184, 0.18);
+
+      --bg-main-light: #f8fafc;
+      --bg-elevated-light: #ffffff;
+      --text-primary-light: #0f172a;
+      --text-muted-light: #6b7280;
+      --border-subtle-light: rgba(148, 163, 184, 0.35);
+
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-soft: 0 18px 35px rgba(0, 0, 0, 0.45);
     }
 
-    body {
-      font-family: var(--body-font);
-      background: radial-gradient(circle at top, #0d1117, #0b0e13 40%, #080b0f 80%);
-      color: #e5e7eb;
+    /* BODY THEMES --------------------------------------- */
+    body.theme-dark {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: var(--text-primary-dark);
+      background:
+        radial-gradient(circle at top left, var(--blue-soft), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
+      display: flex;
+      min-height: 100vh;
     }
 
-    .sidebar-link {
-      @apply flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-text)] hover:text-white hover:bg-[var(--sidebar-active)] cursor-pointer transition;
+    body.theme-light {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: var(--text-primary-light);
+      background: var(--bg-main-light);
+      display: flex;
+      min-height: 100vh;
     }
 
-    .sidebar-link.active {
-      @apply bg-[var(--sidebar-active)] text-white font-semibold;
-      box-shadow: 0 0 6px rgba(75,124,255,0.6);
+    /* LAYOUT WRAPPER ------------------------------------- */
+    .shell {
+      display: flex;
+      width: 100%;
     }
 
+    /* SIDEBAR -------------------------------------------- */
+    .sidebar {
+      width: 260px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      box-shadow: 18px 0 40px rgba(0, 0, 0, 0.45);
+      z-index: 20;
+    }
+
+    body.theme-dark .sidebar {
+      background: linear-gradient(180deg, #05060a, #0b0d12 40%, #05060a 100%);
+      border-right: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    body.theme-light .sidebar {
+      background: #ffffff;
+      border-right: 1px solid var(--border-subtle-light);
+      box-shadow: 12px 0 30px rgba(15, 23, 42, 0.06);
+    }
+
+    /* SIDEBAR BRAND -------------------------------------- */
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    .nav-section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted-dark);
+      margin-bottom: 6px;
+    }
+    body.theme-light .nav-section-label {
+      color: var(--text-muted-light);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-item {
+      border-radius: 999px;
+      padding: 8px 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background 0.18s ease, transform 0.12s ease;
+    }
+
+    body.theme-dark .nav-item {
+      color: var(--text-muted-dark);
+    }
+    body.theme-light .nav-item {
+      color: var(--text-muted-light);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    body.theme-dark .nav-item:hover {
+      background: rgba(15, 23, 42, 0.8);
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, var(--blue), #5b8bff);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.4);
+    }
+
+    /* MAIN AREA ------------------------------------------- */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 28px;
+      gap: 24px;
+      box-sizing: border-box;
+    }
+
+    /* TOP BAR --------------------------------------------- */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .topbar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      opacity: 0.75;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid rgba(148,163,184,0.4);
+    }
+
+    .avatar-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, var(--gold), #4b5563);
+    }
+
+    /* CARD WRAPPER ---------------------------------------- */
     .content-card {
-      background: var(--card-bg);
-      border-radius: 1rem;
-      padding: 2rem;
-      box-shadow: 0 3px 20px rgba(0,0,0,0.25);
-      color: #111827;
+      border-radius: var(--radius-lg);
+      padding: 26px 30px;
+      box-sizing: border-box;
+      margin-top: 10px;
     }
 
-    .fade-section {
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.35s ease;
+    body.theme-dark .content-card {
+      background: radial-gradient(circle at top left, rgba(48,108,222,0.22), transparent 60%),
+        linear-gradient(145deg, #0b1020, #111827);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow: var(--shadow-soft);
     }
-    .fade-section.show {
-      opacity: 1;
-      transform: translateY(0);
+
+    body.theme-light .content-card {
+      background: var(--bg-elevated-light);
+      border: 1px solid var(--border-subtle-light);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
     }
   </style>
 </head>
 
-<body class="overflow-x-hidden">
+<body class="theme-dark">
 
-<!-- ▀▀▀ TOP HEADER (FUNERAL HOME STYLE) ▀▀▀ -->
-<header class="w-full bg-[#0f131a] shadow-lg py-4 px-6 flex justify-between items-center fixed top-0 left-0 z-50 border-b border-gray-800">
-  
-  <!-- Brand -->
-  <div class="text-2xl font-semibold text-white tracking-wide" style="font-family: var(--heading-font);">
-    W.E. Funeral Service Console
-  </div>
+  <div class="shell">
 
-  <!-- Profile Icon -->
-  <div class="flex items-center space-x-6">
-    <img src="/admin-avatar.png" alt="Profile" class="w-10 h-10 rounded-full border border-gray-600 shadow">
-  </div>
-</header>
+    <!-- ============================= -->
+    <!-- SIDEBAR (FUNERAL MANAGEMENT) -->
+    <!-- ============================= -->
+    <aside class="sidebar">
 
-<!-- ▀▀▀ LAYOUT WRAPPER ▀▀▀ -->
-<div class="flex pt-20">
-
-  <!-- ▀▀▀ SIDEBAR ▀▀▀ -->
-  <aside class="w-64 min-h-screen bg-[var(--sidebar-bg)] text-gray-300 p-6 space-y-3 fixed top-20 left-0 border-r border-gray-800">
-
-    <h2 class="text-lg font-semibold mb-4 tracking-wide text-gray-400" style="font-family: var(--heading-font);">
-      Funeral Management
-    </h2>
-
-    <div id="tab-deceased" class="sidebar-link active">🕊️ Deceased Information</div>
-    <div id="tab-nok" class="sidebar-link">👨‍👩‍👧 Next of Kin</div>
-    <div id="tab-type" class="sidebar-link">⚰️ Funeral Type</div>
-    <div id="tab-service" class="sidebar-link">⛪ Service & Burial / Cremation</div>
-    <div id="tab-repat" class="sidebar-link">✈️ Shipment / Repatriation</div>
-    <div id="tab-costs" class="sidebar-link">💵 Costs & Payments</div>
-    <div id="tab-docs" class="sidebar-link">📄 Documents</div>
-    <div id="tab-pdf" class="sidebar-link">📝 PDF Auto-Fill</div>
-    <div id="tab-review" class="sidebar-link">✅ Review & Submit</div>
-
-  </aside>
-
-  <!-- ▀▀▀ MAIN CONTENT AREA ▀▀▀ -->
-  <main class="ml-64 w-full px-10 py-10">
-
-    <h1 class="text-4xl font-bold mb-8 text-white" style="font-family: var(--heading-font);">
-      Create New Funeral Record
-    </h1>
-
-    <!-- SECTION WRAPPER -->
-    <div id="content-area">
-
-      <!-- Section Templates -->
-      <div id="section-deceased" class="fade-section show">
-<div class="content-card">
-
-  <!-- SECTION TITLE -->
-  <h2 class="text-3xl font-semibold mb-6 text-gray-800" style="font-family: var(--heading-font);">
-    🕊️ Deceased Information
-  </h2>
-
-  <!-- REFERENCE + FUNERAL DIRECTOR -->
-  <div class="grid md:grid-cols-2 gap-6 mb-10">
-    <div>
-      <label class="font-semibold text-gray-700">Reference Number</label>
-      <input id="d_refNumber" type="text" readonly
-             class="mt-1 w-full p-3 border rounded-lg bg-gray-100 shadow-sm" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Responsible Funeral Director</label>
-      <select id="d_funeralDirector"
-              class="mt-1 w-full p-3 border rounded-lg shadow-sm">
-        <option value="">Select…</option>
-        <option>Carl Brathwaite</option>
-        <option>Winston Edwards</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- UPLOAD BLOCKS -->
-  <div class="grid md:grid-cols-3 gap-10 mb-10">
-
-    <!-- PORTRAIT -->
-    <div>
-      <label class="font-semibold text-gray-700 block mb-2">Portrait Photo</label>
-      <img id="deceasedPhotoPreview"
-           src="/placeholder-portrait.png"
-           class="w-32 h-32 rounded-full object-cover border shadow mb-3" />
-      <input id="deceasedPhoto" type="file" accept="image/*"
-             class="text-sm"
-             onchange="previewImage(this,'deceasedPhotoPreview')" />
-      <button class="text-red-600 underline text-xs mt-1"
-              onclick="clearImage('deceasedPhoto','deceasedPhotoPreview')">
-        Remove
-      </button>
-    </div>
-
-    <!-- ID FRONT -->
-    <div>
-      <label class="font-semibold text-gray-700 block mb-2">ID Front</label>
-      <img id="idFrontPreview"
-           src="/placeholder-id.png"
-           class="w-40 rounded border shadow mb-3" />
-      <input id="d_idFront" type="file" accept="image/*"
-             onchange="previewImage(this,'idFrontPreview')" />
-    </div>
-
-    <!-- ID BACK -->
-    <div>
-      <label class="font-semibold text-gray-700 block mb-2">ID Back</label>
-      <img id="idBackPreview"
-           src="/placeholder-id.png"
-           class="w-40 rounded border shadow mb-3" />
-      <input id="d_idBack" type="file" accept="image/*"
-             onchange="previewImage(this,'idBackPreview')" />
-    </div>
-
-  </div>
-
-  <!-- PERSONAL DETAILS -->
-  <h3 class="text-2xl font-semibold mb-4 text-gray-800" style="font-family:var(--heading-font);">
-    Personal Details
-  </h3>
-
-  <div class="grid md:grid-cols-2 gap-6 mb-10">
-
-    <div>
-      <label class="font-semibold text-gray-700">Full Name</label>
-      <input id="d_fullName" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Alias / Other Names</label>
-      <input id="d_alias" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Gender</label>
-      <select id="d_gender"
-              class="mt-1 w-full p-3 border rounded-lg shadow-sm">
-        <option value="">Select…</option>
-        <option>Male</option>
-        <option>Female</option>
-        <option>Other</option>
-      </select>
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Marital Status</label>
-      <select id="d_maritalStatus"
-              class="mt-1 w-full p-3 border rounded-lg shadow-sm"
-              onchange="toggleSpouseField()">
-        <option value="">Select…</option>
-        <option>Single</option>
-        <option>Married</option>
-        <option>Widowed</option>
-        <option>Divorced</option>
-        <option>Common-law</option>
-      </select>
-    </div>
-
-    <div id="spouseField" class="hidden">
-      <label class="font-semibold text-gray-700">Spouse Name</label>
-      <input id="d_spouseName" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-  </div>
-
-  <!-- DATES -->
-  <h3 class="text-2xl font-semibold mb-4 text-gray-800" style="font-family:var(--heading-font);">
-    Dates & Age
-  </h3>
-
-  <div class="grid md:grid-cols-3 gap-6 mb-10">
-
-    <div>
-      <label class="font-semibold text-gray-700">Date of Birth</label>
-      <input id="d_dob" type="date"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm"
-             onchange="calculateAge()" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Date & Time of Death</label>
-      <input id="d_dod" type="datetime-local"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm"
-             onchange="calculateAge()" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Age (Auto)</label>
-      <input id="d_age" type="number" readonly
-             class="mt-1 w-full p-3 border rounded-lg bg-gray-100 shadow-inner" />
-    </div>
-
-  </div>
-
-  <!-- LOCATION -->
-  <h3 class="text-2xl font-semibold mb-4 text-gray-800" style="font-family:var(--heading-font);">
-    Location Information
-  </h3>
-
-  <div class="grid md:grid-cols-2 gap-6 mb-10">
-
-    <div>
-      <label class="font-semibold text-gray-700">Place of Death</label>
-      <input id="d_placeOfDeath" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Country of Death</label>
-      <select id="d_countryOfDeath"
-              class="mt-1 w-full p-3 border rounded-lg shadow-sm">
-        <option value="">Select country…</option>
-      </select>
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Last Known Address</label>
-      <input id="d_address" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Country of Residence</label>
-      <select id="d_countryOfResidence"
-              class="mt-1 w-full p-3 border rounded-lg shadow-sm">
-        <option value="">Select country…</option>
-      </select>
-    </div>
-
-  </div>
-
-  <!-- MEDICAL & LEGAL -->
-  <h3 class="text-2xl font-semibold mb-4 text-gray-800" style="font-family:var(--heading-font);">
-    Medical & Legal Information
-  </h3>
-
-  <div class="grid md:grid-cols-2 gap-6 mb-10">
-
-    <div>
-      <label class="font-semibold text-gray-700">Cause of Death</label>
-      <input id="d_cod" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Attending Physician</label>
-      <input id="d_physician" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Physician Contact</label>
-      <input id="d_physicianContact" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">Death Certificate Issued?</label>
-      <select id="d_certificateIssued"
-              class="mt-1 w-full p-3 border rounded-lg shadow-sm"
-              onchange="toggleCertificateNumber()">
-        <option value="">Select…</option>
-        <option>Yes</option>
-        <option>No</option>
-      </select>
-    </div>
-
-    <div id="certificateNumberField" class="hidden">
-      <label class="font-semibold text-gray-700">Certificate Number</label>
-      <input id="d_certificateNumber" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-  </div>
-
-  <!-- IDENTIFICATION -->
-  <h3 class="text-2xl font-semibold mb-4 text-gray-800" style="font-family:var(--heading-font);">
-    Identification
-  </h3>
-
-  <div class="grid md:grid-cols-2 gap-6">
-
-    <div>
-      <label class="font-semibold text-gray-700">ID Type</label>
-      <select id="d_idType"
-              class="mt-1 w-full p-3 border rounded-lg shadow-sm">
-        <option value="">Select…</option>
-        <option>National ID</option>
-        <option>Passport</option>
-        <option>Driver’s License</option>
-        <option>Other</option>
-      </select>
-    </div>
-
-    <div>
-      <label class="font-semibold text-gray-700">ID Number</label>
-      <input id="d_idNumber" type="text"
-             class="mt-1 w-full p-3 border rounded-lg shadow-sm" />
-    </div>
-
-  </div>
-
-</div>
-
-        
+      <div class="brand-block">
+        <div class="brand-title">W.E. FUNERAL</div>
+        <div class="brand-sub">Service Console</div>
       </div>
 
-      <div id="section-nok" class="fade-section hidden"></div>
-      <div id="section-type" class="fade-section hidden"></div>
-      <div id="section-service" class="fade-section hidden"></div>
-      <div id="section-repat" class="fade-section hidden"></div>
-      <div id="section-costs" class="fade-section hidden"></div>
-      <div id="section-docs" class="fade-section hidden"></div>
-      <div id="section-pdf" class="fade-section hidden"></div>
-      <div id="section-review" class="fade-section hidden"></div>
+      <div>
+        <div class="nav-section-label">Funeral Management</div>
+        <ul class="nav-list">
+          <li class="nav-item active" data-target="section-deceased">🕊️ Deceased Information</li>
+          <li class="nav-item" data-target="section-nok">👥 Next of Kin</li>
+          <li class="nav-item" data-target="section-funeral-type">⚰️ Funeral Type</li>
+          <li class="nav-item" data-target="section-services">📜 Service & Burial / Cremation</li>
+          <li class="nav-item" data-target="section-shipment">✈️ Shipment / Repatriation</li>
+          <li class="nav-item" data-target="section-costs">💲 Costs & Payments</li>
+          <li class="nav-item" data-target="section-documents">📄 Documents</li>
+          <li class="nav-item" data-target="section-pdf">🧾 PDF Auto-Fill</li>
+          <li class="nav-item" data-target="section-review">✅ Review & Submit</li>
+        </ul>
+      </div>
 
-    </div>
+      <div class="sidebar-footer">
+        W.E. Funeral Platform © <span id="yearSpan"></span>
+      </div>
 
-  </main>
-</div>
+    </aside>
 
-<!-- ▀▀▀ SIDEBAR LOGIC SCRIPT ▀▀▀ -->
+    <!-- ============================= -->
+    <!-- MAIN AREA -->
+    <!-- ============================= -->
+    <main class="main">
+
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="page-title">Create New Funeral Record</div>
+          <div class="page-subtitle">Enter, review, and manage all funeral arrangement details.</div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="avatar-chip">
+            <div class="avatar-circle"></div>
+            <span>Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT AREA (sections will be inserted next) -->
+      <div id="contentArea">
+        <!-- PART A — 2/2 will continue from here -->
+<!-- ===================================================== -->
+<!-- FUNERAL FORM SECTIONS (STRUCTURE ONLY FOR NOW)        -->
+<!-- ===================================================== -->
+
+<!-- SECTION 1 — DECEASED INFORMATION -->
+<section id="section-deceased" class="content-card">
+  <h2>Deceased Information</h2>
+  <p class="section-description">
+    Enter full details for the deceased, including legal information and identification.
+  </p>
+
+  <div class="section-placeholder">
+    <!-- Form fields added in PART B -->
+    <em>Deceased Information fields will appear here.</em>
+  </div>
+</section>
+
+<!-- SECTION 2 — NEXT OF KIN -->
+<section id="section-nok" class="content-card">
+  <h2>Next of Kin</h2>
+  <p class="section-description">
+    List primary and secondary contact persons responsible for arrangements.
+  </p>
+
+  <div class="section-placeholder">
+    <em>Next of Kin fields will appear here.</em>
+  </div>
+</section>
+
+<!-- SECTION 3 — FUNERAL TYPE -->
+<section id="section-funeral-type" class="content-card">
+  <h2>Funeral Type</h2>
+  <p class="section-description">
+    Select the funeral arrangement and automatically display relevant options.
+  </p>
+
+  <div class="section-placeholder">
+    <em>Funeral Type form fields go here.</em>
+  </div>
+</section>
+
+<!-- SECTION 4 — SERVICE & BURIAL / CREMATION -->
+<section id="section-services" class="content-card">
+  <h2>Service, Burial & Cremation Details</h2>
+  <p class="section-description">
+    Add service details such as clergy, venue, cemetery, crematorium info, and timings.
+  </p>
+  <div class="section-placeholder">
+    <em>Service & Burial fields will go here.</em>
+  </div>
+</section>
+
+<!-- SECTION 5 — SHIPMENT / REPATRIATION -->
+<section id="section-shipment" class="content-card">
+  <h2>Shipment / Repatriation Details</h2>
+  <p class="section-description">
+    Airline info, international funeral home details, consular data, etc.
+  </p>
+  <div class="section-placeholder">
+    <em>Shipment & Repatriation fields will go here.</em>
+  </div>
+</section>
+
+<!-- SECTION 6 — COSTS & PAYMENTS -->
+<section id="section-costs" class="content-card">
+  <h2>Costs & Payments</h2>
+  <p class="section-description">
+    Itemize funeral expenses and calculate totals, deposits, and outstanding balances.
+  </p>
+  <div class="section-placeholder">
+    <em>Costs & Payment fields will go here.</em>
+  </div>
+</section>
+
+<!-- SECTION 7 — DOCUMENTS -->
+<section id="section-documents" class="content-card">
+  <h2>Documents</h2>
+  <p class="section-description">
+    Upload ID cards, police reports, medical certificates, and supporting files.
+  </p>
+  <div class="section-placeholder">
+    <em>Document upload fields go here.</em>
+  </div>
+</section>
+
+<!-- SECTION 8 — PDF AUTO-FILL -->
+<section id="section-pdf" class="content-card">
+  <h2>PDF Auto-Fill</h2>
+  <p class="section-description">
+    Select the government PDF form to automatically populate with funeral details.
+  </p>
+  <div class="section-placeholder">
+    <em>PDF selection and preview will go here.</em>
+  </div>
+</section>
+
+<!-- SECTION 9 — REVIEW & SUBMIT -->
+<section id="section-review" class="content-card">
+  <h2>Review & Submit</h2>
+  <p class="section-description">
+    Final validation and submission of the complete funeral record.
+  </p>
+  <div class="section-placeholder">
+    <em>Review summary goes here.</em>
+  </div>
+</section>
+
+
+</div> <!-- END contentArea -->
+</main> <!-- END main -->
+</div> <!-- END shell -->
+
+<!-- ========================================= -->
+<!-- JAVASCRIPT — ACTIVE STATE + SCROLL LOGIC -->
+<!-- ========================================= -->
 <script>
-  const tabs = ["deceased","nok","type","service","repat","costs","docs","pdf","review"];
+/* -------------------------
+   YEAR AUTO-FILL
+-------------------------- */
+document.getElementById("yearSpan").textContent = new Date().getFullYear();
 
-  tabs.forEach(name => {
-    document.getElementById(`tab-${name}`).addEventListener("click", () => {
+/* -------------------------
+   SIDEBAR NAVIGATION
+-------------------------- */
+const navItems = document.querySelectorAll(".nav-item");
 
-      tabs.forEach(n => {
-        document.getElementById(`tab-${n}`).classList.remove("active");
-        document.getElementById(`section-${n}`).classList.add("hidden");
-        document.getElementById(`section-${n}`).classList.remove("show");
-      });
+navItems.forEach(item => {
+  item.addEventListener("click", () => {
+    // Remove active from all
+    navItems.forEach(i => i.classList.remove("active"));
 
-      document.getElementById(`tab-${name}`).classList.add("active");
+    // Add active to clicked item
+    item.classList.add("active");
 
-      const section = document.getElementById(`section-${name}`);
-      section.classList.remove("hidden");
-      setTimeout(() => section.classList.add("show"), 50);
+    // Scroll to target section
+    const target = item.getAttribute("data-target");
+    const section = document.getElementById(target);
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
-</script>
-  <script>
-/* IMAGE PREVIEW LOGIC */
-function previewImage(input, previewId) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById(previewId).src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
+});
 
-function clearImage(inputId, previewId) {
-  document.getElementById(inputId).value = "";
-  document.getElementById(previewId).src = "/placeholder-portrait.png";
-}
+/* --------------------------------------------------
+   OBSERVER: HIGHLIGHT SIDEBAR item when scrolling
+--------------------------------------------------- */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const id = entry.target.id;
+    const navItem = document.querySelector(`.nav-item[data-target="${id}"]`);
 
-/* AGE CALCULATION — DOD - DOB */
-function calculateAge() {
-  const dob = document.getElementById("d_dob").value;
-  const dod = document.getElementById("d_dod").value;
-  if (!dob || !dod) return;
-
-  const birth = new Date(dob);
-  const death = new Date(dod);
-  let age = death.getFullYear() - birth.getFullYear();
-
-  const m = death.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && death.getDate() < birth.getDate())) age--;
-
-  document.getElementById("d_age").value = age;
-}
-
-/* MARITAL STATUS */
-function toggleSpouseField() {
-  const status = document.getElementById("d_maritalStatus").value;
-  document.getElementById("spouseField").classList.toggle("hidden", status !== "Married");
-}
-
-/* CERTIFICATE LOGIC */
-function toggleCertificateNumber() {
-  const issued = document.getElementById("d_certificateIssued").value;
-  document.getElementById("certificateNumberField").classList.toggle("hidden", issued !== "Yes");
-}
-
-/* COUNTRY LIST */
-const countries = [
-  "Barbados","United States","United Kingdom","Canada","Jamaica",
-  "Trinidad & Tobago","Guyana","Saint Lucia","Dominica","Grenada",
-  "India","China","Australia","Germany","France","Brazil","Mexico",
-  "Nigeria","Ghana","South Africa","Japan","Spain","Italy","Netherlands"
-];
-
-function loadCountries() {
-  ["d_countryOfDeath", "d_countryOfResidence"].forEach(id => {
-    const sel = document.getElementById(id);
-    countries.forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c;
-      opt.textContent = c;
-      sel.appendChild(opt);
-    });
+    if (entry.isIntersecting) {
+      navItems.forEach(i => i.classList.remove("active"));
+      if (navItem) navItem.classList.add("active");
+    }
   });
-}
-loadCountries();
+}, { threshold: 0.4 });
 
-/* AUTO-GENERATE REFERENCE NUMBER */
-document.getElementById("d_refNumber").value = "REF-" + Math.floor(100000 + Math.random() * 900000);
+document.querySelectorAll("section").forEach(section => {
+  observer.observe(section);
+});
 </script>
 
 </body>
