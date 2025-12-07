@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Funeral – W.E. Admin Console</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary-blue: #0a2a43;
+      --gold: #f6c945;
+      --light-bg: #f7f9fc;
+      --heading-font: "Playfair Display", serif;
+      --body-font: "Inter", sans-serif;
+    }
+
+    body {
+      font-family: var(--body-font);
+      background: var(--light-bg);
+    }
+
+    .sidebar-link {
+      @apply flex items-center px-5 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition cursor-pointer;
+    }
+
+    .sidebar-link.active {
+      @apply bg-white/20 text-white font-semibold;
+    }
+
+    .content-card {
+      @apply bg-white shadow-md rounded-xl p-8 mb-10 border border-gray-200;
+    }
+
+    /* Smooth fade-in for pages */
+    .fade-section {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease;
+    }
+    .fade-section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+
+</head>
+<body class="overflow-x-hidden">
+
+<!-- TOP ADMIN BAR -->
+<header class="w-full bg-white shadow-md py-4 px-6 flex justify-between items-center fixed top-0 left-0 z-40">
+  <div class="text-xl font-semibold text-gray-800" style="font-family: var(--heading-font);">
+    W.E. Funeral Service Console
+  </div>
+
+  <div class="flex items-center space-x-6">
+    <span class="text-gray-600">Admin</span>
+    <img src="/admin-avatar.png" class="w-10 h-10 rounded-full border" alt="">
+  </div>
+</header>
+
+<!-- LAYOUT WRAPPER -->
+<div class="flex pt-20">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64 min-h-screen bg-[var(--primary-blue)] text-white p-6 space-y-3 fixed top-20 left-0">
+
+    <h2 class="text-lg font-semibold mb-4" style="font-family: var(--heading-font);">
+      Funeral Management
+    </h2>
+
+    <div id="tab-deceased" class="sidebar-link active">🕊️ Deceased Information</div>
+    <div id="tab-nok" class="sidebar-link">👨‍👩‍👧 Next of Kin</div>
+    <div id="tab-type" class="sidebar-link">⚰️ Funeral Type</div>
+    <div id="tab-service" class="sidebar-link">⛪ Service & Burial / Cremation</div>
+    <div id="tab-repat" class="sidebar-link">✈️ Shipment / Repatriation</div>
+    <div id="tab-costs" class="sidebar-link">💵 Funeral Costs</div>
+    <div id="tab-docs" class="sidebar-link">📄 Documents & Uploads</div>
+    <div id="tab-pdf" class="sidebar-link">📝 PDF Auto-Fill</div>
+    <div id="tab-review" class="sidebar-link">✅ Review & Submit</div>
+
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="ml-64 w-full px-10 py-10">
+
+    <h1 class="text-3xl font-bold mb-8" style="font-family: var(--heading-font);">
+      Create New Funeral Record
+    </h1>
+
+    <!-- CONTENT SLOT FOR EACH SECTION -->
+    <div id="content-area">
+
+      <!-- PART 2 WILL BE INSERTED HERE -->
+      <div id="section-deceased" class="fade-section show">
+<div class="content-card">
+
+  <h2 class="text-2xl font-semibold mb-6" style="font-family: var(--heading-font);">
+    🕊️ Deceased Information
+  </h2>
+
+  <!-- PHOTO UPLOAD -->
+  <div class="mb-8">
+    <label class="block font-semibold mb-2">Deceased Photo</label>
+    <div class="flex items-center space-x-6">
+
+      <!-- PREVIEW -->
+      <img id="deceasedPhotoPreview" 
+           src="/placeholder-portrait.png" 
+           class="w-28 h-28 rounded-full object-cover border shadow" />
+
+      <!-- UPLOAD BUTTON -->
+      <div>
+        <input id="deceasedPhoto" type="file" accept="image/*"
+               class="mb-2 block text-sm"
+               onchange="previewImage(this, 'deceasedPhotoPreview')" />
+
+        <button type="button" 
+                onclick="clearImage('deceasedPhoto','deceasedPhotoPreview')"
+                class="text-red-600 underline text-sm">
+          Remove Photo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BASIC INFO -->
+  <div class="grid md:grid-cols-2 gap-6">
+
+    <div>
+      <label class="font-semibold">Full Name</label>
+      <input id="d_fullName" type="text" 
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Alias / Other Names (optional)</label>
+      <input id="d_alias" type="text" 
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Gender</label>
+      <select id="d_gender" 
+              class="mt-1 w-full p-3 border rounded-lg">
+        <option value="">Select…</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="font-semibold">Marital Status</label>
+      <select id="d_maritalStatus" 
+              class="mt-1 w-full p-3 border rounded-lg"
+              onchange="toggleSpouseField()">
+        <option value="">Select…</option>
+        <option>Single</option>
+        <option>Married</option>
+        <option>Widowed</option>
+        <option>Divorced</option>
+        <option>Common-law</option>
+      </select>
+    </div>
+
+    <div id="spouseField" class="hidden">
+      <label class="font-semibold">Spouse Name</label>
+      <input id="d_spouseName" type="text" 
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+  </div>
+
+  <!-- DATES -->
+  <div class="grid md:grid-cols-3 gap-6 mt-8">
+
+    <div>
+      <label class="font-semibold">Date of Birth</label>
+      <input id="d_dob" type="date" 
+             class="mt-1 w-full p-3 border rounded-lg" 
+             onchange="calculateAge()" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Age (auto)</label>
+      <input id="d_age" type="number" readonly
+             class="mt-1 w-full p-3 border rounded-lg bg-gray-100" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Date & Time of Death</label>
+      <input id="d_dod" type="datetime-local" 
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Place of Death</label>
+      <input id="d_placeOfDeath" type="text"
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Country of Death</label>
+      <select id="d_countryOfDeath"
+              class="mt-1 w-full p-3 border rounded-lg">
+        <option value="">Select country…</option>
+      </select>
+    </div>
+
+  </div>
+
+  <!-- RESIDENTIAL INFO -->
+  <h3 class="text-xl font-semibold mt-10 mb-3">Residential Information</h3>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div>
+      <label class="font-semibold">Last Known Address</label>
+      <input id="d_address" type="text"
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Country of Residence</label>
+      <select id="d_countryOfResidence"
+              class="mt-1 w-full p-3 border rounded-lg">
+        <option value="">Select country…</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- LEGAL / MEDICAL INFO -->
+  <h3 class="text-xl font-semibold mt-10 mb-3">Legal & Medical Information</h3>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div>
+      <label class="font-semibold">Cause of Death (optional)</label>
+      <input id="d_cod" type="text"
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Attending Physician</label>
+      <input id="d_physician" type="text"
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Physician Contact</label>
+      <input id="d_physicianContact" type="text"
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="font-semibold">Death Certificate Issued?</label>
+      <select id="d_certificateIssued"
+              class="mt-1 w-full p-3 border rounded-lg"
+              onchange="toggleCertificateNumber()">
+        <option value="">Select…</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
+
+    <div id="certificateNumberField" class="hidden">
+      <label class="font-semibold">Certificate Number</label>
+      <input id="d_certificateNumber" type="text"
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+  </div>
+
+  <!-- IDENTIFICATION -->
+  <h3 class="text-xl font-semibold mt-10 mb-3">Identification Documents</h3>
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div>
+      <label class="font-semibold">ID Type</label>
+      <select id="d_idType" class="mt-1 w-full p-3 border rounded-lg">
+        <option value="">Select…</option>
+        <option>National ID</option>
+        <option>Passport</option>
+        <option>Driver’s License</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="font-semibold">ID Number</label>
+      <input id="d_idNumber" type="text"
+             class="mt-1 w-full p-3 border rounded-lg" />
+    </div>
+
+  </div>
+
+  <!-- ID UPLOADS -->
+  <div class="grid md:grid-cols-2 gap-6 mt-6">
+
+    <!-- ID FRONT -->
+    <div>
+      <label class="font-semibold">ID Front Upload</label>
+      <input id="d_idFront" type="file" accept="image/*"
+             class="mt-1 w-full"
+             onchange="previewImage(this, 'idFrontPreview')" />
+      <img id="idFrontPreview" 
+           src="/placeholder-id.png" 
+           class="mt-2 w-40 rounded border shadow" />
+    </div>
+
+    <!-- ID BACK -->
+    <div>
+      <label class="font-semibold">ID Back Upload</label>
+      <input id="d_idBack" type="file" accept="image/*"
+             class="mt-1 w-full"
+             onchange="previewImage(this, 'idBackPreview')" />
+      <img id="idBackPreview" 
+           src="/placeholder-id.png" 
+           class="mt-2 w-40 rounded border shadow" />
+    </div>
+
+  </div>
+
+</div>
+
+        
+      </div>
+
+      <div id="section-nok" class="fade-section hidden"></div>
+      <div id="section-type" class="fade-section hidden"></div>
+      <div id="section-service" class="fade-section hidden"></div>
+      <div id="section-repat" class="fade-section hidden"></div>
+      <div id="section-costs" class="fade-section hidden"></div>
+      <div id="section-docs" class="fade-section hidden"></div>
+      <div id="section-pdf" class="fade-section hidden"></div>
+      <div id="section-review" class="fade-section hidden"></div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- SIDEBAR SWITCHING SCRIPT -->
+<script>
+  const tabs = [
+    "deceased","nok","type","service","repat","costs","docs","pdf","review"
+  ];
+
+  tabs.forEach(name => {
+    document.getElementById(`tab-${name}`).addEventListener("click", () => {
+
+      // Update sidebar highlight
+      tabs.forEach(n => {
+        document.getElementById(`tab-${n}`).classList.remove("active");
+        document.getElementById(`section-${n}`).classList.add("hidden");
+        document.getElementById(`section-${n}`).classList.remove("show");
+      });
+
+      document.getElementById(`tab-${name}`).classList.add("active");
+
+      const section = document.getElementById(`section-${name}`);
+      section.classList.remove("hidden");
+      setTimeout(() => section.classList.add("show"), 50);
+
+      // Scroll to top of form when switching sections
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+</script>
+<script>
+/* ------------------ IMAGE UPLOAD HANDLING ------------------ */
+function previewImage(input, previewId) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById(previewId).src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage(inputId, previewId) {
+  document.getElementById(inputId).value = "";
+  document.getElementById(previewId).src = "/placeholder-portrait.png";
+}
+
+/* ------------------ AGE CALCULATION ------------------ */
+function calculateAge() {
+  const dob = document.getElementById("d_dob").value;
+  if (!dob) return;
+
+  const birth = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+
+  document.getElementById("d_age").value = age;
+}
+
+/* ------------------ MARITAL STATUS LOGIC ------------------ */
+function toggleSpouseField() {
+  const status = document.getElementById("d_maritalStatus").value;
+  const spouse = document.getElementById("spouseField");
+  if (status === "Married") spouse.classList.remove("hidden");
+  else spouse.classList.add("hidden");
+}
+
+/* ------------------ CERTIFICATE FIELD LOGIC ------------------ */
+function toggleCertificateNumber() {
+  const issued = document.getElementById("d_certificateIssued").value;
+  const field = document.getElementById("certificateNumberField");
+  if (issued === "Yes") field.classList.remove("hidden");
+  else field.classList.add("hidden");
+}
+
+/* ------------------ LOAD COUNTRY DROPDOWNS ------------------ */
+const countries = [
+  "Barbados","United States","United Kingdom","Canada","Jamaica",
+  "Trinidad & Tobago","Guyana","Saint Lucia","Dominica","Grenada",
+  "India","China","Australia","Germany","France","Brazil","Mexico",
+  "Nigeria","Ghana","South Africa","Japan","Spain","Italy","Netherlands"
+]; // Can be replaced with full UN list
+
+function populateCountryFields() {
+  const fields = ["d_countryOfDeath","d_countryOfResidence"];
+  fields.forEach(id => {
+    const field = document.getElementById(id);
+    countries.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      field.appendChild(opt);
+    });
+  });
+}
+
+populateCountryFields();
+</script>
+
+</body>
+</html>
