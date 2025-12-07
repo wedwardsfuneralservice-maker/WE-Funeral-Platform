@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>W.E. Funeral Services – Compassionate Care</title>
 
-  <!-- TailwindCSS -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     /* Background gradient */
     body {
       background: linear-gradient(to bottom right, #0a2a43, #0e4a7e, #eaf4ff);
+      color: white;
+      overflow-x: hidden;
     }
 
-    /* Fade up animation */
+    /* Fade-up animation */
     .fade-up {
       opacity: 0;
       transform: translateY(25px);
@@ -25,7 +27,7 @@
       transform: translateY(0);
     }
 
-    /* Slide right animation */
+    /* Slide-right animation */
     .slide-right {
       opacity: 0;
       transform: translateX(35px);
@@ -36,53 +38,88 @@
       transform: translateX(0);
     }
 
-    /* Services & Platform hover glow */
+    /* Hover glow for cards */
     .card-hover:hover {
       background: white;
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      transition: 0.3s;
+      transform: translateY(-6px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      transition: 0.25s;
     }
 
-    /* Carousel */
-    .carousel-container {
+    /* WAVE DIVIDER */
+    .wave-divider {
+      width: 100%;
+      height: 90px;
+      background: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/soft-ui-design-system/assets/img/curved-images/waves-white.svg');
+      background-size: cover;
+      opacity: 0.8;
+    }
+
+    /* CAROUSEL */
+    .carousel-wrapper {
+      width: 100%;
       overflow: hidden;
       position: relative;
-      width: 100%;
+      padding: 40px 0;
     }
-
     .carousel-track {
       display: flex;
-      transition: transform 0.6s ease;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.7s ease;
+      gap: 40px;
     }
-
-    .carousel-item {
-      min-width: 300px;
-      margin-right: 20px;
+    .carousel-card {
+      width: 260px;
+      height: 340px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      color: #0a2a43;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: all 0.5s ease;
+      transform-origin: center;
     }
-
-    .carousel-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255,255,255,0.8);
+    .carousel-card.active {
+      width: 330px;
+      height: 390px;
+      transform: scale(1.15);
+      z-index: 5;
+    }
+    .carousel-card img {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
       border-radius: 50%;
-      padding: 10px;
-      cursor: pointer;
-      z-index: 20;
+      margin: 0 auto 18px;
+      border: 5px solid white;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
     }
 
-    .carousel-prev { left: -10px; }
-    .carousel-next { right: -10px; }
+    /* Buttons */
+    .carousel-btn {
+      background: #F6C945;
+      padding: 12px 25px;
+      border-radius: 10px;
+      color: #0a2a43;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: 0.2s;
+    }
+    .carousel-btn:hover {
+      background: #ffd54d;
+      transform: translateY(-2px);
+    }
 
   </style>
 </head>
 
-<body class="min-h-screen text-white">
+<body>
 
   <!-- NAVBAR -->
-  <header class="bg-white/40 backdrop-blur-md sticky top-0 z-50 border-b border-blue-300/30 shadow-sm fade-up">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+  <header class="bg-white/30 backdrop-blur-md sticky top-0 z-50 shadow-md fade-up">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <h1 class="text-2xl font-semibold text-white">W.E. Funeral Services</h1>
       <nav class="space-x-6 font-medium">
         <a href="#memorials" class="hover:text-blue-300">Memorials</a>
@@ -94,147 +131,149 @@
     </div>
   </header>
 
-  <!-- HERO — USING YOUR IMAGE -->
-  <section class="relative h-[70vh] flex items-center justify-center bg-cover bg-center"
-      style="background-image:url('hearse-banner.jpg');">
+  <!-- HERO -->
+  <section class="relative h-[70vh] bg-cover bg-center flex items-center justify-center"
+           style="background-image:url('hearse-banner.jpg');">
     <div class="absolute inset-0 bg-blue-900/50"></div>
 
-    <div class="relative z-10 text-center max-w-2xl px-4 fade-up">
-      <h2 class="text-5xl font-bold text-white slide-right">
-        Compassionate Care When You Need It Most
-      </h2>
-      <p class="text-xl text-blue-100 mt-3 slide-right">
-        Providing dignified funeral services with compassion and professionalism.
-      </p>
+    <div class="relative z-10 text-center px-4">
+      <h2 class="text-5xl font-bold slide-right">Compassionate Care When You Need It Most</h2>
+      <p class="text-xl text-blue-100 mt-3 slide-right">Providing dignified funeral services with compassion.</p>
     </div>
   </section>
 
-  <!-- RECENT MEMORIALS — NOW AT TOP -->
+  <!-- WAVE DIVIDER -->
+  <div class="wave-divider"></div>
+
+  <!-- RECENT MEMORIALS -->
   <section id="memorials" class="max-w-7xl mx-auto py-20 px-6 fade-up">
     <h3 class="text-3xl font-bold text-white mb-4 slide-right">Recent Memorials</h3>
 
     <!-- SEARCH BAR -->
-    <div class="mb-8">
-      <input id="memorialSearch" type="text"
-             placeholder="Search memorials..."
-             class="w-full max-w-md px-4 py-3 rounded-lg text-blue-900 shadow-md">
-    </div>
+    <input id="searchInput" type="text"
+      placeholder="Search memorials..."
+      class="w-full max-w-md px-4 py-3 rounded-lg text-blue-900 mb-10 shadow-lg">
 
     <!-- CAROUSEL -->
-    <div class="carousel-container">
-
-      <button class="carousel-btn carousel-prev">◀</button>
-      <button class="carousel-btn carousel-next">▶</button>
-
+    <div class="carousel-wrapper">
       <div id="carouselTrack" class="carousel-track">
 
-        <!-- ITEM 1 -->
-        <div class="carousel-item rounded-xl overflow-hidden shadow-md bg-white/80 text-blue-900">
-          <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover">
-          <div class="p-4">
-            <h4 class="text-xl font-semibold">John Doe</h4>
-            <p class="text-sm text-blue-700">Sunrise – Sunset</p>
-          </div>
+        <!-- CARD TEMPLATE EXAMPLE -->
+        <div class="carousel-card active">
+          <img src="https://via.placeholder.com/300" />
+          <h4 class="font-bold text-xl">John Doe</h4>
+          <p class="text-blue-700 mt-1">Sunrise – Sunset</p>
         </div>
 
-        <!-- ITEM 2 -->
-        <div class="carousel-item rounded-xl overflow-hidden shadow-md bg-white/80 text-blue-900">
-          <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover">
-          <div class="p-4">
-            <h4 class="text-xl font-semibold">Mary Ann</h4>
-            <p class="text-sm text-blue-700">Sunrise – Sunset</p>
-          </div>
+        <div class="carousel-card">
+          <img src="https://via.placeholder.com/300" />
+          <h4 class="font-bold text-xl">Mary Ann</h4>
+          <p class="text-blue-700 mt-1">Sunrise – Sunset</p>
         </div>
 
-        <!-- ITEM 3 -->
-        <div class="carousel-item rounded-xl overflow-hidden shadow-md bg-white/80 text-blue-900">
-          <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover">
-          <div class="p-4">
-            <h4 class="text-xl font-semibold">Samuel Green</h4>
-            <p class="text-sm text-blue-700">Sunrise – Sunset</p>
-          </div>
+        <div class="carousel-card">
+          <img src="https://via.placeholder.com/300" />
+          <h4 class="font-bold text-xl">Samuel Green</h4>
+          <p class="text-blue-700 mt-1">Sunrise – Sunset</p>
+        </div>
+
+        <div class="carousel-card">
+          <img src="https://via.placeholder.com/300" />
+          <h4 class="font-bold text-xl">Lydia James</h4>
+          <p class="text-blue-700 mt-1">Sunrise – Sunset</p>
+        </div>
+
+        <div class="carousel-card">
+          <img src="https://via.placeholder.com/300" />
+          <h4 class="font-bold text-xl">Peter Clarke</h4>
+          <p class="text-blue-700 mt-1">Sunrise – Sunset</p>
         </div>
 
       </div>
+
+      <!-- BUTTONS -->
+      <div class="flex justify-center gap-6 mt-10">
+        <button id="prevBtn" class="carousel-btn">Previous</button>
+        <button id="nextBtn" class="carousel-btn">Next</button>
+      </div>
     </div>
   </section>
+
+  <!-- WAVE DIVIDER -->
+  <div class="wave-divider"></div>
 
   <!-- SERVICES -->
-  <section id="services" class="py-20 border-t border-blue-300/30 fade-up">
-    <div class="max-w-6xl mx-auto px-6">
-      <h3 class="text-3xl font-bold text-white mb-10 slide-right">Our Services</h3>
+  <section id="services" class="max-w-7xl mx-auto py-20 px-6 fade-up">
+    <h3 class="text-3xl font-bold mb-10 slide-right">Our Services</h3>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+    <div class="grid md:grid-cols-3 gap-10">
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+        <h4 class="text-xl font-semibold mb-3">Funeral Arrangements</h4>
+        <p>Planning and coordinating meaningful services.</p>
+      </div>
 
-        <div class="p-6 rounded-xl shadow-lg border bg-white/70 text-blue-900 card-hover fade-up">
-          <h4 class="text-xl font-semibold mb-3">Funeral Arrangements</h4>
-          <p>Planning and coordinating meaningful services.</p>
-        </div>
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+        <h4 class="text-xl font-semibold mb-3">Memorial Services</h4>
+        <p>Honouring cherished memories with dignity.</p>
+      </div>
 
-        <div class="p-6 rounded-xl shadow-lg border bg-white/70 text-blue-900 card-hover fade-up">
-          <h4 class="text-xl font-semibold mb-3">Memorial Services</h4>
-          <p>Honouring cherished memories with dignity.</p>
-        </div>
-
-        <div class="p-6 rounded-xl shadow-lg border bg-white/70 text-blue-900 card-hover fade-up">
-          <h4 class="text-xl font-semibold mb-3">Pre-Planning</h4>
-          <p>Plan ahead with clarity and peace of mind.</p>
-        </div>
-
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+        <h4 class="text-xl font-semibold mb-3">Pre-Planning</h4>
+        <p>Plan ahead with clarity and peace of mind.</p>
       </div>
     </div>
   </section>
 
-  <!-- PLATFORM PROMOTION -->
-  <section id="platform" class="py-20 fade-up">
-    <div class="max-w-6xl mx-auto px-6">
-      <h3 class="text-3xl font-bold text-white mb-10 slide-right">W.E. Funeral Platform</h3>
+  <!-- WAVE DIVIDER -->
+  <div class="wave-divider"></div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  <!-- PLATFORM -->
+  <section id="platform" class="max-w-7xl mx-auto py-20 px-6 fade-up">
+    <h3 class="text-3xl font-bold mb-10 slide-right">W.E. Funeral Platform</h3>
 
-        <div class="p-6 rounded-xl bg-white/70 text-blue-900 shadow-lg card-hover fade-up">
-          <h4 class="text-xl font-semibold mb-3">Multi-Tenant Console</h4>
-          <p>Manage multiple funeral homes in one place.</p>
-        </div>
+    <div class="grid md:grid-cols-3 gap-10">
 
-        <div class="p-6 rounded-xl bg-white/70 text-blue-900 shadow-lg card-hover fade-up">
-          <h4 class="text-xl font-semibold mb-3">Memorial Page Builder</h4>
-          <p>Create beautiful obituary pages.</p>
-        </div>
-
-        <div class="p-6 rounded-xl bg-white/70 text-blue-900 shadow-lg card-hover fade-up">
-          <h4 class="text-xl font-semibold mb-3">PDF Automation</h4>
-          <p>Generate funeral documents instantly.</p>
-        </div>
-
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+        <h4 class="font-semibold text-xl mb-3">Multi-Tenant Console</h4>
+        Manage multiple funeral homes easily.
       </div>
 
-      <div class="mt-10">
-        <a href="/" class="bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-lg shadow-lg text-white">
-          Learn More →
-        </a>
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+        <h4 class="font-semibold text-xl mb-3">Memorial Page Builder</h4>
+        Create beautiful obituary pages.
       </div>
+
+      <div class="p-6 rounded-xl bg-white/80 text-blue-900 card-hover">
+        <h4 class="font-semibold text-xl mb-3">PDF Automation</h4>
+        Generate funeral documents instantly.
+      </div>
+
+    </div>
+
+    <div class="mt-10">
+      <a href="/" class="px-8 py-3 bg-blue-700 hover:bg-blue-800 rounded-lg shadow-lg">
+        Learn More →
+      </a>
     </div>
   </section>
 
-  <!-- ABOUT (now at bottom) -->
-  <section id="about" class="max-w-6xl mx-auto py-20 px-6 fade-up">
-    <h3 class="text-3xl font-bold text-white mb-6 slide-right">About Us</h3>
+  <!-- WAVE DIVIDER -->
+  <div class="wave-divider"></div>
 
-    <p class="text-lg text-white/90 max-w-3xl">
+  <!-- ABOUT US -->
+  <section id="about" class="max-w-7xl mx-auto py-20 px-6 fade-up">
+    <h3 class="text-3xl font-bold mb-6 slide-right">About Us</h3>
+    <p class="max-w-3xl text-white/90 text-lg">
       At W.E. Funeral Services, we support families with compassion and dignity.
-      Our team is dedicated to honouring every life with meaningful services.
     </p>
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-white/40 backdrop-blur-md text-blue-900 py-8 mt-12 border-t border-blue-200 fade-up">
-    <div class="max-w-6xl mx-auto px-6 text-center">
-      © 2025 W.E. Funeral Services — All Rights Reserved.
-    </div>
+  <footer class="bg-white/20 backdrop-blur-md text-blue-900 py-8 text-center border-t border-blue-200">
+    © 2025 W.E. Funeral Services — All Rights Reserved.
   </footer>
 
-  <!-- INTERSECTION OBSERVER ANIMATIONS -->
+  <!-- ANIMATION SCRIPT -->
   <script>
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -245,32 +284,40 @@
     document.querySelectorAll(".fade-up, .slide-right").forEach(el => observer.observe(el));
   </script>
 
-  <!-- CAROUSEL + SEARCH LOGIC -->
+  <!-- CAROUSEL LOGIC -->
   <script>
     const track = document.querySelector("#carouselTrack");
-    const nextBtn = document.querySelector(".carousel-next");
-    const prevBtn = document.querySelector(".carousel-prev");
-    let index = 0;
+    const cards = Array.from(document.querySelectorAll(".carousel-card"));
+    const nextBtn = document.querySelector("#nextBtn");
+    const prevBtn = document.querySelector("#prevBtn");
 
-    nextBtn.onclick = () => {
-      index++;
-      track.style.transform = `translateX(-${index * 320}px)`;
-    };
+    let currentIndex = 0;
 
-    prevBtn.onclick = () => {
-      index = Math.max(0, index - 1);
-      track.style.transform = `translateX(-${index * 320}px)`;
-    };
-
-    // Search filter
-    const searchInput = document.querySelector("#memorialSearch");
-    searchInput.addEventListener("input", () => {
-      const query = searchInput.value.toLowerCase();
-      document.querySelectorAll(".carousel-item").forEach(item => {
-        const name = item.querySelector("h4").innerText.toLowerCase();
-        item.style.display = name.includes(query) ? "block" : "none";
+    function updateCarousel() {
+      cards.forEach((card, i) => {
+        card.classList.remove("active");
+        if (i === currentIndex) card.classList.add("active");
       });
+
+      const offset = (currentIndex - 2) * -300;
+      track.style.transform = `translateX(${offset}px)`;
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % cards.length;
+      updateCarousel();
     });
+
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+      updateCarousel();
+    });
+
+    // Auto-slide (4 seconds)
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % cards.length;
+      updateCarousel();
+    }, 4000);
   </script>
 
 </body>
