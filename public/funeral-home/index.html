@@ -5,20 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>W.E. Funeral Services – Compassionate Care</title>
 
-  <!-- Tailwind -->
+  <!-- TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+    /* Background gradient */
     body {
-      background: linear-gradient(
-        to bottom right,
-        #0a2a43,
-        #0e4a7e,
-        #eaf4ff
-      );
-      color: #1a2a3a;
+      background: linear-gradient(to bottom right, #0a2a43, #0e4a7e, #eaf4ff);
     }
 
+    /* Fade up animation */
     .fade-up {
       opacity: 0;
       transform: translateY(25px);
@@ -29,194 +25,252 @@
       transform: translateY(0);
     }
 
-    .fade-in {
+    /* Slide right animation */
+    .slide-right {
       opacity: 0;
-      transition: opacity 1s ease;
+      transform: translateX(35px);
+      transition: all 0.9s ease;
     }
-    .fade-in.show {
+    .slide-right.show {
       opacity: 1;
+      transform: translateX(0);
     }
+
+    /* Services & Platform hover glow */
+    .card-hover:hover {
+      background: white;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: 0.3s;
+    }
+
+    /* Carousel */
+    .carousel-container {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.6s ease;
+    }
+
+    .carousel-item {
+      min-width: 300px;
+      margin-right: 20px;
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    .carousel-prev { left: -10px; }
+    .carousel-next { right: -10px; }
+
   </style>
 </head>
 
-<body class="min-h-screen">
+<body class="min-h-screen text-white">
 
   <!-- NAVBAR -->
-  <header id="navbar" class="fade-in bg-white/40 backdrop-blur-md sticky top-0 z-50 border-b border-blue-300/30 shadow-sm">
+  <header class="bg-white/40 backdrop-blur-md sticky top-0 z-50 border-b border-blue-300/30 shadow-sm fade-up">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-      <h1 class="text-2xl font-semibold tracking-wide text-white">
-        W.E. Funeral Services
-      </h1>
-
-      <nav class="space-x-6 text-white font-medium">
-        <a href="#about" class="hover:text-blue-200">About</a>
-        <a href="#services" class="hover:text-blue-200">Services</a>
-        <a href="#platform" class="hover:text-blue-200">Platform</a>
-        <a href="#memorials" class="hover:text-blue-200">Memorials</a>
-        <a href="/" class="hover:text-blue-200">Platform Site</a>
-        <a href="/admin/login.html" class="hover:text-blue-200">Admin</a>
+      <h1 class="text-2xl font-semibold text-white">W.E. Funeral Services</h1>
+      <nav class="space-x-6 font-medium">
+        <a href="#memorials" class="hover:text-blue-300">Memorials</a>
+        <a href="#services" class="hover:text-blue-300">Services</a>
+        <a href="#platform" class="hover:text-blue-300">Platform</a>
+        <a href="#about" class="hover:text-blue-300">About</a>
+        <a href="/" class="hover:text-blue-300">Platform Home</a>
       </nav>
     </div>
   </header>
 
-  <!-- HERO (using NEW image) -->
-  <section class="relative h-[70vh] flex items-center justify-center bg-cover bg-center fade-up"
-    style="background-image:url('/Hearse.png');">
+  <!-- HERO — USING YOUR IMAGE -->
+  <section class="relative h-[70vh] flex items-center justify-center bg-cover bg-center"
+      style="background-image:url('hearse-banner.jpg');">
     <div class="absolute inset-0 bg-blue-900/50"></div>
 
     <div class="relative z-10 text-center max-w-2xl px-4 fade-up">
-      <h2 class="text-4xl sm:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+      <h2 class="text-5xl font-bold text-white slide-right">
         Compassionate Care When You Need It Most
       </h2>
-      <p class="text-lg text-blue-100">
-        Providing dignified funeral services with compassion, respect, and professionalism.
+      <p class="text-xl text-blue-100 mt-3 slide-right">
+        Providing dignified funeral services with compassion and professionalism.
       </p>
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section id="about" class="max-w-6xl mx-auto py-20 px-6 fade-up">
-    <h3 class="text-3xl font-bold text-white mb-6">About Us</h3>
+  <!-- RECENT MEMORIALS — NOW AT TOP -->
+  <section id="memorials" class="max-w-7xl mx-auto py-20 px-6 fade-up">
+    <h3 class="text-3xl font-bold text-white mb-4 slide-right">Recent Memorials</h3>
 
-    <p class="text-lg leading-relaxed text-white/90 max-w-3xl">
-      At W.E. Funeral Services, we are committed to supporting families with guidance,
-      dignity, and compassion. Our dedicated team ensures that every service reflects
-      the life, values, and wishes of your loved one.
-    </p>
-  </section>
+    <!-- SEARCH BAR -->
+    <div class="mb-8">
+      <input id="memorialSearch" type="text"
+             placeholder="Search memorials..."
+             class="w-full max-w-md px-4 py-3 rounded-lg text-blue-900 shadow-md">
+    </div>
 
-  <!-- SERVICES -->
-  <section id="services" class="py-20 border-t border-blue-200/40 fade-up">
-    <div class="max-w-6xl mx-auto px-6">
-      <h3 class="text-3xl font-bold text-white mb-10">Our Services</h3>
+    <!-- CAROUSEL -->
+    <div class="carousel-container">
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <button class="carousel-btn carousel-prev">◀</button>
+      <button class="carousel-btn carousel-next">▶</button>
 
-        <div class="p-6 rounded-xl shadow-lg border border-blue-200 bg-white/70 hover:bg-white transition fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">Funeral Arrangements</h4>
-          <p class="text-blue-900/80">Planning and coordinating meaningful funeral services.</p>
+      <div id="carouselTrack" class="carousel-track">
+
+        <!-- ITEM 1 -->
+        <div class="carousel-item rounded-xl overflow-hidden shadow-md bg-white/80 text-blue-900">
+          <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover">
+          <div class="p-4">
+            <h4 class="text-xl font-semibold">John Doe</h4>
+            <p class="text-sm text-blue-700">Sunrise – Sunset</p>
+          </div>
         </div>
 
-        <div class="p-6 rounded-xl shadow-lg border border-blue-200 bg-white/70 hover:bg-white transition fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">Memorial Services</h4>
-          <p class="text-blue-900/80">Honouring cherished memories with dignity and respect.</p>
+        <!-- ITEM 2 -->
+        <div class="carousel-item rounded-xl overflow-hidden shadow-md bg-white/80 text-blue-900">
+          <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover">
+          <div class="p-4">
+            <h4 class="text-xl font-semibold">Mary Ann</h4>
+            <p class="text-sm text-blue-700">Sunrise – Sunset</p>
+          </div>
         </div>
 
-        <div class="p-6 rounded-xl shadow-lg border border-blue-200 bg-white/70 hover:bg-white transition fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">Pre-Planning</h4>
-          <p class="text-blue-900/80">Plan ahead with clarity and confidence for your family.</p>
+        <!-- ITEM 3 -->
+        <div class="carousel-item rounded-xl overflow-hidden shadow-md bg-white/80 text-blue-900">
+          <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover">
+          <div class="p-4">
+            <h4 class="text-xl font-semibold">Samuel Green</h4>
+            <p class="text-sm text-blue-700">Sunrise – Sunset</p>
+          </div>
         </div>
 
       </div>
     </div>
   </section>
 
-  <!-- PLATFORM PROMOTION SECTION -->
+  <!-- SERVICES -->
+  <section id="services" class="py-20 border-t border-blue-300/30 fade-up">
+    <div class="max-w-6xl mx-auto px-6">
+      <h3 class="text-3xl font-bold text-white mb-10 slide-right">Our Services</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+        <div class="p-6 rounded-xl shadow-lg border bg-white/70 text-blue-900 card-hover fade-up">
+          <h4 class="text-xl font-semibold mb-3">Funeral Arrangements</h4>
+          <p>Planning and coordinating meaningful services.</p>
+        </div>
+
+        <div class="p-6 rounded-xl shadow-lg border bg-white/70 text-blue-900 card-hover fade-up">
+          <h4 class="text-xl font-semibold mb-3">Memorial Services</h4>
+          <p>Honouring cherished memories with dignity.</p>
+        </div>
+
+        <div class="p-6 rounded-xl shadow-lg border bg-white/70 text-blue-900 card-hover fade-up">
+          <h4 class="text-xl font-semibold mb-3">Pre-Planning</h4>
+          <p>Plan ahead with clarity and peace of mind.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM PROMOTION -->
   <section id="platform" class="py-20 fade-up">
     <div class="max-w-6xl mx-auto px-6">
-      <h3 class="text-3xl font-bold text-white mb-8">W.E. Funeral Platform</h3>
-
-      <p class="text-white/90 max-w-3xl text-lg mb-8">
-        Our advanced funeral home management platform provides everything you need to run a modern funeral home.  
-        From memorial pages to accounting, scheduling, and document automation, we provide a complete digital solution.
-      </p>
+      <h3 class="text-3xl font-bold text-white mb-10 slide-right">W.E. Funeral Platform</h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-        <div class="p-6 rounded-xl bg-white/70 shadow-lg fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">Multi-Tenant Console</h4>
-          <p class="text-blue-900/80">Manage multiple funeral homes from one interface.</p>
+        <div class="p-6 rounded-xl bg-white/70 text-blue-900 shadow-lg card-hover fade-up">
+          <h4 class="text-xl font-semibold mb-3">Multi-Tenant Console</h4>
+          <p>Manage multiple funeral homes in one place.</p>
         </div>
 
-        <div class="p-6 rounded-xl bg-white/70 shadow-lg fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">Memorial Page Builder</h4>
-          <p class="text-blue-900/80">Create beautiful obituary and tribute pages.</p>
+        <div class="p-6 rounded-xl bg-white/70 text-blue-900 shadow-lg card-hover fade-up">
+          <h4 class="text-xl font-semibold mb-3">Memorial Page Builder</h4>
+          <p>Create beautiful obituary pages.</p>
         </div>
 
-        <div class="p-6 rounded-xl bg-white/70 shadow-lg fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">PDF Automation</h4>
-          <p class="text-blue-900/80">Generate funeral documents instantly from forms.</p>
-        </div>
-
-        <div class="p-6 rounded-xl bg-white/70 shadow-lg fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">Accounting Module</h4>
-          <p class="text-blue-900/80">Track payments, invoices, and funeral costs.</p>
-        </div>
-
-        <div class="p-6 rounded-xl bg-white/70 shadow-lg fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">Appointment Scheduler</h4>
-          <p class="text-blue-900/80">Book viewings, consultations, and funeral services.</p>
-        </div>
-
-        <div class="p-6 rounded-xl bg-white/70 shadow-lg fade-up">
-          <h4 class="text-xl font-semibold text-blue-900 mb-3">Admin Dashboard</h4>
-          <p class="text-blue-900/80">Manage staff, memorials, approvals and settings.</p>
+        <div class="p-6 rounded-xl bg-white/70 text-blue-900 shadow-lg card-hover fade-up">
+          <h4 class="text-xl font-semibold mb-3">PDF Automation</h4>
+          <p>Generate funeral documents instantly.</p>
         </div>
 
       </div>
 
       <div class="mt-10">
-        <a href="/" class="text-white bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-lg shadow-lg transition">
+        <a href="/" class="bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-lg shadow-lg text-white">
           Learn More →
         </a>
       </div>
-
     </div>
   </section>
 
-  <!-- MEMORIALS -->
-  <section id="memorials" class="max-w-7xl mx-auto py-20 px-6 fade-up">
-    <h3 class="text-3xl font-bold text-white mb-10">Recent Memorials</h3>
+  <!-- ABOUT (now at bottom) -->
+  <section id="about" class="max-w-6xl mx-auto py-20 px-6 fade-up">
+    <h3 class="text-3xl font-bold text-white mb-6 slide-right">About Us</h3>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-      <!-- Placeholder cards -->
-      <div class="rounded-xl overflow-hidden shadow-md border border-blue-200 bg-white/70 fade-up">
-        <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover" />
-        <div class="p-5">
-          <h4 class="text-xl font-semibold text-blue-900">Memorial Name</h4>
-          <p class="text-blue-900/80 mb-3">Sunrise – Sunset</p>
-          <a href="#" class="text-blue-700 hover:underline">View Memorial →</a>
-        </div>
-      </div>
-
-      <div class="rounded-xl overflow-hidden shadow-md border border-blue-200 bg-white/70 fade-up">
-        <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover" />
-        <div class="p-5">
-          <h4 class="text-xl font-semibold text-blue-900">Memorial Name</h4>
-          <p class="text-blue-900/80 mb-3">Sunrise – Sunset</p>
-          <a href="#" class="text-blue-700 hover:underline">View Memorial →</a>
-        </div>
-      </div>
-
-      <div class="rounded-xl overflow-hidden shadow-md border border-blue-200 bg-white/70 fade-up">
-        <img src="https://via.placeholder.com/400x300" class="w-full h-48 object-cover" />
-        <div class="p-5">
-          <h4 class="text-xl font-semibold text-blue-900">Memorial Name</h4>
-          <p class="text-blue-900/80 mb-3">Sunrise – Sunset</p>
-          <a href="#" class="text-blue-700 hover:underline">View Memorial →</a>
-        </div>
-      </div>
-    </div>
+    <p class="text-lg text-white/90 max-w-3xl">
+      At W.E. Funeral Services, we support families with compassion and dignity.
+      Our team is dedicated to honouring every life with meaningful services.
+    </p>
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-white/40 backdrop-blur-md text-blue-900 py-8 mt-12 border-t border-blue-200 fade-in">
+  <footer class="bg-white/40 backdrop-blur-md text-blue-900 py-8 mt-12 border-t border-blue-200 fade-up">
     <div class="max-w-6xl mx-auto px-6 text-center">
-      <p>© 2025 W.E. Funeral Services — All Rights Reserved.</p>
+      © 2025 W.E. Funeral Services — All Rights Reserved.
     </div>
   </footer>
 
-  <!-- SCROLL ANIMATIONS -->
+  <!-- INTERSECTION OBSERVER ANIMATIONS -->
   <script>
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("show");
-        }
+        if (entry.isIntersecting) entry.target.classList.add("show");
       });
     }, { threshold: 0.2 });
 
-    document.querySelectorAll(".fade-up, .fade-in").forEach(el => observer.observe(el));
+    document.querySelectorAll(".fade-up, .slide-right").forEach(el => observer.observe(el));
+  </script>
+
+  <!-- CAROUSEL + SEARCH LOGIC -->
+  <script>
+    const track = document.querySelector("#carouselTrack");
+    const nextBtn = document.querySelector(".carousel-next");
+    const prevBtn = document.querySelector(".carousel-prev");
+    let index = 0;
+
+    nextBtn.onclick = () => {
+      index++;
+      track.style.transform = `translateX(-${index * 320}px)`;
+    };
+
+    prevBtn.onclick = () => {
+      index = Math.max(0, index - 1);
+      track.style.transform = `translateX(-${index * 320}px)`;
+    };
+
+    // Search filter
+    const searchInput = document.querySelector("#memorialSearch");
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.toLowerCase();
+      document.querySelectorAll(".carousel-item").forEach(item => {
+        const name = item.querySelector("h4").innerText.toLowerCase();
+        item.style.display = name.includes(query) ? "block" : "none";
+      });
+    });
   </script>
 
 </body>
