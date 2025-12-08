@@ -705,7 +705,7 @@
 <!-- ===================================== -->
 <!-- NOK TEMPLATE (ID front/back + signature) -->
 <!-- ===================================== -->
-<div id="nokContainer" style="display:none;">
+<div id="nokTemplate" style="display:none;">
 
   <div class="nok-card">
 
@@ -1283,6 +1283,24 @@ function recalcPriorities() {
     });
 }
 
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Auto-create the first NOK card on page load
+    const template = document.getElementById("nokTemplate");
+    const container = document.getElementById("nokContainer");
+
+    if (template && container && container.children.length === 0) {
+        const clone = template.cloneNode(true);
+        clone.style.display = "block"; // show first one
+        clone.removeAttribute("id");   // prevent duplicate IDs
+        clone.classList.add("nok-block");
+        container.appendChild(clone);
+    }
+
+});
+
+  
 /* ================================
    Relationship: Show "Other" field
 ================================ */
