@@ -592,6 +592,47 @@
   </div>
 </div>
 
+<!-- Hidden NOK TEMPLATE -->
+<div class="nok-block" id="nokTemplate" style="display:none;">
+    <div class="two-col">
+        
+        <div>
+            <label>Full Name</label>
+            <input type="text" name="nok_fullName[]" required>
+        </div>
+
+        <div>
+            <label>Relationship</label>
+            <select name="nok_relationship[]" required>
+                <option value="">Select…</option>
+                <option>Spouse</option>
+                <option>Child</option>
+                <option>Parent</option>
+                <option>Sibling</option>
+                <option>Relative</option>
+                <option>Friend</option>
+                <option>Other</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Phone</label>
+            <input type="text" name="nok_phone[]" oninput="formatPhone(this)" required>
+        </div>
+
+        <div>
+            <label>Email</label>
+            <input type="email" name="nok_email[]">
+        </div>
+
+        <div>
+            <label>Address</label>
+            <input type="text" name="nok_address[]">
+        </div>
+    </div>
+
+    <button class="remove-nok" onclick="this.parentElement.remove()">Remove</button>
+</div>
 
 
 <!-- SECTION 2 — NEXT OF KIN -->
