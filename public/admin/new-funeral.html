@@ -81,14 +81,14 @@
     }
 
 /* Multi-step visibility control */
-section {
+.form-section, section {
   display: none;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-section.active-step {
+.form-section.active-step, section.active-step {
   display: block;
   opacity: 1;
   transform: translateY(0);
@@ -587,10 +587,7 @@ section.active-step {
       </select>
     </div>
 
-    <!-- Single CLEAN next button -->
-    <div class="full-row next-holder">
-      <button class="next-btn" onclick="goToSection('section-nok')">Next →</button>
-    </div>
+    
 
   </div>
 </div>
