@@ -1071,15 +1071,25 @@ function generateReferenceNumber() {
   let nokCount = 0;
 
 function addNok() {
+    const template = document.getElementById("nokTemplate");
     const container = document.getElementById("nokContainer");
 
-    const clone = document.querySelector(".nok-block").cloneNode(true);
+    if (!template) {
+        console.error("NOK template missing: .nok-block OR #nokTemplate not found.");
+        alert("Developer Error: NOK template missing.");
+        return;
+    }
 
-    // Clear clone inputs
+    const clone = template.cloneNode(true);
+    clone.style.display = "block";
+    clone.removeAttribute("id"); // prevent duplicate IDs
+
+    // Clear fields inside clone
     clone.querySelectorAll("input, select").forEach(i => i.value = "");
 
     container.appendChild(clone);
 }
+
 
 
 function validateNokSection() {
