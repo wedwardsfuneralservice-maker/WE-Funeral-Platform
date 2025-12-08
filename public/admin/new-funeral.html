@@ -609,10 +609,7 @@
     <button class="next-btn" style="background:#10b981;" onclick="addNok()">➕ Add Another Next of Kin</button>
   </div>
 
-  <!-- Step Navigation
-  <div class="full-row next-holder" style="margin-top:40px;"> 
-    <button class="next-btn" onclick="validateNokSection()">Next →</button>
-  </div> -->
+ 
 </section>
 
 <!-- SECTION 3 — FUNERAL TYPE -->
@@ -1182,12 +1179,10 @@ function validateNokSection() {
         }
     }
 
-    // YOUR REAL NAVIGATION FUNCTION
-    goTo("section-funeral-type");
+    // PROPER MULTISTEP NAVIGATION
+    showStep(2);
 }
 
-
-}
 </script>
 </body>
 </html>
