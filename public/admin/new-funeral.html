@@ -601,14 +601,14 @@
     List primary and secondary contact persons responsible for arrangements.
   </p>
 
- <!-- NOK Container (Dynamic Items Will Be Inserted Here) -->
-  <div id="nokContainer"></div>
+<div id="nokContainer">
+        <!-- NOK BLOCKS HERE (your existing layout stays the same) -->
+    </div>
 
-  <!-- Add NOK Button -->
-  <div style="margin-top:20px;">
-    <button class="next-btn" style="background:#10b981;" onclick="addNok()">➕ Add Another Next of Kin</button>
-  </div>
-
+    <!-- ADD NOK BUTTON (LEFT ALIGNED) -->
+    <div style="margin: 20px 0;">
+        <button class="green-btn" onclick="addNok()">＋ Add Another Next of Kin</button>
+    </div>
  
 </section>
 
@@ -816,20 +816,31 @@ function injectStepButtons(index) {
     nav.appendChild(spacer);
   }
 
-  // Next button
-  if (index < sections.length - 1) {
-    const next = document.createElement("button");
-    next.className = "step-btn primary";
-    next.textContent = "Next →";
-    next.onclick = () => showStep(index + 1);
-    nav.appendChild(next);
+// Next button
+if (index < sections.length - 1) {
+  const next = document.createElement("button");
+  next.className = "step-btn primary";
+  next.textContent = "Next →";
+
+  // SPECIAL HANDLING FOR NEXT OF KIN (section index = 1)
+  if (index === 1) {
+    next.onclick = () => validateNokSection();
   } else {
-    const finish = document.createElement("button");
-    finish.className = "step-btn primary";
-    finish.textContent = "Submit Record";
-    finish.onclick = () => alert("Submitting final funeral record…");
-    nav.appendChild(finish);
+    next.onclick = () => showStep(index + 1);
   }
+
+  nav.appendChild(next);
+
+} else {
+
+  const finish = document.createElement("button");
+  finish.className = "step-btn primary";
+  finish.textContent = "Submit Record";
+  finish.onclick = () => alert("Submitting final funeral record…");
+  nav.appendChild(finish);
+
+}
+
 
   section.appendChild(nav);
 }
@@ -1017,147 +1028,16 @@ function generateReferenceNumber() {
   let nokCount = 0;
 
 function addNok() {
-    nokCount++;
-
     const container = document.getElementById("nokContainer");
 
-    const block = document.createElement("div");
-    block.classList.add("nok-block");
-    block.style.marginBottom = "40px";
-    block.dataset.index = nokCount;
+    const clone = document.querySelector(".nok-block").cloneNode(true);
 
-    block.innerHTML = `
-      <div class="form-grid">
+    // Clear clone inputs
+    clone.querySelectorAll("input, select").forEach(i => i.value = "");
 
-        <div class="full-row">
-          <h3 style="margin-bottom:10px;">Next of Kin #${nokCount}</h3>
-        </div>
-
-        <!-- NOK Full Name -->
-        <div>
-          <div class="label-chip">Full Name</div>
-          <input class="form-input short nok_fullName" type="text" required>
-        </div>
-
-        <!-- NOK Relationship -->
-        <div>
-          <div class="label-chip">Relationship</div>
-          <select class="form-select short nok_relationship" required>
-            <option value="">Select…</option>
-            <option>Spouse</option>
-            <option>Child</option>
-            <option>Sibling</option>
-            <option>Parent</option>
-            <option>Relative</option>
-            <option>Friend</option>
-            <option>Guardian</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <!-- Alias -->
-        <div>
-          <div class="label-chip">Alias / Other Names</div>
-          <input class="form-input short nok_alias" type="text">
-        </div>
-
-        <!-- Gender -->
-        <div>
-          <div class="label-chip">Gender</div>
-          <select class="form-select short nok_gender">
-            <option value="">Select…</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <!-- Phone -->
-        <div>
-          <div class="label-chip">Primary Phone</div>
-          <input class="form-input short nok_phone" type="tel" oninput="formatPhone(this)" required>
-        </div>
-
-        <!-- Secondary Phone -->
-        <div>
-          <div class="label-chip">Alternate Phone</div>
-          <input class="form-input short nok_altPhone" type="tel" oninput="formatPhone(this)">
-        </div>
-
-        <!-- Email -->
-        <div>
-          <div class="label-chip">Email Address</div>
-          <input class="form-input short nok_email" type="email">
-        </div>
-
-        <!-- Address -->
-        <div>
-          <div class="label-chip">Home Address</div>
-          <input class="form-input short nok_address" type="text" required>
-        </div>
-
-        <!-- Country -->
-        <div>
-          <div class="label-chip">Country</div>
-          <select class="form-select short nok_country" required>
-            <option value="">Select…</option>
-            <option>Barbados</option>
-            <option>Trinidad & Tobago</option>
-            <option>Jamaica</option>
-            <option>United States</option>
-            <option>Canada</option>
-            <option>United Kingdom</option>
-          </select>
-        </div>
-
-        <!-- ID Front -->
-        <div>
-          <div class="label-chip">ID Front</div>
-          <img class="small-id nok_idFrontPreview">
-          <input type="file" onchange="previewImage(this, this.previousElementSibling)">
-        </div>
-
-        <!-- ID Back -->
-        <div>
-          <div class="label-chip">ID Back</div>
-          <img class="small-id nok_idBackPreview">
-          <input type="file" onchange="previewImage(this, this.previousElementSibling)">
-        </div>
-
-        <!-- Authority -->
-        <div>
-          <div class="label-chip">Legal Authority to Act?</div>
-          <select class="form-select short nok_authority" required>
-            <option value="">Select…</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
-        </div>
-
-        <!-- Notes -->
-        <div>
-          <div class="label-chip">Notes</div>
-          <textarea class="form-input short nok_notes" style="height:90px;"></textarea>
-        </div>
-
-        <!-- Consent -->
-        <div class="full-row">
-          <label style="display:flex; align-items:center; gap:10px; margin-top:15px;">
-            <input type="checkbox" class="nok_consent" required>
-            <span>This person confirms the information is accurate and they consent to act as NOK.</span>
-          </label>
-        </div>
-
-        <!-- Remove Button -->
-        <div class="full-row" style="margin-top:20px;">
-          <button class="next-btn" style="background:#dc2626;" onclick="removeNok(this)">❌ Remove This NOK</button>
-        </div>
-
-      </div>
-    `;
-
-    container.appendChild(block);
+    container.appendChild(clone);
 }
+
 
 function validateNokSection() {
     const blocks = document.querySelectorAll(".nok-block");
