@@ -655,52 +655,7 @@
 <!-- CO-PAYER TEMPLATE (No ID)     -->
 <!-- ============================= -->
 
-<div id="copayerTemplate" style="display:none;">
-  <div class="nok-card copayer-card">
 
-      <h3 class="nok-title">Co-Payer</h3>
-
-      <div class="nok-grid">
-
-          <div>
-              <label>Full Name *</label>
-              <input type="text" name="copayer_fullName[]" required>
-          </div>
-
-          <div>
-              <label>Relationship *</label>
-              <select name="copayer_relationship[]" required>
-                  <option value="">Select…</option>
-                  <option>Spouse</option>
-                  <option>Child</option>
-                  <option>Parent</option>
-                  <option>Relative</option>
-                  <option>Friend</option>
-                  <option value="other">Other</option>
-              </select>
-          </div>
-
-          <div>
-              <label>Phone *</label>
-              <input type="text" name="copayer_phone[]" oninput="formatPhone(this)" required>
-          </div>
-
-          <div>
-              <label>Email</label>
-              <input type="email" name="copayer_email[]">
-          </div>
-
-          <div>
-              <label>Address</label>
-              <input type="text" name="copayer_address[]">
-          </div>
-
-      </div>
-
-      <button type="button" class="remove-nok" onclick="removeNok(this)">Remove</button>
-
-  </div>
-</div>
 
 <!-- ===================================== -->
 <!-- NOK TEMPLATE (ID front/back + signature) -->
@@ -720,26 +675,31 @@
         </div>
 
         <!-- Relationship -->
-        <div>
-            <label>Relationship *</label>
-            <select name="nok_relationship[]" onchange="toggleOtherRelationship(this)" required>
-                <option value="">Select…</option>
-                <option>Spouse</option>
-                <option>Child</option>
-                <option>Parent</option>
-                <option>Sibling</option>
-                <option>Relative</option>
-                <option>Friend</option>
-                <option>Care-giver</option>
-                <option value="other">Other</option>
-            </select>
-        </div>
+       <div class="relationship-wrapper">
+    <label>Relationship *</label>
+    <div class="relationship-row">
+        <select name="nok_relationship[]" onchange="toggleOtherRelationship(this)" required>
+            <option value="">Select…</option>
+            <option>Spouse</option>
+            <option>Child</option>
+            <option>Parent</option>
+            <option>Sibling</option>
+            <option>Relative</option>
+            <option>Friend</option>
+            <option>Care-giver</option>
+            <option value="other">Other</option>
+        </select>
 
-        <!-- OTHER relationship field -->
-        <div class="nok-other-field" style="display:none;">
-            <label>Please specify *</label>
-            <input type="text" name="nok_otherText[]">
-        </div>
+        <input 
+            type="text" 
+            class="other-input" 
+            name="nok_otherText[]" 
+            placeholder="Please specify…" 
+            style="display:none;"
+            required
+        >
+    </div>
+</div>
 
         <!-- Phone -->
         <div>
@@ -792,7 +752,52 @@
     </select>
 </div>
 
-    <button type="button" class="remove-nok" onclick="removeNok(this)">Remove</button>
+  <div id="copayerTemplate" style="display:none;">
+  <div class="nok-card copayer-card">
+
+      <h3 class="nok-title">Co-Payer</h3>
+
+      <div class="nok-grid">
+
+          <div>
+              <label>Full Name *</label>
+              <input type="text" name="copayer_fullName[]" required>
+          </div>
+
+          <div>
+              <label>Relationship *</label>
+              <select name="copayer_relationship[]" required>
+                  <option value="">Select…</option>
+                  <option>Spouse</option>
+                  <option>Child</option>
+                  <option>Parent</option>
+                  <option>Relative</option>
+                  <option>Friend</option>
+                  <option value="other">Other</option>
+              </select>
+          </div>
+
+          <div>
+              <label>Phone *</label>
+              <input type="text" name="copayer_phone[]" oninput="formatPhone(this)" required>
+          </div>
+
+          <div>
+              <label>Email</label>
+              <input type="email" name="copayer_email[]">
+          </div>
+
+          <div>
+              <label>Address</label>
+              <input type="text" name="copayer_address[]">
+          </div>
+
+      </div>
+
+      <button type="button" class="remove-nok" onclick="removeNok(this)">Remove</button>
+
+  </div>
+</div>
 
   </div>
 
@@ -1259,6 +1264,21 @@ function addNok() {
     recalcPriorities();
 }
 
+function toggleOtherRelationship(sel) {
+    const row = sel.closest(".relationship-row");
+    const otherInput = row.querySelector(".other-input");
+
+    if (sel.value === "other") {
+        otherInput.style.display = "block";
+        otherInput.required = true;
+    } else {
+        otherInput.style.display = "none";
+        otherInput.required = false;
+        otherInput.value = "";
+    }
+}
+
+  
 function removeNok(btn) {
     btn.parentElement.remove();
     recalcPriorities();
