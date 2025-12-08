@@ -276,6 +276,138 @@ section.active-step {
       border: 1px solid var(--border-subtle-light);
       box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
     }
+
+    <style>
+
+/* =========================
+   FORM LAYOUT CONTAINER
+========================= */
+.form-section {
+  background: rgba(255,255,255,0.04);
+  padding: 28px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 32px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+/* Section Title */
+.form-section h2 {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+/* Section subtitle */
+.form-section p {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 18px;
+}
+
+/* =========================
+   CLASSIC TWO-COLUMN GRID
+========================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 30px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+/* =========================
+   LABEL CHIP STYLE
+========================= */
+.label-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  font-size: 13px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* =========================
+   INPUT FIELD STYLING
+========================= */
+.form-input, 
+.form-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: white;
+  color: #111;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+}
+
+.form-input:focus, 
+.form-select:focus {
+  border-color: #306cde;
+  box-shadow: 0 0 0 2px rgba(48,108,222,0.25);
+}
+
+/* =========================
+   PORTRAIT + ID IMAGES
+========================= */
+.photo-center {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin: 15px 0 25px;
+}
+
+.portrait-wrapper {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 10px;
+  border-radius: 100%;
+  border: 2px solid rgba(255,255,255,0.4);
+  overflow: hidden;
+  background: rgba(255,255,255,0.15);
+}
+
+.portrait-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Small ID preview */
+.small-id {
+  width: 90px;
+  height: 60px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.25);
+  object-fit: cover;
+}
+
+/* =========================
+   NEXT BUTTON ALIGNMENT
+========================= */
+.next-btn {
+  background: #306CDE;
+  padding: 12px 26px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  margin-top: 20px;
+  cursor: pointer;
+  float: right;
+  box-shadow: 0 8px 20px rgba(48,108,222,0.4);
+}
+
+.next-btn:hover {
+  background: #3e7cff;
+}
+</style>
+
   </style>
 </head>
 
@@ -349,97 +481,73 @@ section.active-step {
     Enter full legal and identification information for the deceased.
   </p>
 
-  <!-- ============================== -->
-  <!-- REFERENCE + FUNERAL DIRECTOR -->
-  <!-- ============================== -->
-  <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 25px;">
-    
+  <div class="form-section" id="section-deceased">
+
+  <h2>🕊️ Deceased Information</h2>
+  <p>Enter full legal and identification information for the deceased.</p>
+
+  <div class="form-grid">
+
+    <!-- ===========================
+         PORTRAIT PHOTO (CENTER)
+    ============================ -->
+    <div class="photo-center">
+      <div class="portrait-wrapper">
+        <img id="portraitPreview" src="" alt="">
+      </div>
+      <div class="label-chip">Portrait Photo</div>
+      <input type="file" onchange="previewImage(this,'portraitPreview')" />
+    </div>
+
+    <!-- ===========================
+         REFERENCE + FUNERAL DIRECTOR
+    ============================ -->
     <div>
-      <label class="font-semibold">Reference Number</label>
-      <input id="d_refNumber" type="text" readonly 
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a; border:1px solid rgba(148,163,184,0.35); color:white;">
+      <div class="label-chip">Reference Number</div>
+      <input id="refNumber" class="form-input" readonly />
     </div>
 
     <div>
-      <label class="font-semibold">Responsible Funeral Director</label>
-      <select id="d_funeralDirector"
-              class="w-full p-3 rounded-md"
-              style="background:#0f172a; border:1px solid rgba(148,163,184,0.35); color:white;">
+      <div class="label-chip">Responsible Funeral Director</div>
+      <select id="funeralDirector" class="form-select">
         <option value="">Select…</option>
-        <option>Carl Brathwaite</option>
-        <option>Winston Edwards</option>
+        <option value="Carl Brathwaite">Carl Brathwaite</option>
+        <option value="Winston Edwards">Winston Edwards</option>
       </select>
     </div>
 
-  </div>
-
-  <!-- ============================== -->
-  <!-- PHOTOS: Portrait + ID uploads -->
-  <!-- ============================== -->
-  <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 35px;">
-
-    <!-- Portrait -->
+    <!-- ===========================
+         ID FRONT + ID BACK
+    ============================ -->
     <div>
-      <label class="font-semibold block mb-2">Portrait Photo</label>
-      <img id="deceasedPhotoPreview"
-           src="/placeholder-portrait.png"
-           style="width:120px; height:120px; object-fit:cover; border-radius:999px; border:2px solid rgba(255,255,255,0.2); margin-bottom:8px;">
-      <input id="deceasedPhoto" type="file" accept="image/*"
-             onchange="previewImage(this,'deceasedPhotoPreview')"
-             style="color:white;">
-    </div>
-
-    <!-- ID Front -->
-    <div>
-      <label class="font-semibold block mb-2">ID Front</label>
-      <img id="idFrontPreview"
-           src="/placeholder-id.png"
-           style="width:160px; border-radius:8px; border:1px solid rgba(255,255,255,0.3); margin-bottom:8px;">
-      <input id="d_idFront" type="file" accept="image/*"
-             onchange="previewImage(this,'idFrontPreview')"
-             style="color:white;">
-    </div>
-
-    <!-- ID Back -->
-    <div>
-      <label class="font-semibold block mb-2">ID Back</label>
-      <img id="idBackPreview"
-           src="/placeholder-id.png"
-           style="width:160px; border-radius:8px; border:1px solid rgba(255,255,255,0.3); margin-bottom:8px;">
-      <input id="d_idBack" type="file" accept="image/*"
-             onchange="previewImage(this,'idBackPreview')"
-             style="color:white;">
-    </div>
-
-  </div>
-
-  <!-- ============================== -->
-  <!-- PERSONAL DETAILS -->
-  <!-- ============================== -->
-  <h3 class="text-xl font-semibold mb-3">Personal Details</h3>
-
-  <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom:25px;">
-
-    <div>
-      <label class="font-semibold">Full Name</label>
-      <input id="d_fullName" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a; border:1px solid rgba(148,163,184,0.35); color:white;">
+      <div class="label-chip">ID Front</div>
+      <img id="idFrontPreview" class="small-id" />
+      <input type="file" onchange="previewImage(this,'idFrontPreview')" />
     </div>
 
     <div>
-      <label class="font-semibold">Alias / Other Names</label>
-      <input id="d_alias" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
+      <div class="label-chip">ID Back</div>
+      <img id="idBackPreview" class="small-id" />
+      <input type="file" onchange="previewImage(this,'idBackPreview')" />
+    </div>
+
+    <!-- ===========================
+         PERSONAL DETAILS
+    ============================ -->
+
+    <div>
+      <div class="label-chip">Full Name</div>
+      <input id="fullName" class="form-input" type="text" />
     </div>
 
     <div>
-      <label class="font-semibold">Gender</label>
-      <select id="d_gender"
-              class="w-full p-3 rounded-md"
-              style="background:#0f172a;">
+      <div class="label-chip">Alias / Other Names</div>
+      <input id="alias" class="form-input" type="text" />
+    </div>
+
+    <div>
+      <div class="label-chip">Gender</div>
+      <select id="gender" class="form-select">
         <option value="">Select…</option>
         <option>Male</option>
         <option>Female</option>
@@ -448,155 +556,56 @@ section.active-step {
     </div>
 
     <div>
-      <label class="font-semibold">Marital Status</label>
-      <select id="d_maritalStatus"
-              class="w-full p-3 rounded-md"
-              onchange="toggleSpouseField()"
-              style="background:#0f172a;">
+      <div class="label-chip">Marital Status</div>
+      <select id="maritalStatus" class="form-select">
         <option value="">Select…</option>
         <option>Single</option>
         <option>Married</option>
-        <option>Widowed</option>
         <option>Divorced</option>
-        <option>Common-law</option>
+        <option>Widowed</option>
       </select>
     </div>
 
-    <div id="spouseField" style="display:none;">
-      <label class="font-semibold">Spouse Name</label>
-      <input id="d_spouseName" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
-    </div>
-
-  </div>
-
-  <!-- ============================== -->
-  <!-- DATES + AGE -->
-  <!-- ============================== -->
-  <h3 class="text-xl font-semibold mb-3">Dates & Age</h3>
-
-  <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom:30px;">
-
+    <!-- ===========================
+         DATE OF BIRTH / DEATH
+    ============================ -->
     <div>
-      <label class="font-semibold">Date of Birth</label>
-      <input id="d_dob" type="date"
-             onchange="calculateAge()"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
+      <div class="label-chip">Date of Birth</div>
+      <input id="dob" class="form-input" type="date" onchange="calculateAge()" />
     </div>
 
     <div>
-      <label class="font-semibold">Date & Time of Death</label>
-      <input id="d_dod" type="datetime-local"
-             onchange="calculateAge()"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
+      <div class="label-chip">Date & Time of Death</div>
+      <input id="dod" class="form-input" type="datetime-local" onchange="calculateAge()" />
     </div>
 
     <div>
-      <label class="font-semibold">Age</label>
-      <input id="d_age" type="number" readonly
-             class="w-full p-3 rounded-md"
-             style="background:#1a1f2b; border:1px solid rgba(148,163,184,0.35);">
-    </div>
-
-  </div>
-
-  <!-- ============================== -->
-  <!-- LOCATION -->
-  <!-- ============================== -->
-  <h3 class="text-xl font-semibold mb-3">Location Information</h3>
-
-  <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom:25px;">
-
-    <div>
-      <label class="font-semibold">Place of Death</label>
-      <input id="d_placeOfDeath" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
+      <div class="label-chip">Age</div>
+      <input id="age" class="form-input" type="text" readonly />
     </div>
 
     <div>
-      <label class="font-semibold">Country of Death</label>
-      <select id="d_countryOfDeath"
-              class="w-full p-3 rounded-md"
-              style="background:#0f172a;">
-        <option value="">Select country…</option>
+      <div class="label-chip">Country of Death</div>
+      <select id="countryOfDeath" class="form-select">
+        <option value="">Select Country…</option>
+        <!-- Placeholder – you can import full UN country list -->
+        <option>Barbados</option>
+        <option>Trinidad & Tobago</option>
+        <option>Jamaica</option>
+        <option>United States</option>
       </select>
     </div>
 
-    <div>
-      <label class="font-semibold">Last Known Address</label>
-      <input id="d_address" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
-    </div>
-
-    <div>
-      <label class="font-semibold">Country of Residence</label>
-      <select id="d_countryOfResidence"
-              class="w-full p-3 rounded-md"
-              style="background:#0f172a;">
-        <option value="">Select country…</option>
-      </select>
+    <!-- ===========================
+         NEXT BUTTON
+    ============================ -->
+    <div style="grid-column: 1 / -1; margin-top: 10px;">
+      <button class="next-btn" onclick="goToSection('section-nok')">Next →</button>
     </div>
 
   </div>
+</div>
 
-  <!-- ============================== -->
-  <!-- MEDICAL & LEGAL -->
-  <!-- ============================== -->
-  <h3 class="text-xl font-semibold mb-3">Medical & Legal Information</h3>
-
-  <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom:20px;">
-
-    <div>
-      <label class="font-semibold">Cause of Death</label>
-      <input id="d_cod" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
-    </div>
-
-    <div>
-      <label class="font-semibold">Attending Physician</label>
-      <input id="d_physician" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
-    </div>
-
-    <div>
-      <label class="font-semibold">Physician Contact</label>
-      <input id="d_physicianContact" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
-    </div>
-
-    <div>
-      <label class="font-semibold">Death Certificate Issued?</label>
-      <select id="d_certificateIssued"
-              onchange="toggleCertificateNumber()"
-              class="w-full p-3 rounded-md"
-              style="background:#0f172a;">
-        <option value="">Select…</option>
-        <option>Yes</option>
-        <option>No</option>
-      </select>
-    </div>
-
-    <div id="certificateNumberField" style="display:none;">
-      <label class="font-semibold">Certificate Number</label>
-      <input id="d_certificateNumber" type="text"
-             class="w-full p-3 rounded-md"
-             style="background:#0f172a;">
-    </div>
-
-  </div>
-
-</section>
-
-  </div>
-</section>
 
 <!-- SECTION 2 — NEXT OF KIN -->
 <section id="section-nok" class="content-card">
@@ -965,6 +974,30 @@ document.addEventListener("DOMContentLoaded", () => {
   initCountries();
   generateRefNumber();
 });
+
+  function previewImage(input, target) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => document.getElementById(target).src = e.target.result;
+  reader.readAsDataURL(file);
+}
+
+function calculateAge() {
+  const dob = new Date(document.getElementById("dob").value);
+  const dod = new Date(document.getElementById("dod").value);
+
+  if (!dob || !dod) return;
+
+  let age = dod.getFullYear() - dob.getFullYear();
+  const m = dod.getMonth() - dob.getMonth();
+
+  if (m < 0 || (m === 0 && dod.getDate() < dob.getDate())) {
+    age--;
+  }
+
+  document.getElementById("age").value = age + " years";
+}
 </script>
 </body>
 </html>
