@@ -801,7 +801,11 @@
 </div>
 
   </div>
-
+  
+<div class="copayer-container"></div>
+<button type="button" class="add-copayer-btn" style="display:none;" onclick="addCoPayerTo(this.closest('.nok-card'))">
+    + Add Additional Co-Payer
+</button>
 </div>
 
 
@@ -1343,34 +1347,42 @@ function toggleOtherRelationship(sel) {
 /* ================================
    PAYER LOGIC
 ================================ */
-function handlePayerSelection() {
-    const value = document.getElementById("primaryPayerSelect").value;
-    const container = document.getElementById("copayerContainer");
-    const addBtn = document.getElementById("addCoPayerBtn");
+function handlePayerSelection(sel) {
 
+    const nokBlock = sel.closest(".nok-card");
+    const container = nokBlock.querySelector(".copayer-container");
+    const addBtn = nokBlock.querySelector(".add-copayer-btn");
+
+    // Reset container
     container.innerHTML = "";
 
-    if (value === "yes") {
-        addBtn.style.display = "none";
+    if (sel.value === "yes") {
+        if (addBtn) addBtn.style.display = "none";
+        return;
     }
 
-    if (value === "no") {
-        addBtn.style.display = "none";
-        addCoPayer();
+    if (sel.value === "no") {
+        if (addBtn) addBtn.style.display = "none";
+        addCoPayerTo(nokBlock);
+        return;
     }
 
-    if (value === "partial") {
-        addBtn.style.display = "inline-block";
-        addCoPayer();
+    if (sel.value === "partial") {
+        if (addBtn) addBtn.style.display = "block";
+        addCoPayerTo(nokBlock);
+        return;
     }
 }
 
-function addCoPayer() {
+
+function addCoPayerTo(nokBlock) {
     const template = document.getElementById("copayerTemplate");
     const clone = template.cloneNode(true);
     clone.style.display = "block";
-    document.getElementById("copayerContainer").appendChild(clone);
+
+    nokBlock.querySelector(".copayer-container").appendChild(clone);
 }
+
 
 
 
