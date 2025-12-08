@@ -309,9 +309,10 @@ section.active-step {
 ========================= */
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px 30px;
-  align-items: start;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px 28px;
+  width: 85%;
+  margin: auto;
 }
 
 @media (max-width: 900px) {
@@ -334,9 +335,10 @@ section.active-step {
 /* =========================
    INPUT FIELD STYLING
 ========================= */
-.form-input, 
-.form-select {
-  width: 100%;
+/* Make fields shorter */
+.form-input.short,
+.form-select.short {
+  width: 95%;
   padding: 10px 12px;
   background: white;
   color: #111;
@@ -355,10 +357,12 @@ section.active-step {
 /* =========================
    PORTRAIT + ID IMAGES
 ========================= */
+/* Portrait center */
 .photo-center {
-  grid-column: 1 / -1;
-  text-align: center;
-  margin: 15px 0 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .portrait-wrapper {
@@ -376,7 +380,11 @@ section.active-step {
   height: 100%;
   object-fit: cover;
 }
-
+/* Full-width rows (portrait & button) */
+.full-row {
+  grid-column: 1 / -1;
+}
+    
 /* Small ID preview */
 .small-id {
   width: 90px;
@@ -408,7 +416,6 @@ section.active-step {
 }
 </style>
 
-  </style>
 </head>
 
 <body class="theme-dark">
@@ -475,23 +482,16 @@ section.active-step {
 
 <!-- SECTION 1 — DECEASED INFORMATION -->
     <!-- Form fields added in PART B -->
-    <section id="section-deceased" class="content-card">
-  <h2 class="text-2xl font-semibold mb-3">🕊️ Deceased Information</h2>
-  <p class="section-description mb-6">
-    Enter full legal and identification information for the deceased.
-  </p>
 
-  <div class="form-section" id="section-deceased">
+ <div class="form-section" id="section-deceased">
 
   <h2>🕊️ Deceased Information</h2>
   <p>Enter full legal and identification information for the deceased.</p>
 
   <div class="form-grid">
 
-    <!-- ===========================
-         PORTRAIT PHOTO (CENTER)
-    ============================ -->
-    <div class="photo-center">
+    <!-- CENTERED PORTRAIT -->
+    <div class="full-row photo-center">
       <div class="portrait-wrapper">
         <img id="portraitPreview" src="" alt="">
       </div>
@@ -499,26 +499,22 @@ section.active-step {
       <input type="file" onchange="previewImage(this,'portraitPreview')" />
     </div>
 
-    <!-- ===========================
-         REFERENCE + FUNERAL DIRECTOR
-    ============================ -->
+    <!-- Reference + Director -->
     <div>
       <div class="label-chip">Reference Number</div>
-      <input id="refNumber" class="form-input" readonly />
+      <input id="refNumber" class="form-input short" readonly />
     </div>
 
     <div>
       <div class="label-chip">Responsible Funeral Director</div>
-      <select id="funeralDirector" class="form-select">
-        <option value="">Select…</option>
-        <option value="Carl Brathwaite">Carl Brathwaite</option>
-        <option value="Winston Edwards">Winston Edwards</option>
+      <select id="funeralDirector" class="form-select short">
+        <option>Select…</option>
+        <option>Carl Brathwaite</option>
+        <option>Winston Edwards</option>
       </select>
     </div>
 
-    <!-- ===========================
-         ID FRONT + ID BACK
-    ============================ -->
+    <!-- ID Images -->
     <div>
       <div class="label-chip">ID Front</div>
       <img id="idFrontPreview" class="small-id" />
@@ -531,24 +527,22 @@ section.active-step {
       <input type="file" onchange="previewImage(this,'idBackPreview')" />
     </div>
 
-    <!-- ===========================
-         PERSONAL DETAILS
-    ============================ -->
-
+    <!-- Full Name + Alias -->
     <div>
       <div class="label-chip">Full Name</div>
-      <input id="fullName" class="form-input" type="text" />
+      <input id="fullName" class="form-input short" type="text" />
     </div>
 
     <div>
       <div class="label-chip">Alias / Other Names</div>
-      <input id="alias" class="form-input" type="text" />
+      <input id="alias" class="form-input short" type="text" />
     </div>
 
+    <!-- Gender + Marital -->
     <div>
       <div class="label-chip">Gender</div>
-      <select id="gender" class="form-select">
-        <option value="">Select…</option>
+      <select id="gender" class="form-select short">
+        <option>Select…</option>
         <option>Male</option>
         <option>Female</option>
         <option>Other</option>
@@ -557,8 +551,8 @@ section.active-step {
 
     <div>
       <div class="label-chip">Marital Status</div>
-      <select id="maritalStatus" class="form-select">
-        <option value="">Select…</option>
+      <select id="maritalStatus" class="form-select short">
+        <option>Select…</option>
         <option>Single</option>
         <option>Married</option>
         <option>Divorced</option>
@@ -566,29 +560,26 @@ section.active-step {
       </select>
     </div>
 
-    <!-- ===========================
-         DATE OF BIRTH / DEATH
-    ============================ -->
+    <!-- Date of Birth + Date of Death -->
     <div>
       <div class="label-chip">Date of Birth</div>
-      <input id="dob" class="form-input" type="date" onchange="calculateAge()" />
+      <input id="dob" class="form-input short" type="date" onchange="calculateAge()" />
     </div>
 
     <div>
       <div class="label-chip">Date & Time of Death</div>
-      <input id="dod" class="form-input" type="datetime-local" onchange="calculateAge()" />
+      <input id="dod" class="form-input short" type="datetime-local" onchange="calculateAge()" />
     </div>
 
+    <!-- Age + Country -->
     <div>
       <div class="label-chip">Age</div>
-      <input id="age" class="form-input" type="text" readonly />
+      <input id="age" class="form-input short" readonly />
     </div>
 
     <div>
       <div class="label-chip">Country of Death</div>
-      <select id="countryOfDeath" class="form-select">
-        <option value="">Select Country…</option>
-        <!-- Placeholder – you can import full UN country list -->
+      <select id="countryOfDeath" class="form-select short">
         <option>Barbados</option>
         <option>Trinidad & Tobago</option>
         <option>Jamaica</option>
@@ -596,15 +587,14 @@ section.active-step {
       </select>
     </div>
 
-    <!-- ===========================
-         NEXT BUTTON
-    ============================ -->
-    <div style="grid-column: 1 / -1; margin-top: 10px;">
+    <!-- Single CLEAN next button -->
+    <div class="full-row next-holder">
       <button class="next-btn" onclick="goToSection('section-nok')">Next →</button>
     </div>
 
   </div>
 </div>
+
 
 
 <!-- SECTION 2 — NEXT OF KIN -->
@@ -997,6 +987,19 @@ function calculateAge() {
   }
 
   document.getElementById("age").value = age + " years";
+}
+  
+  document.addEventListener("DOMContentLoaded", () => {
+  generateReferenceNumber();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  generateReferenceNumber();
+});
+
+function generateReferenceNumber() {
+  const ref = "REF-" + Math.floor(100000 + Math.random() * 900000);
+  document.getElementById("refNumber").value = ref;
 }
 </script>
 </body>
