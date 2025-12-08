@@ -799,13 +799,19 @@
 
   </div>
 </div>
+    
+<div class="copayer-container"></div>
+
+<button type="button" 
+        class="add-copayer-btn" 
+        style="display:none;" 
+        onclick="addCoPayerTo(this.closest('.nok-card'))">
+    + Add Additional Co-Payer
+</button>
 
   </div>
   
-<div class="copayer-container"></div>
-<button type="button" class="add-copayer-btn" style="display:none;" onclick="addCoPayerTo(this.closest('.nok-card'))">
-    + Add Additional Co-Payer
-</button>
+
 </div>
 
 
@@ -1249,66 +1255,6 @@ function generateReferenceNumber() {
 
   let nokCount = 0;
 
-function addNok() {
-    const template = document.getElementById("nokTemplate");
-    const container = document.getElementById("nokContainer");
-
-    const clone = template.cloneNode(true);
-    clone.style.display = "block";
-    clone.removeAttribute("id");
-    clone.classList.add("nok-block", "nok-card");
-
-    // Clear fields
-    clone.querySelectorAll("input, select").forEach(el => el.value = "");
-
-    // Add listeners for priority buttons
-    clone.querySelector(".priority-btn.up").onclick = () => moveNok(clone, -1);
-    clone.querySelector(".priority-btn.down").onclick = () => moveNok(clone, 1);
-
-    container.appendChild(clone);
-    recalcPriorities();
-}
-
-function toggleOtherRelationship(sel) {
-    const row = sel.closest(".relationship-row");
-    const otherInput = row.querySelector(".other-input");
-
-    if (sel.value === "other") {
-        otherInput.style.display = "block";
-        otherInput.required = true;
-    } else {
-        otherInput.style.display = "none";
-        otherInput.required = false;
-        otherInput.value = "";
-    }
-}
-
-  
-function removeNok(btn) {
-    btn.parentElement.remove();
-    recalcPriorities();
-}
-
-function moveNok(card, direction) {
-    const container = document.getElementById("nokContainer");
-    const cards = [...container.children];
-    const index = cards.indexOf(card);
-    const newIndex = index + direction;
-
-    if (newIndex < 0 || newIndex >= cards.length) return;
-
-    container.insertBefore(card, cards[newIndex + (direction === 1 ? 1 : -1)]);
-    recalcPriorities();
-}
-
-function recalcPriorities() {
-    const cards = document.querySelectorAll("#nokContainer .nok-card");
-    cards.forEach((card, i) => {
-        card.querySelector(".nok-priority").textContent = i + 1;
-    });
-}
-
-
 document.addEventListener("DOMContentLoaded", () => {
 
     // Auto-create the first NOK card on page load
@@ -1325,69 +1271,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-  
 /* ================================
-   Relationship: Show "Other" field
+   FIXED “OTHER” RELATIONSHIP LOGIC
 ================================ */
 function toggleOtherRelationship(sel) {
-    const block = sel.closest(".nok-grid");
-    const otherField = block.querySelector(".nok-other-field");
+    const row = sel.closest(".relationship-row");
+    const otherInput = row.querySelector(".other-input");
 
-    if (!otherField) return;
+    if (!otherInput) return;
 
     if (sel.value === "other") {
-        otherField.style.display = "block";
-        otherField.querySelector("input").required = true;
+        otherInput.style.display = "inline-block";
+        otherInput.required = true;
     } else {
-        otherField.style.display = "none";
-        otherField.querySelector("input").required = false;
+        otherInput.style.display = "none";
+        otherInput.required = false;
+        otherInput.value = "";
     }
 }
 
 /* ================================
-   PAYER LOGIC
+   FIXED CO-PAYER MECHANISM
 ================================ */
 function handlePayerSelection(sel) {
+    const nokCard = sel.closest(".nok-card");
+    const coContainer = nokCard.querySelector(".copayer-container");
+    const addBtn = nokCard.querySelector(".add-copayer-btn");
 
-    const nokBlock = sel.closest(".nok-card");
-    const container = nokBlock.querySelector(".copayer-container");
-    const addBtn = nokBlock.querySelector(".add-copayer-btn");
+    coContainer.innerHTML = ""; // clear before inserting anything
 
-    // Reset container
-    container.innerHTML = "";
+    switch (sel.value) {
+        case "yes":
+            addBtn.style.display = "none";
+            break;
 
-    if (sel.value === "yes") {
-        if (addBtn) addBtn.style.display = "none";
-        return;
-    }
+        case "no":
+            addBtn.style.display = "none";
+            addCoPayerTo(nokCard);
+            break;
 
-    if (sel.value === "no") {
-        if (addBtn) addBtn.style.display = "none";
-        addCoPayerTo(nokBlock);
-        return;
-    }
+        case "partial":
+            addBtn.style.display = "block";
+            addCoPayerTo(nokCard);
+            break;
 
-    if (sel.value === "partial") {
-        if (addBtn) addBtn.style.display = "block";
-        addCoPayerTo(nokBlock);
-        return;
+        default:
+            addBtn.style.display = "none";
     }
 }
 
-
-function addCoPayerTo(nokBlock) {
+/* ================================
+   CLONE CO-PAYER BLOCK INTO NOK
+================================ */
+function addCoPayerTo(nokCard) {
     const template = document.getElementById("copayerTemplate");
+    const coContainer = nokCard.querySelector(".copayer-container");
+
     const clone = template.cloneNode(true);
     clone.style.display = "block";
+    clone.removeAttribute("id");
 
-    nokBlock.querySelector(".copayer-container").appendChild(clone);
+    coContainer.appendChild(clone);
 }
 
-
-
-
+/* ================================
+   NOK VALIDATION
+================================ */
 function validateNokSection() {
-    const blocks = document.querySelectorAll(".nok-block");
+    const blocks = document.querySelectorAll(".nok-card");
 
     if (blocks.length === 0) {
         alert("Please add at least one Next of Kin.");
@@ -1395,10 +1346,9 @@ function validateNokSection() {
     }
 
     for (let block of blocks) {
-        let requiredFields = block.querySelectorAll("[required]");
-
-        for (let f of requiredFields) {
-            if (!f.value || (f.type === "checkbox" && !f.checked)) {
+        const required = block.querySelectorAll("[required]");
+        for (let f of required) {
+            if (!f.value.trim()) {
                 alert("Please complete all required fields in the Next of Kin section.");
                 f.scrollIntoView({ behavior: "smooth", block: "center" });
                 return;
@@ -1406,9 +1356,9 @@ function validateNokSection() {
         }
     }
 
-    // PROPER MULTISTEP NAVIGATION
     showStep(2);
 }
+
 
 </script>
 </body>
