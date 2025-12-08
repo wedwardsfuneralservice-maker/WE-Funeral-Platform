@@ -276,7 +276,66 @@
       border: 1px solid var(--border-subtle-light);
       box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
     }
+.nok-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
 
+.nok-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.priority-badge {
+    background: rgba(48,108,222,0.2);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #fff;
+}
+
+.priority-controls button {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    padding: 4px 8px;
+    margin-left: 4px;
+    cursor: pointer;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+}
+
+.nok-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 16px 30px;
+}
+
+.id-preview,
+.signature-preview {
+    width: 90px;
+    height: 90px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-top: 6px;
+    background: rgba(0,0,0,0.4);
+}
+
+.remove-nok {
+    margin-top: 16px;
+    background: #dc2626;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
     <style>
 
 /* =========================
@@ -591,18 +650,32 @@
 
   </div>
 </div>
-
+<!-- SECTION 2 — NEXT OF KIN -->
 <!-- Hidden NOK TEMPLATE -->
 <div id="nokTemplate" style="display:none;">
-    <div class="two-col">
-        
+   <div class="nok-card">
+    
+    <!-- PRIORITY HEADER -->
+    <div class="nok-header">
+        <div class="priority-badge">
+            Priority: <span class="nok-priority">1</span>
+        </div>
+        <div class="priority-controls">
+            <button type="button" class="priority-btn up">▲</button>
+            <button type="button" class="priority-btn down">▼</button>
+        </div>
+    </div>
+
+    <!-- NOK FIELDS -->
+    <div class="nok-grid">
+
         <div>
-            <label>Full Name</label>
+            <label>Full Name *</label>
             <input type="text" name="nok_fullName[]" required>
         </div>
 
         <div>
-            <label>Relationship</label>
+            <label>Relationship *</label>
             <select name="nok_relationship[]" required>
                 <option value="">Select…</option>
                 <option>Spouse</option>
@@ -616,27 +689,49 @@
         </div>
 
         <div>
-            <label>Phone</label>
+            <label>Phone *</label>
             <input type="text" name="nok_phone[]" oninput="formatPhone(this)" required>
         </div>
 
         <div>
             <label>Email</label>
-            <input type="email" name="nok_email[]" required>
+            <input type="email" name="nok_email[]">
         </div>
 
         <div>
             <label>Address</label>
-            <input type="text" name="nok_address[]" required>
+            <input type="text" name="nok_address[]">
         </div>
+
+        <!-- ID FRONT -->
+        <div>
+            <label>ID Front</label>
+            <input type="file" accept="image/*" name="nok_idFront[]" onchange="previewImage(this, this.nextElementSibling)">
+            <img class="id-preview" src="" alt="">
+        </div>
+
+        <!-- ID BACK -->
+        <div>
+            <label>ID Back</label>
+            <input type="file" accept="image/*" name="nok_idBack[]" onchange="previewImage(this, this.nextElementSibling)">
+            <img class="id-preview" src="" alt="">
+        </div>
+
+        <!-- SIGNATURE -->
+        <div>
+            <label>Signature</label>
+            <input type="file" accept="image/*" name="nok_signature[]" onchange="previewImage(this, this.nextElementSibling)">
+            <img class="signature-preview" src="" alt="">
+        </div>
+
     </div>
 
-    <button class="remove-nok" onclick="this.parentElement.remove()">Remove</button>
+    <!-- REMOVE BUTTON -->
+    <button class="remove-nok" onclick="removeNok(this)">Remove</button>
+
 </div>
 
 
-
-<!-- SECTION 2 — NEXT OF KIN -->
 <section id="section-nok" class="content-card">
   <h2>Next of Kin</h2>
   <p class="section-description">
@@ -1075,22 +1170,46 @@ function addNok() {
     const template = document.getElementById("nokTemplate");
     const container = document.getElementById("nokContainer");
 
-    if (!template) {
-        console.error("NOK template missing: .nok-block OR #nokTemplate not found.");
-        alert("Developer Error: NOK template missing.");
-        return;
-    }
-
     const clone = template.cloneNode(true);
     clone.style.display = "block";
-    clone.removeAttribute("id"); // prevent duplicate IDs
-    clone.classList.add("nok-block");    
+    clone.removeAttribute("id");
+    clone.classList.add("nok-block", "nok-card");
 
-    // Clear fields inside clone
-    clone.querySelectorAll("input, select").forEach(i => i.value = "");
+    // Clear fields
+    clone.querySelectorAll("input, select").forEach(el => el.value = "");
+
+    // Add listeners for priority buttons
+    clone.querySelector(".priority-btn.up").onclick = () => moveNok(clone, -1);
+    clone.querySelector(".priority-btn.down").onclick = () => moveNok(clone, 1);
 
     container.appendChild(clone);
+    recalcPriorities();
 }
+
+function removeNok(btn) {
+    btn.parentElement.remove();
+    recalcPriorities();
+}
+
+function moveNok(card, direction) {
+    const container = document.getElementById("nokContainer");
+    const cards = [...container.children];
+    const index = cards.indexOf(card);
+    const newIndex = index + direction;
+
+    if (newIndex < 0 || newIndex >= cards.length) return;
+
+    container.insertBefore(card, cards[newIndex + (direction === 1 ? 1 : -1)]);
+    recalcPriorities();
+}
+
+function recalcPriorities() {
+    const cards = document.querySelectorAll("#nokContainer .nok-card");
+    cards.forEach((card, i) => {
+        card.querySelector(".nok-priority").textContent = i + 1;
+    });
+}
+
 
 
 
