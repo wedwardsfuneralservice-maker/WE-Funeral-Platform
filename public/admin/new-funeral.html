@@ -702,6 +702,101 @@
   </div>
 </div>
 
+<!-- ===================================== -->
+<!-- NOK TEMPLATE (ID front/back + signature) -->
+<!-- ===================================== -->
+<div id="nokTemplate" style="display:none;">
+
+  <div class="nok-card">
+
+    <h3 class="nok-title">Next of Kin</h3>
+
+    <div class="nok-grid">
+
+        <!-- Full Name -->
+        <div>
+            <label>Full Name *</label>
+            <input type="text" name="nok_fullName[]" required>
+        </div>
+
+        <!-- Relationship -->
+        <div>
+            <label>Relationship *</label>
+            <select name="nok_relationship[]" onchange="toggleOtherRelationship(this)" required>
+                <option value="">Select…</option>
+                <option>Spouse</option>
+                <option>Child</option>
+                <option>Parent</option>
+                <option>Sibling</option>
+                <option>Relative</option>
+                <option>Friend</option>
+                <option>Care-giver</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <!-- OTHER relationship field -->
+        <div class="nok-other-field" style="display:none;">
+            <label>Please specify *</label>
+            <input type="text" name="nok_otherText[]">
+        </div>
+
+        <!-- Phone -->
+        <div>
+            <label>Phone *</label>
+            <input type="text" name="nok_phone[]" oninput="formatPhone(this)" required>
+        </div>
+
+        <!-- Email -->
+        <div>
+            <label>Email</label>
+            <input type="email" name="nok_email[]">
+        </div>
+
+        <!-- Address -->
+        <div>
+            <label>Address</label>
+            <input type="text" name="nok_address[]">
+        </div>
+
+        <!-- ID FRONT -->
+        <div>
+            <label>ID Card Front</label>
+            <img class="small-id" id="idFrontPreview_NOK" />
+            <input type="file" name="nok_idFront[]" onchange="previewImage(this,'idFrontPreview_NOK')">
+        </div>
+
+        <!-- ID BACK -->
+        <div>
+            <label>ID Card Back</label>
+            <img class="small-id" id="idBackPreview_NOK" />
+            <input type="file" name="nok_idBack[]" onchange="previewImage(this,'idBackPreview_NOK')">
+        </div>
+
+        <!-- SIGNATURE -->
+        <div>
+            <label>Electronic Signature</label>
+            <img class="signature-preview" id="signaturePreview_NOK" />
+            <input type="file" name="nok_signature[]" onchange="previewImage(this,'signaturePreview_NOK')">
+        </div>
+
+    </div>
+
+    <div style="margin-bottom:20px;">
+    <label><strong>Is this person the primary payer?</strong></label>
+    <select id="primaryPayerSelect" onchange="handlePayerSelection()">
+        <option value="">Select…</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+        <option value="partial">Partial Payer</option>
+    </select>
+</div>
+
+    <button type="button" class="remove-nok" onclick="removeNok(this)">Remove</button>
+
+  </div>
+
+</div>
 
 
 
@@ -711,15 +806,7 @@
     List primary and secondary contact persons responsible for arrangements.
   </p>
 
-  <div style="margin-bottom:20px;">
-    <label><strong>Is this person the primary payer?</strong></label>
-    <select id="primaryPayerSelect" onchange="handlePayerSelection()">
-        <option value="">Select…</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-        <option value="partial">Partial Payer</option>
-    </select>
-</div>
+  
 
 <!-- Co-Payers container -->
 <div id="copayerContainer"></div>
@@ -731,11 +818,6 @@
 
 <div id="nokContainer">
         <!-- NOK BLOCKS HERE (your existing layout stays the same) -->
-    </div>
-
-    <!-- ADD NOK BUTTON (LEFT ALIGNED) -->
-    <div style="margin: 20px 0;">
-        <button class="green-btn" onclick="addNok()">＋ Add Another Next of Kin</button>
     </div>
  
 </section>
