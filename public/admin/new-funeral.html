@@ -852,6 +852,7 @@ document.querySelectorAll(".nav-item").forEach((item, index) => {
   });
 });
 </script>
+  
 <script>
 /* ================================
    IMAGE PREVIEW HELPERS
@@ -1014,6 +1015,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function generateReferenceNumber() {
   const ref = "REF-" + Math.floor(100000 + Math.random() * 900000);
   document.getElementById("refNumber").value = ref;
+}
 
   function formatPhone(input) {
     let v = input.value.replace(/\D/g, "");
