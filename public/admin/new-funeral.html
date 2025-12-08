@@ -745,7 +745,7 @@
 
     <div style="margin-bottom:20px;">
     <label><strong>Is this person the primary payer?</strong></label>
-    <select id="primaryPayerSelect" onchange="handlePayerSelection()">
+   <select id="primaryPayerSelect" onchange="handlePayerSelection(this)">
         <option value="">Select…</option>
         <option value="yes">Yes</option>
         <option value="no">No</option>
@@ -1294,11 +1294,16 @@ function toggleOtherRelationship(sel) {
    FIXED CO-PAYER MECHANISM
 ================================ */
 function handlePayerSelection(sel) {
+
+    if (!sel) return;  // safety
+
     const nokCard = sel.closest(".nok-card");
+    if (!nokCard) return;  // prevents your console error
+
     const coContainer = nokCard.querySelector(".copayer-container");
     const addBtn = nokCard.querySelector(".add-copayer-btn");
 
-    coContainer.innerHTML = ""; // clear before inserting anything
+    coContainer.innerHTML = "";
 
     switch (sel.value) {
         case "yes":
@@ -1319,6 +1324,7 @@ function handlePayerSelection(sel) {
             addBtn.style.display = "none";
     }
 }
+
 
 /* ================================
    CLONE CO-PAYER BLOCK INTO NOK
