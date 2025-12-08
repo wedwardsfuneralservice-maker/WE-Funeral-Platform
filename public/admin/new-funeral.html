@@ -651,92 +651,57 @@
   </div>
 </div>
 <!-- SECTION 2 — NEXT OF KIN -->
-<!-- ========================== -->
-<!-- FIXED NOK TEMPLATE BLOCK   -->
-<!-- ========================== -->
+<!-- ============================= -->
+<!-- CO-PAYER TEMPLATE (No ID)     -->
+<!-- ============================= -->
 
-<div id="nokTemplate" style="display:none;">
-   <div class="nok-card nok-block">
+<div id="copayerTemplate" style="display:none;">
+  <div class="nok-card copayer-card">
 
-    <!-- PRIORITY HEADER -->
-    <div class="nok-header">
-        <div class="priority-badge">
-            Priority: <span class="nok-priority">1</span>
-        </div>
-        <div class="priority-controls">
-            <button type="button" class="priority-btn up">▲</button>
-            <button type="button" class="priority-btn down">▼</button>
-        </div>
-    </div>
+      <h3 class="nok-title">Co-Payer</h3>
 
-    <!-- NOK FIELDS -->
-    <div class="nok-grid">
+      <div class="nok-grid">
 
-        <div>
-            <label>Full Name *</label>
-            <input type="text" name="nok_fullName[]" required>
-        </div>
+          <div>
+              <label>Full Name *</label>
+              <input type="text" name="copayer_fullName[]" required>
+          </div>
 
-        <div>
-            <label>Relationship *</label>
-            <select name="nok_relationship[]" required>
-                <option value="">Select…</option>
-                <option>Spouse</option>
-                <option>Child</option>
-                <option>Parent</option>
-                <option>Sibling</option>
-                <option>Relative</option>
-                <option>Friend</option>
-                <option>Other</option>
-            </select>
-        </div>
+          <div>
+              <label>Relationship *</label>
+              <select name="copayer_relationship[]" required>
+                  <option value="">Select…</option>
+                  <option>Spouse</option>
+                  <option>Child</option>
+                  <option>Parent</option>
+                  <option>Relative</option>
+                  <option>Friend</option>
+                  <option value="other">Other</option>
+              </select>
+          </div>
 
-        <div>
-            <label>Phone *</label>
-            <input type="text" name="nok_phone[]" oninput="formatPhone(this)" required>
-        </div>
+          <div>
+              <label>Phone *</label>
+              <input type="text" name="copayer_phone[]" oninput="formatPhone(this)" required>
+          </div>
 
-        <div>
-            <label>Email</label>
-            <input type="email" name="nok_email[]">
-        </div>
+          <div>
+              <label>Email</label>
+              <input type="email" name="copayer_email[]">
+          </div>
 
-        <div>
-            <label>Address</label>
-            <input type="text" name="nok_address[]">
-        </div>
+          <div>
+              <label>Address</label>
+              <input type="text" name="copayer_address[]">
+          </div>
 
-        <!-- ID FRONT -->
-        <div>
-            <label>ID Front</label>
-            <input type="file" accept="image/*" name="nok_idFront[]" 
-                   onchange="previewImage(this, this.nextElementSibling)">
-            <img class="id-preview" src="" alt="">
-        </div>
+      </div>
 
-        <!-- ID BACK -->
-        <div>
-            <label>ID Back</label>
-            <input type="file" accept="image/*" name="nok_idBack[]" 
-                   onchange="previewImage(this, this.nextElementSibling)">
-            <img class="id-preview" src="" alt="">
-        </div>
-
-        <!-- SIGNATURE -->
-        <div>
-            <label>Signature</label>
-            <input type="file" accept="image/*" name="nok_signature[]" 
-                   onchange="previewImage(this, this.nextElementSibling)">
-            <img class="signature-preview" src="" alt="">
-        </div>
-
-    </div>
-
-    <!-- REMOVE BUTTON -->
-    <button class="remove-nok" onclick="removeNok(this)">Remove</button>
+      <button type="button" class="remove-nok" onclick="removeNok(this)">Remove</button>
 
   </div>
 </div>
+
 
 
 
@@ -745,6 +710,24 @@
   <p class="section-description">
     List primary and secondary contact persons responsible for arrangements.
   </p>
+
+  <div style="margin-bottom:20px;">
+    <label><strong>Is this person the primary payer?</strong></label>
+    <select id="primaryPayerSelect" onchange="handlePayerSelection()">
+        <option value="">Select…</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+        <option value="partial">Partial Payer</option>
+    </select>
+</div>
+
+<!-- Co-Payers container -->
+<div id="copayerContainer"></div>
+
+<!-- Button for partial payers -->
+<button id="addCoPayerBtn" class="green-btn" style="display:none;" onclick="addCoPayer()">
+    ＋ Add Additional Co-Payer
+</button>
 
 <div id="nokContainer">
         <!-- NOK BLOCKS HERE (your existing layout stays the same) -->
@@ -1218,6 +1201,55 @@ function recalcPriorities() {
     });
 }
 
+/* ================================
+   Relationship: Show "Other" field
+================================ */
+function toggleOtherRelationship(sel) {
+    const block = sel.closest(".nok-grid");
+    const otherField = block.querySelector(".nok-other-field");
+
+    if (!otherField) return;
+
+    if (sel.value === "other") {
+        otherField.style.display = "block";
+        otherField.querySelector("input").required = true;
+    } else {
+        otherField.style.display = "none";
+        otherField.querySelector("input").required = false;
+    }
+}
+
+/* ================================
+   PAYER LOGIC
+================================ */
+function handlePayerSelection() {
+    const value = document.getElementById("primaryPayerSelect").value;
+    const container = document.getElementById("copayerContainer");
+    const addBtn = document.getElementById("addCoPayerBtn");
+
+    container.innerHTML = "";
+
+    if (value === "yes") {
+        addBtn.style.display = "none";
+    }
+
+    if (value === "no") {
+        addBtn.style.display = "none";
+        addCoPayer();
+    }
+
+    if (value === "partial") {
+        addBtn.style.display = "inline-block";
+        addCoPayer();
+    }
+}
+
+function addCoPayer() {
+    const template = document.getElementById("copayerTemplate");
+    const clone = template.cloneNode(true);
+    clone.style.display = "block";
+    document.getElementById("copayerContainer").appendChild(clone);
+}
 
 
 
