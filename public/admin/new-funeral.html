@@ -651,10 +651,13 @@
   </div>
 </div>
 <!-- SECTION 2 — NEXT OF KIN -->
-<!-- Hidden NOK TEMPLATE -->
+<!-- ========================== -->
+<!-- FIXED NOK TEMPLATE BLOCK   -->
+<!-- ========================== -->
+
 <div id="nokTemplate" style="display:none;">
-   <div class="nok-card">
-    
+   <div class="nok-card nok-block">
+
     <!-- PRIORITY HEADER -->
     <div class="nok-header">
         <div class="priority-badge">
@@ -706,21 +709,24 @@
         <!-- ID FRONT -->
         <div>
             <label>ID Front</label>
-            <input type="file" accept="image/*" name="nok_idFront[]" onchange="previewImage(this, this.nextElementSibling)">
+            <input type="file" accept="image/*" name="nok_idFront[]" 
+                   onchange="previewImage(this, this.nextElementSibling)">
             <img class="id-preview" src="" alt="">
         </div>
 
         <!-- ID BACK -->
         <div>
             <label>ID Back</label>
-            <input type="file" accept="image/*" name="nok_idBack[]" onchange="previewImage(this, this.nextElementSibling)">
+            <input type="file" accept="image/*" name="nok_idBack[]" 
+                   onchange="previewImage(this, this.nextElementSibling)">
             <img class="id-preview" src="" alt="">
         </div>
 
         <!-- SIGNATURE -->
         <div>
             <label>Signature</label>
-            <input type="file" accept="image/*" name="nok_signature[]" onchange="previewImage(this, this.nextElementSibling)">
+            <input type="file" accept="image/*" name="nok_signature[]" 
+                   onchange="previewImage(this, this.nextElementSibling)">
             <img class="signature-preview" src="" alt="">
         </div>
 
@@ -729,7 +735,9 @@
     <!-- REMOVE BUTTON -->
     <button class="remove-nok" onclick="removeNok(this)">Remove</button>
 
+  </div>
 </div>
+
 
 
 <section id="section-nok" class="content-card">
