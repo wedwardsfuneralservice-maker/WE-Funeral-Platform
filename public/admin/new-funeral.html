@@ -350,7 +350,258 @@ section.active-step {
 
   <div class="section-placeholder">
     <!-- Form fields added in PART B -->
-    <em>Deceased Information fields will appear here.</em>
+    <section id="section-deceased" class="content-card">
+  <h2 class="text-2xl font-semibold mb-3">🕊️ Deceased Information</h2>
+  <p class="section-description mb-6">
+    Enter full legal and identification information for the deceased.
+  </p>
+
+  <!-- ============================== -->
+  <!-- REFERENCE + FUNERAL DIRECTOR -->
+  <!-- ============================== -->
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 25px;">
+    
+    <div>
+      <label class="font-semibold">Reference Number</label>
+      <input id="d_refNumber" type="text" readonly 
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a; border:1px solid rgba(148,163,184,0.35); color:white;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Responsible Funeral Director</label>
+      <select id="d_funeralDirector"
+              class="w-full p-3 rounded-md"
+              style="background:#0f172a; border:1px solid rgba(148,163,184,0.35); color:white;">
+        <option value="">Select…</option>
+        <option>Carl Brathwaite</option>
+        <option>Winston Edwards</option>
+      </select>
+    </div>
+
+  </div>
+
+  <!-- ============================== -->
+  <!-- PHOTOS: Portrait + ID uploads -->
+  <!-- ============================== -->
+  <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 35px;">
+
+    <!-- Portrait -->
+    <div>
+      <label class="font-semibold block mb-2">Portrait Photo</label>
+      <img id="deceasedPhotoPreview"
+           src="/placeholder-portrait.png"
+           style="width:120px; height:120px; object-fit:cover; border-radius:999px; border:2px solid rgba(255,255,255,0.2); margin-bottom:8px;">
+      <input id="deceasedPhoto" type="file" accept="image/*"
+             onchange="previewImage(this,'deceasedPhotoPreview')"
+             style="color:white;">
+    </div>
+
+    <!-- ID Front -->
+    <div>
+      <label class="font-semibold block mb-2">ID Front</label>
+      <img id="idFrontPreview"
+           src="/placeholder-id.png"
+           style="width:160px; border-radius:8px; border:1px solid rgba(255,255,255,0.3); margin-bottom:8px;">
+      <input id="d_idFront" type="file" accept="image/*"
+             onchange="previewImage(this,'idFrontPreview')"
+             style="color:white;">
+    </div>
+
+    <!-- ID Back -->
+    <div>
+      <label class="font-semibold block mb-2">ID Back</label>
+      <img id="idBackPreview"
+           src="/placeholder-id.png"
+           style="width:160px; border-radius:8px; border:1px solid rgba(255,255,255,0.3); margin-bottom:8px;">
+      <input id="d_idBack" type="file" accept="image/*"
+             onchange="previewImage(this,'idBackPreview')"
+             style="color:white;">
+    </div>
+
+  </div>
+
+  <!-- ============================== -->
+  <!-- PERSONAL DETAILS -->
+  <!-- ============================== -->
+  <h3 class="text-xl font-semibold mb-3">Personal Details</h3>
+
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom:25px;">
+
+    <div>
+      <label class="font-semibold">Full Name</label>
+      <input id="d_fullName" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a; border:1px solid rgba(148,163,184,0.35); color:white;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Alias / Other Names</label>
+      <input id="d_alias" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Gender</label>
+      <select id="d_gender"
+              class="w-full p-3 rounded-md"
+              style="background:#0f172a;">
+        <option value="">Select…</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="font-semibold">Marital Status</label>
+      <select id="d_maritalStatus"
+              class="w-full p-3 rounded-md"
+              onchange="toggleSpouseField()"
+              style="background:#0f172a;">
+        <option value="">Select…</option>
+        <option>Single</option>
+        <option>Married</option>
+        <option>Widowed</option>
+        <option>Divorced</option>
+        <option>Common-law</option>
+      </select>
+    </div>
+
+    <div id="spouseField" style="display:none;">
+      <label class="font-semibold">Spouse Name</label>
+      <input id="d_spouseName" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+  </div>
+
+  <!-- ============================== -->
+  <!-- DATES + AGE -->
+  <!-- ============================== -->
+  <h3 class="text-xl font-semibold mb-3">Dates & Age</h3>
+
+  <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom:30px;">
+
+    <div>
+      <label class="font-semibold">Date of Birth</label>
+      <input id="d_dob" type="date"
+             onchange="calculateAge()"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Date & Time of Death</label>
+      <input id="d_dod" type="datetime-local"
+             onchange="calculateAge()"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Age</label>
+      <input id="d_age" type="number" readonly
+             class="w-full p-3 rounded-md"
+             style="background:#1a1f2b; border:1px solid rgba(148,163,184,0.35);">
+    </div>
+
+  </div>
+
+  <!-- ============================== -->
+  <!-- LOCATION -->
+  <!-- ============================== -->
+  <h3 class="text-xl font-semibold mb-3">Location Information</h3>
+
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom:25px;">
+
+    <div>
+      <label class="font-semibold">Place of Death</label>
+      <input id="d_placeOfDeath" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Country of Death</label>
+      <select id="d_countryOfDeath"
+              class="w-full p-3 rounded-md"
+              style="background:#0f172a;">
+        <option value="">Select country…</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="font-semibold">Last Known Address</label>
+      <input id="d_address" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Country of Residence</label>
+      <select id="d_countryOfResidence"
+              class="w-full p-3 rounded-md"
+              style="background:#0f172a;">
+        <option value="">Select country…</option>
+      </select>
+    </div>
+
+  </div>
+
+  <!-- ============================== -->
+  <!-- MEDICAL & LEGAL -->
+  <!-- ============================== -->
+  <h3 class="text-xl font-semibold mb-3">Medical & Legal Information</h3>
+
+  <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom:20px;">
+
+    <div>
+      <label class="font-semibold">Cause of Death</label>
+      <input id="d_cod" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Attending Physician</label>
+      <input id="d_physician" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Physician Contact</label>
+      <input id="d_physicianContact" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+    <div>
+      <label class="font-semibold">Death Certificate Issued?</label>
+      <select id="d_certificateIssued"
+              onchange="toggleCertificateNumber()"
+              class="w-full p-3 rounded-md"
+              style="background:#0f172a;">
+        <option value="">Select…</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
+
+    <div id="certificateNumberField" style="display:none;">
+      <label class="font-semibold">Certificate Number</label>
+      <input id="d_certificateNumber" type="text"
+             class="w-full p-3 rounded-md"
+             style="background:#0f172a;">
+    </div>
+
+  </div>
+
+</section>
+
   </div>
 </section>
 
@@ -595,6 +846,132 @@ document.querySelectorAll(".nav-item").forEach((item, index) => {
   });
 });
 </script>
+<script>
+/* ================================
+   IMAGE PREVIEW HELPERS
+================================ */
+function previewImage(input, previewId) {
+  const file = input.files && input.files[0];
+  if (!file) return;
 
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById(previewId);
+    if (img) img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ================================
+   AGE CALCULATION (DOD - DOB)
+================================ */
+function calculateAge() {
+  const dobEl = document.getElementById("d_dob");
+  const dodEl = document.getElementById("d_dod");
+  const ageEl = document.getElementById("d_age");
+
+  if (!dobEl || !dodEl || !ageEl) return;
+
+  const dob = dobEl.value;
+  const dod = dodEl.value;
+  if (!dob || !dod) {
+    ageEl.value = "";
+    return;
+  }
+
+  const birth = new Date(dob);
+  const death = new Date(dod);
+
+  if (isNaN(birth.getTime()) || isNaN(death.getTime())) {
+    ageEl.value = "";
+    return;
+  }
+
+  let age = death.getFullYear() - birth.getFullYear();
+  const m = death.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && death.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  ageEl.value = age >= 0 ? age : "";
+}
+
+/* ================================
+   MARITAL STATUS → SPOUSE FIELD
+================================ */
+function toggleSpouseField() {
+  const statusEl = document.getElementById("d_maritalStatus");
+  const spouseField = document.getElementById("spouseField");
+  if (!statusEl || !spouseField) return;
+
+  const show = statusEl.value === "Married";
+  spouseField.style.display = show ? "block" : "none";
+}
+
+/* ================================
+   CERTIFICATE ISSUED → NUMBER
+================================ */
+function toggleCertificateNumber() {
+  const certEl = document.getElementById("d_certificateIssued");
+  const certField = document.getElementById("certificateNumberField");
+  if (!certEl || !certField) return;
+
+  const show = certEl.value === "Yes";
+  certField.style.display = show ? "block" : "none";
+}
+
+/* ================================
+   COUNTRY LIST POPULATION
+================================ */
+const countries = [
+  "Barbados","United States","United Kingdom","Canada","Jamaica",
+  "Trinidad & Tobago","Guyana","Saint Lucia","Dominica","Grenada",
+  "St. Vincent & the Grenadines","Antigua & Barbuda","St. Kitts & Nevis",
+  "Bahamas","Belize","Suriname","France","Germany","Spain","Italy","Netherlands",
+  "Brazil","Mexico","Nigeria","Ghana","South Africa","India","China","Australia",
+  "New Zealand","Japan"
+];
+
+function loadCountriesIntoSelect(id) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+
+  // Only populate if it's still on default state
+  if (sel.options.length <= 1) {
+    countries.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+function initCountries() {
+  loadCountriesIntoSelect("d_countryOfDeath");
+  loadCountriesIntoSelect("d_countryOfResidence");
+}
+
+/* ================================
+   REFERENCE NUMBER GENERATOR
+================================ */
+function generateRefNumber() {
+  const refEl = document.getElementById("d_refNumber");
+  if (!refEl) return;
+
+  if (!refEl.value) {
+    const rand = Math.floor(100000 + Math.random() * 900000);
+    refEl.value = "REF-" + rand;
+  }
+}
+
+/* ================================
+   INITIALIZE ON PAGE LOAD
+================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  initCountries();
+  generateRefNumber();
+});
+</script>
 </body>
 </html>
