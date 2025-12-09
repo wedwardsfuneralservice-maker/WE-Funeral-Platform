@@ -126,7 +126,7 @@
   transform: translateY(1px);
 }
 
-    
+
     /* SIDEBAR BRAND -------------------------------------- */
     .brand-block {
       display: flex;
@@ -408,7 +408,7 @@
   outline: none;
 }
 
-.form-input:focus, 
+.form-input:focus,
 .form-select:focus {
   border-color: #306cde;
   box-shadow: 0 0 0 2px rgba(48,108,222,0.25);
@@ -444,7 +444,7 @@
 .full-row {
   grid-column: 1 / -1;
 }
-    
+
 /* Small ID preview */
 .small-id {
   width: 90px;
@@ -647,7 +647,7 @@
       </select>
     </div>
 
-    
+
 
   </div>
 </div>
@@ -691,11 +691,11 @@
             <option value="other">Other</option>
         </select>
 
-        <input 
-            type="text" 
-            class="other-input" 
-            name="nok_otherText[]" 
-            placeholder="Please specify…" 
+        <input
+            type="text"
+            class="other-input"
+            name="nok_otherText[]"
+            placeholder="Please specify…"
             style="display:none;"
             required
         >
@@ -765,18 +765,32 @@
               <input type="text" name="copayer_fullName[]" required>
           </div>
 
-          <div>
-              <label>Relationship *</label>
-              <select name="copayer_relationship[]" required>
-                  <option value="">Select…</option>
-                  <option>Spouse</option>
-                  <option>Child</option>
-                  <option>Parent</option>
-                  <option>Relative</option>
-                  <option>Friend</option>
-                  <option value="other">Other</option>
-              </select>
-          </div>
+          <!-- Relationship -->
+         <div class="relationship-wrapper">
+      <label>Relationship *</label>
+      <div class="relationship-row">
+          <select name="nok_relationship[]" onchange="toggleOtherRelationship(this)" required>
+              <option value="">Select…</option>
+              <option>Spouse</option>
+              <option>Child</option>
+              <option>Parent</option>
+              <option>Sibling</option>
+              <option>Relative</option>
+              <option>Friend</option>
+              <option>Care-giver</option>
+              <option value="other">Other</option>
+          </select>
+
+          <input
+              type="text"
+              class="other-input"
+              name="nok_otherText[]"
+              placeholder="Please specify…"
+              style="display:none;"
+              required
+          >
+      </div>
+  </div>
 
           <div>
               <label>Phone *</label>
@@ -799,18 +813,18 @@
 
   </div>
 </div>
-    
+
 <div class="copayer-container"></div>
 
-<button type="button" 
-        class="add-copayer-btn" 
-        style="display:none;" 
+<button type="button"
+        class="add-copayer-btn"
+        style="display:none;"
         onclick="addCoPayerTo(this.closest('.nok-card'))">
     + Add Additional Co-Payer
 </button>
 
   </div>
-  
+
 
 </div>
 
@@ -822,7 +836,7 @@
     List primary and secondary contact persons responsible for arrangements.
   </p>
 
-  
+
 
 <!-- Co-Payers container -->
 <div id="copayerContainer"></div>
@@ -835,7 +849,7 @@
 <div id="nokContainer">
         <!-- NOK BLOCKS HERE (your existing layout stays the same) -->
     </div>
- 
+
 </section>
 
 <!-- SECTION 3 — FUNERAL TYPE -->
@@ -1078,7 +1092,7 @@ document.querySelectorAll(".nav-item").forEach((item, index) => {
   });
 });
 </script>
-  
+
 <script>
 /* ================================
    IMAGE PREVIEW HELPERS
@@ -1229,7 +1243,7 @@ function calculateAge() {
 
   document.getElementById("age").value = age + " years";
 }
-  
+
   document.addEventListener("DOMContentLoaded", () => {
   generateReferenceNumber();
 });
