@@ -809,6 +809,16 @@
 
       </div>
 
+      <div style="margin-bottom:20px;">
+      <label><strong>Is this person the primary payer?</strong></label>
+     <select id="primaryPayerSelect" onchange="handlePayerSelection(this)">
+          <option value="">Select…</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+          <option value="partial">Partial Payer</option>
+      </select>
+  </div>
+
       <button type="button" class="remove-nok" onclick="removeNok(this)">Remove</button>
 
   </div>
@@ -1325,7 +1335,7 @@ function handlePayerSelection(sel) {
             break;
 
         case "no":
-            addBtn.style.display = "none";
+            addBtn.style.display = "block";
             addCoPayerTo(nokCard);
             break;
 
