@@ -1319,13 +1319,20 @@ function toggleOtherRelationship(sel) {
 ================================ */
 function handlePayerSelection(sel) {
 
-    if (!sel) return;  // safety
+    if (!sel) return;
 
     const nokCard = sel.closest(".nok-card");
-    if (!nokCard) return;  // prevents your console error
 
+    // If this is inside a Co-Payer card, DO NOTHING (just accept selection)
+    if (nokCard.classList.contains("copayer-card")) {
+        return;
+    }
+
+    // Normal NOK behavior
     const coContainer = nokCard.querySelector(".copayer-container");
     const addBtn = nokCard.querySelector(".add-copayer-btn");
+
+    if (!coContainer || !addBtn) return;
 
     coContainer.innerHTML = "";
 
@@ -1335,10 +1342,6 @@ function handlePayerSelection(sel) {
             break;
 
         case "no":
-            addBtn.style.display = "block";
-            addCoPayerTo(nokCard);
-            break;
-
         case "partial":
             addBtn.style.display = "block";
             addCoPayerTo(nokCard);
@@ -1348,6 +1351,7 @@ function handlePayerSelection(sel) {
             addBtn.style.display = "none";
     }
 }
+
 
 
 /* ================================
@@ -1387,6 +1391,11 @@ function validateNokSection() {
     }
 
     showStep(2);
+}
+
+function removeNok(btn) {
+    const card = btn.closest(".nok-card");
+    if (card) card.remove();
 }
 
 
