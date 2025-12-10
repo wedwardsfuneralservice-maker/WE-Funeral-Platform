@@ -697,7 +697,7 @@
             name="nok_otherText[]"
             placeholder="Please specify…"
             style="display:none;"
-            required
+
         >
     </div>
 </div>
@@ -723,29 +723,32 @@
         <!-- ID FRONT -->
         <div>
             <label>ID Card Front</label>
-            <img class="small-id" id="idFrontPreview_NOK" />
-            <input type="file" name="nok_idFront[]" onchange="previewImage(this,'idFrontPreview_NOK')">
+            <img class="small-id nok-id-front" />
+            <input type="file" onchange="previewSiblingPreview(this, 'nok-id-front')">
+
         </div>
 
         <!-- ID BACK -->
         <div>
             <label>ID Card Back</label>
-            <img class="small-id" id="idBackPreview_NOK" />
-            <input type="file" name="nok_idBack[]" onchange="previewImage(this,'idBackPreview_NOK')">
+            <img class="small-id nok-id-back" />
+  <input type="file" onchange="previewSiblingPreview(this, 'nok-id-back')">
+
         </div>
 
         <!-- SIGNATURE -->
         <div>
             <label>Electronic Signature</label>
-            <img class="signature-preview" id="signaturePreview_NOK" />
-            <input type="file" name="nok_signature[]" onchange="previewImage(this,'signaturePreview_NOK')">
+            <img class="signature-preview nok-signature" />
+  <input type="file" onchange="previewSiblingPreview(this, 'nok-signature')">
+
         </div>
 
     </div>
 
     <div style="margin-bottom:20px;">
     <label><strong>Is this person the primary payer?</strong></label>
-   <select id="primaryPayerSelect" onchange="handlePayerSelection(this)">
+   <select class="primary-payer-select" onchange="handlePayerSelection(this)">
         <option value="">Select…</option>
         <option value="yes">Yes</option>
         <option value="no">No</option>
@@ -762,14 +765,14 @@
 
           <div>
               <label>Full Name *</label>
-              <input type="text" name="copayer_fullName[]" required>
+              <input type="text" name="copayer_fullName[]" required >
           </div>
 
           <!-- Relationship -->
          <div class="relationship-wrapper">
       <label>Relationship *</label>
       <div class="relationship-row">
-          <select name="nok_relationship[]" onchange="toggleOtherRelationship(this)" required>
+          <select name="nok_relationship[]" onchange="toggleOtherRelationship(this)" required >
               <option value="">Select…</option>
               <option>Spouse</option>
               <option>Child</option>
@@ -787,35 +790,32 @@
               name="nok_otherText[]"
               placeholder="Please specify…"
               style="display:none;"
-              required
+
           >
       </div>
   </div>
 
           <div>
               <label>Phone *</label>
-              <input type="text" name="copayer_phone[]" oninput="formatPhone(this)" required>
+              <input type="text" name="copayer_phone[]" oninput="formatPhone(this)"required >
           </div>
 
           <div>
               <label>Email</label>
-              <input type="email" name="copayer_email[]">
+              <input type="email" name="copayer_email[]"required>
           </div>
 
           <div>
               <label>Address</label>
-              <input type="text" name="copayer_address[]">
+              <input type="text" name="copayer_address[]"required>
           </div>
 
       </div>
 
-      <div style="margin-bottom:20px;">
+      <div style="margin-top:20px;">
       <label><strong>Is this person the primary payer?</strong></label>
-     <select id="primaryPayerSelect" onchange="handlePayerSelection(this)">
+     <select class="copayer-payer-select" onchange="handlePayerSelection(this)">
           <option value="">Select…</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-          <option value="partial">Partial Payer</option>
       </select>
   </div>
 
@@ -1066,20 +1066,26 @@ function injectStepButtons(index) {
     nav.appendChild(spacer);
   }
 
-// Next button
-if (index < sections.length - 1) {
-  const next = document.createElement("button");
-  next.className = "step-btn primary";
-  next.textContent = "Next →";
+  // Next button
+  if (index < sections.length - 1) {
+    const next = document.createElement("button");
+    next.className = "step-btn primary";
+    next.textContent = "Next →";
 
-  // SPECIAL HANDLING FOR NEXT OF KIN (section index = 1)
-  if (index === 1) {
-    next.onclick = () => validateNokSection();
-  } else {
-    next.onclick = () => showStep(index + 1);
-  }
+    // SPECIAL HANDLING FOR NEXT OF KIN (section index = 1)
+    if (index === 1) {
+      next.onclick = () => {
+        // Only NOK validation now – payer logic is inside validateNokSection
+        if (validateNokSection()) {
+          showStep(index + 1);
+        }
+      };
+    } else {
+      next.onclick = () => showStep(index + 1);
+    }
 
-  nav.appendChild(next);
+    nav.appendChild(next);
+
 
 } else {
 
@@ -1252,6 +1258,7 @@ function calculateAge() {
   }
 
   document.getElementById("age").value = age + " years";
+
 }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -1294,17 +1301,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+function toggleOtherRelationship(selectEl) {
+    const wrapper = selectEl.closest(".relationship-row");
+    if (!wrapper) return;
 
-/* ================================
-   FIXED “OTHER” RELATIONSHIP LOGIC
-================================ */
-function toggleOtherRelationship(sel) {
-    const row = sel.closest(".relationship-row");
-    const otherInput = row.querySelector(".other-input");
-
+    const otherInput = wrapper.querySelector(".other-input");
     if (!otherInput) return;
 
-    if (sel.value === "other") {
+    if (selectEl.value === "other") {
         otherInput.style.display = "inline-block";
         otherInput.required = true;
     } else {
@@ -1314,88 +1318,330 @@ function toggleOtherRelationship(sel) {
     }
 }
 
-/* ================================
-   FIXED CO-PAYER MECHANISM
-================================ */
-function handlePayerSelection(sel) {
-
-    if (!sel) return;
-
-    const nokCard = sel.closest(".nok-card");
-
-    // If this is inside a Co-Payer card, DO NOTHING (just accept selection)
-    if (nokCard.classList.contains("copayer-card")) {
-        return;
-    }
-
-    // Normal NOK behavior
-    const coContainer = nokCard.querySelector(".copayer-container");
-    const addBtn = nokCard.querySelector(".add-copayer-btn");
-
-    if (!coContainer || !addBtn) return;
-
-    coContainer.innerHTML = "";
-
-    switch (sel.value) {
-        case "yes":
-            addBtn.style.display = "none";
-            break;
-
-        case "no":
-        case "partial":
-            addBtn.style.display = "block";
-            addCoPayerTo(nokCard);
-            break;
-
-        default:
-            addBtn.style.display = "none";
-    }
-}
-
-
-
-/* ================================
-   CLONE CO-PAYER BLOCK INTO NOK
-================================ */
 function addCoPayerTo(nokCard) {
     const template = document.getElementById("copayerTemplate");
+    if (!template) return;
+
     const coContainer = nokCard.querySelector(".copayer-container");
+    if (!coContainer) return;
 
     const clone = template.cloneNode(true);
     clone.style.display = "block";
     clone.removeAttribute("id");
 
+    // Clear fields
+    clone.querySelectorAll("input").forEach(i => i.value = "");
+
+    // Fix remove button
+    const removeBtn = clone.querySelector(".remove-nok");
+    if (removeBtn) {
+        removeBtn.onclick = () => removeNok(removeBtn);
+    }
+
+    // Fix payer dropdown
+    const payerSel = clone.querySelector("select.copayer-payer-select");
+    if (payerSel) {
+        payerSel.onchange = () => handlePayerSelection(payerSel);
+    }
+
+    // Fix "Other" relationship dropdown
+    const relSel = clone.querySelector(".relationship-row select");
+    if (relSel) {
+        relSel.onchange = () => toggleOtherRelationship(relSel);
+    }
+
     coContainer.appendChild(clone);
+
+    // Reconfigure dropdowns
+    configureCoPayerDropdowns(nokCard);
 }
 
-/* ================================
-   NOK VALIDATION
-================================ */
-function validateNokSection() {
-    const blocks = document.querySelectorAll(".nok-card");
+  // DELETE the broken block ABOVE THIS LINE!
 
-    if (blocks.length === 0) {
-        alert("Please add at least one Next of Kin.");
+  function handlePayerSelection(sel) {
+    const card = sel.closest(".nok-card") || sel.closest(".copayer-card");
+    if (!card) return;
+
+    const isCoPayer = card.classList.contains("copayer-card");
+
+    // CASE 1 → Inside a main NOK card (primary payer dropdown)
+    if (!isCoPayer) {
+        const mainNok = card;
+        const coContainer = mainNok.querySelector(".copayer-container");
+        const addBtn = mainNok.querySelector(".add-copayer-btn");
+
+        if (!coContainer || !addBtn) return;
+
+        const value = sel.value;
+
+        if (value === "yes") {
+            // Main NOK is full payer → hide button, remove co-payers
+            addBtn.style.display = "none";
+
+            while (coContainer.firstChild) {
+                coContainer.removeChild(coContainer.firstChild);
+            }
+        }
+
+        else if (value === "no") {
+            // Must have a co-payer card
+            if (coContainer.children.length === 0) {
+                addCoPayerTo(mainNok);
+            }
+            addBtn.style.display = "block";
+
+            // First co-payer gets Yes/Partial; others get Partial only
+            configureCoPayerDropdowns(mainNok);
+        }
+
+        else if (value === "partial") {
+            // Similar to "no" but allows multiple partial payers
+            if (coContainer.children.length === 0) {
+                addCoPayerTo(mainNok);
+            }
+            addBtn.style.display = "block";
+            configureCoPayerDropdowns(mainNok);
+        }
+
         return;
     }
 
-    for (let block of blocks) {
-        const required = block.querySelectorAll("[required]");
-        for (let f of required) {
-            if (!f.value.trim()) {
-                alert("Please complete all required fields in the Next of Kin section.");
-                f.scrollIntoView({ behavior: "smooth", block: "center" });
-                return;
+    // CASE 2 → Inside a Co-Payer card
+    if (isCoPayer) {
+        const cpCard = card;
+        const mainNok = cpCard.closest(".nok-card:not(.copayer-card)");
+        if (!mainNok) return;
+
+        const coContainer = mainNok.querySelector(".copayer-container");
+        const addBtn = mainNok.querySelector(".add-copayer-btn");
+        if (!coContainer || !addBtn) return;
+
+        const coPayers = Array.from(coContainer.querySelectorAll(".copayer-card"));
+        const index = coPayers.indexOf(cpCard);
+        const value = sel.value;
+
+        // FIRST co-payer
+        if (index === 0) {
+            if (value === "yes") {
+                // First co-payer is full payer → cannot have others
+                addBtn.style.display = "none";
+
+                // Remove all other co-payers
+                for (let i = 1; i < coPayers.length; i++) {
+                    coPayers[i].remove();
+                }
+            }
+
+            else if (value === "partial") {
+                addBtn.style.display = "block";
+
+                // If this is the only co-payer → auto-add next
+                if (coPayers.length === 1) {
+                    addCoPayerTo(mainNok);
+                }
+
+                configureCoPayerDropdowns(mainNok);
+            }
+
+            else {
+                // Blank selection → restore add button if needed
+                addBtn.style.display = coPayers.length > 0 ? "block" : "none";
             }
         }
-    }
 
-    showStep(2);
+        // SECOND+ co-payers
+        else {
+            // Only partial payer allowed (your rules)
+            addBtn.style.display = "block";
+        }
+
+        return;
+    }
 }
 
+
+function configureCoPayerDropdowns(nokBlock) {
+    const coContainer = nokBlock.querySelector(".copayer-container");
+    if (!coContainer) return;
+
+    const copayers = Array.from(coContainer.querySelectorAll(".copayer-card"));
+
+    copayers.forEach((cp, index) => {
+        const sel = cp.querySelector("select.copayer-payer-select");
+        if (!sel) return;
+
+        // Save current selection
+        const current = sel.value;
+
+        // Rebuild options
+        sel.innerHTML = "";
+
+        if (index === 0) {
+            // FIRST Co-Payer: Yes + Partial
+            sel.insertAdjacentHTML(
+                "beforeend",
+                '<option value="">Select…</option>' +
+                '<option value="yes">Yes</option>' +
+                '<option value="partial">Partial Payer</option>'
+            );
+        } else {
+            // SECOND+ Co-Payers: Partial only
+            sel.insertAdjacentHTML(
+                "beforeend",
+                '<option value="">Select…</option>' +
+                '<option value="partial">Partial Payer</option>'
+            );
+        }
+
+        // Restore value if still valid
+        const validValues = ["yes", "partial", ""];
+        if (validValues.includes(current)) {
+            sel.value = current;
+        }
+    });
+}
+
+
+
+/* ================================
+   NOK VALIDATION
+   Rules:
+   1) NOK required fields + payer = Yes  → SUCCESS
+   2) NOK required fields + payer = No/Partial
+      AND all Co-Payer cards valid      → SUCCESS
+================================ */
+function validateNokSection() {
+  // Find the main NOK card (not a Co-Payer)
+  const nok = document.querySelector("#nokContainer .nok-card:not(.copayer-card)");
+  if (!nok) {
+    alert("A Next of Kin entry is required.");
+    return false;
+  }
+
+  // --- 1. Validate ONLY NOK's own required fields (not co-payers) ---
+  const nokGrid = nok.querySelector(".nok-grid");
+  if (!nokGrid) {
+    alert("Internal layout error: NOK grid not found.");
+    return false;
+  }
+
+  const nokRequired = nokGrid.querySelectorAll("input[required], select[required], textarea[required]");
+  for (const f of nokRequired) {
+    if (!f.value || !f.value.toString().trim()) {
+      alert("Please complete all required fields for the Next of Kin.");
+      f.scrollIntoView({ behavior: "smooth", block: "center" });
+      f.focus();
+      return false;
+    }
+  }
+
+  // --- 2. Check NOK's primary payer selection ---
+  const nokPayer = nok.querySelector(".primary-payer-select");
+  if (!nokPayer || !nokPayer.value) {
+    alert("Please select if the Next of Kin is the primary payer.");
+    if (nokPayer) {
+      nokPayer.scrollIntoView({ behavior: "smooth", block: "center" });
+      nokPayer.focus();
+    }
+    return false;
+  }
+
+  const coContainer = nok.querySelector(".copayer-container");
+  const coPayers = coContainer ? Array.from(coContainer.querySelectorAll(".copayer-card")) : [];
+
+  // --------------------------------------------
+  // CASE 1 → NOK is full payer (YES)
+  // --------------------------------------------
+  if (nokPayer.value === "yes") {
+    // Co-payers are optional and NOT required in this case
+    return true;
+  }
+
+  // --------------------------------------------
+  // CASE 2 → NOK is NOT full payer (NO or PARTIAL)
+  // → Must have at least one valid Co-Payer
+  // --------------------------------------------
+  if (nokPayer.value === "no" || nokPayer.value === "partial") {
+    if (coPayers.length === 0) {
+      alert("This person is not the full payer. Please add at least one Co-Payer.");
+      return false;
+    }
+
+    // Validate each co-payer block
+    for (const cp of coPayers) {
+      // Required co-payer fields (full name, relationship, phone, email, address)
+      const cpRequired = cp.querySelectorAll("input[required], select[required], textarea[required]");
+
+      for (const f of cpRequired) {
+        if (!f.value || !f.value.toString().trim()) {
+          alert("Please complete all required fields in the Co-Payer section.");
+          f.scrollIntoView({ behavior: "smooth", block: "center" });
+          f.focus();
+          return false;
+        }
+      }
+
+      // Co-payer's own payer status (Yes / Partial depending on position)
+      const cpPayer = cp.querySelector(".copayer-payer-select");
+      if (!cpPayer || !cpPayer.value) {
+        alert("Each Co-Payer must have a payer status selected.");
+        if (cpPayer) {
+          cpPayer.scrollIntoView({ behavior: "smooth", block: "center" });
+          cpPayer.focus();
+        }
+        return false;
+      }
+    }
+
+    // All NOK + Co-Payers valid → OK
+    return true;
+  }
+
+  // Any other value would be unexpected
+  alert("Unexpected payer selection. Please choose Yes, No, or Partial.");
+  return false;
+}
+
+/* ---------------------------------
+   Optional extra rule – disabled
+   (kept to avoid breaking references)
+---------------------------------- */
+function validatePayerConditions() {
+  // Global rule turned off; all logic is in validateNokSection now.
+  return true;
+}
+
+
 function removeNok(btn) {
-    const card = btn.closest(".nok-card");
-    if (card) card.remove();
+  const card = btn.closest(".nok-card");
+  if (!card) return;
+
+  const parent = card.parentElement;
+  const mainNok = parent.closest(".nok-card:not(.copayer-card)");
+
+  card.remove();
+
+  // If ALL co-payers removed → show Add button again
+  if (parent.classList.contains("copayer-container") && parent.children.length === 0) {
+    const addBtn = mainNok ? mainNok.querySelector(".add-copayer-btn") : null;
+    if (addBtn) addBtn.style.display = "block";
+  }
+
+  if (mainNok) {
+    configureCoPayerDropdowns(mainNok);
+  }
+}
+
+function previewSiblingPreview(input, className) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    const img = input.closest("div").querySelector("." + className);
+    if (!img) return;
+
+    const reader = new FileReader();
+    reader.onload = e => img.src = e.target.result;
+    reader.readAsDataURL(file);
 }
 
 
